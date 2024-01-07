@@ -1,4 +1,5 @@
-import { Web5 } from "@web5/api";
+// import { Web5 } from "@web5/api";
+import { Web5 } from "@tbd54566975/web5";
 
 import AccountService from "~/services/account";
 
@@ -8,8 +9,16 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   };
   let web5: Web5;
   let did: string;
-  ({ web5, did } = await Web5.connect());
-
+  try {
+    console.log("connecting to web5");
+    ({ web5, did } = await Web5.connect({
+      techPreview: { dwnEndpoints: ["https://dwn.tbddev.org/dwn3"] },
+    }));
+    console.log({ did });
+  } catch (err) {
+    console.error("error from web5", err);
+    throw err;
+  }
   return {
     provide: {
       api: modules,
