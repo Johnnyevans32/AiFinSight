@@ -27,20 +27,13 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  modules: [
-    // ...
-    "@pinia/nuxt",
-  ],
+  modules: ["@pinia/nuxt"],
   pinia: {
     storesDirs: ["./stores/**", "./custom-folder/stores/**"],
   },
   build: {
-    transpile:
-      process.env.SSR === "enabled"
-        ? ["@headlessui/vue", "vue-clipboard3"]
-        : ["@headlessui/vue"],
+    transpile: ["@headlessui/vue"],
   },
-  ssr: process.env.SSR === "enabled",
   runtimeConfig: {
     public: {
       monoPublicKey: process.env.MONO_PUBLIC_KEY,
