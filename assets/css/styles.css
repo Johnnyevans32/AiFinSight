@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    --bg-bgbase: 255, 255, 255;
+    --bg-base: 31, 41, 55;
+    --bg-lightbase: 209, 213, 219;
+    --bg-hoverlightbase: 209, 213, 219;
+    --text-base: 31, 41, 55;
+    --text-lightbase: 209, 213, 219;
+    --border-base: 31, 41, 55;
+    --border-lightbase: 209, 213, 219;
+  }
+  .cherry {
+    --bg-bgbase: 255, 255, 255;
+    --bg-base: 255, 0, 0;
+    --bg-lightbase: 255, 160, 122;
+    --bg-hoverlightbase: 255, 160, 122;
+    --text-base: 255, 0, 0;
+    --text-lightbase: 255, 160, 122;
+    --border-base: 255, 0, 0;
+    --border-lightbase: 255, 160, 122;
+  }
+  .coffee {
+    --bg-bgbase: 255, 255, 255;
+    --bg-base: 120, 53, 15;
+    --bg-lightbase: 251, 191, 36;
+    --bg-hoverlightbase: 251, 191, 36;
+    --text-base: 120, 53, 15;
+    --text-lightbase: 251, 191, 36;
+    --border-base: 120, 53, 15;
+    --border-lightbase: 251, 191, 36;
+  }
+  .dark {
+    --bg-bgbase: 0, 0, 0;
+    --bg-base: 0, 0, 0;
+    --bg-lightbase: 38, 38, 38;
+    --bg-hoverlightbase: 31, 31, 31;
+    --text-base: 255, 255, 255;
+    --text-lightbase: 255, 255, 255;
+    --border-base: 0, 0, 0;
+    --border-lightbase: 169, 169, 169;
+  }
+}

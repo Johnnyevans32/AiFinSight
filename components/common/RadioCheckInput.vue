@@ -1,0 +1,85 @@
+<template>
+  <div>
+    <RadioGroup v-model="selectedOption" class="text-left space-y-1">
+      <RadioGroupLabel>Select {{ name }}:</RadioGroupLabel>
+      <div class="space-y-2">
+        <RadioGroupOption
+          as="template"
+          v-for="option in options"
+          :key="option"
+          :value="option"
+          v-slot="{ active, checked }"
+        >
+          <div
+            :class="[
+              active
+                ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-sky-300'
+                : '',
+              checked ? ' text-white ' : 'bg-base ',
+            ]"
+            class="cursor-pointer rounded-xl flex items-center justify-between px-5 py-1 w-full border-2 border-base bg-lightbase focus:outline-none"
+          >
+            <RadioGroupLabel as="p" class="text-base">
+              {{ option }}
+            </RadioGroupLabel>
+
+            <div class="text-base text-3xl">
+              <font-awesome-icon
+                v-if="checked"
+                icon="fa-solid fa-circle-check"
+              />
+              <font-awesome-icon
+                v-else
+                icon="fa-solid fa-circle-minus"
+                class="text-white"
+              />
+            </div>
+          </div>
+        </RadioGroupOption>
+      </div>
+    </RadioGroup>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, type PropType } from "vue";
+import {
+  RadioGroup,
+  RadioGroupLabel,
+  RadioGroupDescription,
+  RadioGroupOption,
+} from "@headlessui/vue";
+
+export default defineComponent({
+  components: {
+    RadioGroup,
+    RadioGroupLabel,
+    RadioGroupDescription,
+    RadioGroupOption,
+  },
+  emits: ["changeOption"],
+  props: {
+    options: {
+      type: Array as PropType<string[]>,
+      default: [],
+    },
+    name: {
+      type: String,
+    },
+    selected: {
+      type: String,
+    },
+  },
+  setup(props, ctx) {
+    const selectedOption = ref(props.selected || props.options[0]);
+
+    watch(selectedOption, (newVal, prevVal) => {
+      ctx.emit("changeOption", newVal);
+    });
+
+    return {
+      selectedOption,
+    };
+  },
+});
+</script>

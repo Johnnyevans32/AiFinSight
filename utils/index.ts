@@ -1,0 +1,115 @@
+import moment from "moment";
+import { TransactionCategory } from "~/types/mono";
+
+export const formatMoney = (value: number) =>
+  value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+export const formatDate = (date: string, format = "MMM Do YY") =>
+  moment(date).format(format);
+
+export const groupByDate = <T>(array: T[], dateField: keyof T) => {
+  return array.reduce((result: Record<string, T[]>, item: T) => {
+    const key = formatDate(item[dateField] as string);
+    if (!result[key]) {
+      result[key] = [];
+    }
+    result[key].push(item);
+    return result;
+  }, {});
+};
+export const truncateString = (data: string) =>
+  `${data.substring(0, 7)}...${data.slice(data.length - 4)}`;
+
+export const generateIconMap = (category: TransactionCategory) => {
+  const categoryIconMap = {
+    [TransactionCategory.BETTING_PAYOUT]: "fas fa-coins",
+    [TransactionCategory.BETTING_DEPOSIT]: "fas fa-coins",
+    [TransactionCategory.BILLS]: "fas fa-file-invoice-dollar",
+    [TransactionCategory.CASH_DEPOSIT]: "fas fa-money-bill-wave-alt",
+    [TransactionCategory.CASH_WITHDRAWAL]: "fas fa-money-bill-wave",
+    [TransactionCategory.CHEQUE]: "fas fa-money-check",
+    [TransactionCategory.CHEQUE_DEPOSITS]: "fas fa-money-check",
+    [TransactionCategory.EDUCATION]: "fas fa-graduation-cap",
+    [TransactionCategory.ENTERTAINMENT]: "fas fa-film",
+    [TransactionCategory.BANK_CHARGES]: "fas fa-money-bill",
+    [TransactionCategory.FOOD]: "fas fa-utensils",
+    [TransactionCategory.GIFTS_AND_DONATIONS]: "fas fa-gift",
+    [TransactionCategory.GROCERIES]: "fas fa-shopping-basket",
+    [TransactionCategory.HEALTH]: "fas fa-medkit",
+    [TransactionCategory.INTEREST_RECEIVED]: "fas fa-hand-holding-usd",
+    [TransactionCategory.INVESTMENT_PAYOUT]: "fas fa-chart-line",
+    [TransactionCategory.INVESTMENT_DEPOSIT]: "fas fa-chart-line",
+    [TransactionCategory.LEISURE_ACTIVITIES_TRAVELING]: "fas fa-plane",
+    [TransactionCategory.LOANS]: "fas fa-hand-holding-usd",
+    [TransactionCategory.LOAN_REPAYMENTS]: "fas fa-hand-holding-usd",
+    [TransactionCategory.OTHER_OUTGOING_PAYMENTS]: "fas fa-money-bill-alt",
+    [TransactionCategory.ONLINE_PAYMENTS]: "fas fa-globe",
+    [TransactionCategory.OTHER_INCOMING_PAYMENTS]: "fas fa-hand-holding-usd",
+    [TransactionCategory.OTHER_INCOMING_PAYMENTS_FROM_EMPLOYER]:
+      "fas fa-hand-holding-usd",
+    [TransactionCategory.PERSONAL_CARE]: "fas fa-user",
+    [TransactionCategory.PERSONAL_TRANSFER]: "fas fa-exchange-alt",
+    [TransactionCategory.PHONE_AND_INTERNET]: "fas fa-phone",
+    [TransactionCategory.RENT_AND_MAINTENANCE]: "fas fa-home",
+    [TransactionCategory.RETURNED_DEBIT]: "fas fa-hand-holding-usd",
+    [TransactionCategory.SALARY]: "fas fa-hand-holding-usd",
+    [TransactionCategory.SAVINGS]: "fas fa-piggy-bank",
+    [TransactionCategory.TRANSPORT]: "fas fa-bus",
+    [TransactionCategory.UTILITY_SERVICES]: "fas fa-bolt",
+    [TransactionCategory.UNKNOWN]: "fas fa-question-circle",
+  };
+  return (
+    categoryIconMap[category] || categoryIconMap[TransactionCategory.UNKNOWN]
+  );
+};
+
+type SortDirection = "ascending" | "descending";
+
+export const paginate = <T>(
+  data: T[],
+  pageNumber: number,
+  itemsPerPage = 10,
+  sortColumnName: keyof T,
+  sortDirection: SortDirection = "descending"
+): T[] => {
+  const sortMethod = (a: T, b: T): number => {
+    const aValue = a[sortColumnName];
+    const bValue = b[sortColumnName];
+
+    if (sortColumnName === "date") {
+      return sortDirection === "ascending"
+        ? moment(aValue as string).diff(moment(bValue as string))
+        : moment(bValue as string).diff(moment(aValue as string));
+    }
+
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return sortDirection === "ascending" ? aValue - bValue : bValue - aValue;
+    }
+
+    const compareResult = String(aValue).localeCompare(String(bValue));
+    return sortDirection === "ascending" ? compareResult : -compareResult;
+  };
+
+  const sortedData = data.slice().sort(sortMethod);
+
+  const startIndex = pageNumber * itemsPerPage - itemsPerPage;
+  const endIndex = pageNumber * itemsPerPage;
+
+  return sortedData.slice(startIndex, endIndex);
+};
+
+export const generateMailToLink = () => {
+  const subject = encodeURIComponent("issue with AiFinSight");
+  const email = "evanseburu32@gmail.com";
+  return `mailto:${email}?subject=${subject}`;
+};
+
+export const shortenString = (str: string, maxLength = 20) => {
+  if (str.length <= maxLength) {
+    return str;
+  }
+  return str.substring(0, maxLength) + "...";
+};
