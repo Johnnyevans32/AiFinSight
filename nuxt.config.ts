@@ -34,6 +34,7 @@ export default defineNuxtConfig({
   build: {
     transpile: ["@headlessui/vue"],
   },
+  ssr: false,
   runtimeConfig: {
     public: {
       monoPublicKey: process.env.MONO_PUBLIC_KEY,

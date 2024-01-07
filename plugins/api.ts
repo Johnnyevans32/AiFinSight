@@ -8,9 +8,8 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   };
   let web5: Web5;
   let did: string;
-  console.log("connecting to web5 ");
   ({ web5, did } = await Web5.connect());
-  console.log({ did });
+
   return {
     provide: {
       api: modules,

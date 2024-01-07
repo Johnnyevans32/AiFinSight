@@ -1,4 +1,3 @@
-import { notify } from "@kyvg/vue3-notification";
 import { DateSort } from "@tbd54566975/dwn-sdk-js";
 
 export function useAppVueUtils() {
