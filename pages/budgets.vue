@@ -48,7 +48,7 @@
           </div>
         </div>
 
-        <div v-if="!budgets.length">
+        <div v-if="!budgets.length" class="text-center">
           <font-awesome-icon
             class="text-7xl mb-5"
             icon="fa-solid fa-magnifying-glass-dollar"
