@@ -63,7 +63,7 @@
           )"
           :key="budget.recordId"
           @click="viewSingleBudget(budget)"
-          class="p-5 flex space-x-3 items-center rounded-xl text-base bg-lightbase"
+          class="cursor-pointer p-5 flex space-x-3 items-center rounded-xl text-base bg-lightbase"
         >
           <font-awesome-icon
             :icon="generateIconMap(budget.category)"

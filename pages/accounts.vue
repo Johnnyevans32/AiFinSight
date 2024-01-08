@@ -26,16 +26,18 @@
           v-else
           v-for="account in accounts"
           :key="account.recordId"
-          class="p-5 flex items-center h-16 justify-between rounded-xl text-base bg-lightbase"
+          class="cursor-pointer p-5 flex items-center h-16 justify-between rounded-xl text-base bg-lightbase"
+          @click="viewSingleAccount(account)"
         >
           <div class="flex space-x-3 items-center">
             <img
               :src="account.bankLogo"
-              width="30"
+              width="60"
               :alt="`${account.bankName.toLowerCase()} logo`"
             />
             <div class="flex flex-col text-left">
               <span class="capitalize font-bold">{{ account.bankName }}</span>
+              <span class="">{{ account.accountNumber }}</span>
             </div>
           </div>
           <span class="capitalize text-sm"
@@ -44,6 +46,58 @@
         </div>
       </div>
     </div>
+    <CommonModal
+      :open="viewSingleAccountModal"
+      title="Account Details"
+      @change-modal-status="changeModalStatus"
+    >
+      <div class="flex flex-col gap-2">
+        <img
+          :src="modalAccount?.bankLogo"
+          width="100"
+          :alt="`${modalAccount?.bankName.toLowerCase()} logo`"
+        />
+        <div class="flex flex-col">
+          <span>Bank Name:</span>
+          <span class="font-bold">{{ modalAccount?.bankName }}</span>
+        </div>
+
+        <div class="flex flex-col">
+          <span>Account Name</span>
+          <span class="font-bold">{{ modalAccount?.accountName }}</span>
+        </div>
+
+        <div class="flex flex-col">
+          <span>Account Number</span>
+          <span class="font-bold">{{ modalAccount?.accountNumber }}</span>
+        </div>
+
+        <div class="flex flex-col">
+          <span>Account Balance</span>
+          <span class="font-bold"
+            >{{ modalAccount?.currencySign }}
+            {{ formatMoney(modalAccount?.balance || 0) }}</span
+          >
+        </div>
+
+        <div
+          class="mt-5 flex space-x-3 font-bold border-t-[1px] border-base pt-5"
+        >
+          <CommonButton
+            text="Unlink Account"
+            @btn-action="unlinkAccount"
+            :disabled="true"
+            custom-css="bg-red-400 w-full"
+            :loading="unlinkeBtnLoading"
+          />
+          <CommonButton
+            text="Close Modal"
+            @btn-action="viewSingleAccountModal = false"
+            custom-css="bg-green-400 w-full"
+          />
+        </div>
+      </div>
+    </CommonModal>
   </div>
 </template>
 <script lang="ts">
@@ -67,6 +121,10 @@ export default defineComponent({
     const { $api } = useNuxtApp();
     const { createRecord, $launchMono, findRecords } = useAppVueUtils();
     const { accounts } = storeToRefs(useAppStore());
+    const viewSingleAccountModal = ref(false);
+    const unlinkeBtnLoading = ref(false);
+    const modalAccount = ref<AccountDTO | null>(null);
+
     const {
       setAccounts,
       setAssets,
@@ -150,7 +208,31 @@ export default defineComponent({
       $launchMono(options);
     };
 
-    return { accounts, launchMono };
+    const changeModalStatus = (newVal: boolean) => {
+      viewSingleAccountModal.value = newVal;
+    };
+
+    const viewSingleAccount = (account: AccountDTO) => {
+      modalAccount.value = account;
+      viewSingleAccountModal.value = true;
+    };
+
+    const unlinkAccount = () => {
+      notify({
+        type: "info",
+        title: "feature not avaiable at the moment ",
+      });
+    };
+    return {
+      accounts,
+      launchMono,
+      viewSingleAccountModal,
+      unlinkeBtnLoading,
+      modalAccount,
+      changeModalStatus,
+      viewSingleAccount,
+      unlinkAccount,
+    };
   },
 });
 </script>

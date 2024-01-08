@@ -6,7 +6,9 @@
           <CommonPageBar mainPage="Finance Genie" />
         </div>
         <div class="mb-5 grid grid-cols-2 justify-items-start">
-          <h1 class="text-xl font-bold">Personalized Financial Assistant</h1>
+          <h1 class="text-xl font-bold text-left">
+            Personalized Financial Assistant
+          </h1>
         </div>
         <CommonFormInput
           v-model="prompt"
@@ -58,12 +60,19 @@ export default defineComponent({
         return "";
       }
       const transactionText = transactions.value
+        .slice(0, 10)
         .map((transaction) => {
           return `Transaction: ${transaction.narration} | Amount: ${
             transaction.amount
           } | Type: ${transaction.type} | Category: ${
             transaction.category || "Uncategorized"
-          } | Currency: ${transaction.currency}`;
+          } | Currency: ${
+            transaction.currency
+          } | Account Balance After Transaction | ${
+            transaction.balance
+          } |  Account Id: ${transaction.accountId} |  Date: ${
+            transaction.date
+          } `;
         })
         .join("\n");
 
@@ -75,7 +84,7 @@ export default defineComponent({
 
       const accountText = accounts.value
         .map((account) => {
-          return `Account: ${account.accountName} | Balance: ${account.balance} | Currency: ${account.currency}`;
+          return `Account Id: ${account.accountId} | Account: ${account.accountName} | Balance: ${account.balance} | Currency: ${account.currency}`;
         })
         .join("\n");
 
@@ -132,13 +141,14 @@ export default defineComponent({
       }
     };
 
-    const typeCharacter = (string: string) => {
+    const typeCharacter = (string: string, loop = false) => {
       const textArea = document.getElementById("block");
       if (textArea) {
         textArea.textContent = "";
         typed = new Typed(textArea, {
           strings: [string],
           showCursor: false,
+          loop,
         });
       }
     };
