@@ -2,7 +2,7 @@
   <div class="grid grid-cols-4 gap-y-4">
     <div class="col-span-4 md:col-start-2 md:col-span-2">
       <div class="grid grid-cols-1 gap-2 text-center p-5">
-        <div class="flex gap-4 text-center items-center justify-center">
+        <div class="flex gap-4 text-center items-center justify-between">
           <overview-card
             icon="fa-solid fa-shopping-cart"
             :value="

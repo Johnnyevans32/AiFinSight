@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex justify-between items-center md:w-72 p-5 rounded-3xl border-2 border-b-8 bg-lightbase border-base"
+    class="flex justify-between items-center w-full p-5 rounded-3xl border-2 border-b-8 bg-lightbase border-base"
   >
     <div class="flex flex-col items-start gap-5">
       <font-awesome-icon :icon="icon" :class="labelIconClass" />
