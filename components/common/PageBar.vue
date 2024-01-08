@@ -1,5 +1,8 @@
 <template>
-  <a class="text-sm items-center font-bold capitalize" @click="router.back()">
+  <a
+    class="text-sm items-center font-bold capitalize cursor-pointer"
+    @click="router.back()"
+  >
     <font-awesome-icon icon="fa-solid fa-arrow-left" /> {{ mainPage }} /
     {{ currentPage }}
   </a>

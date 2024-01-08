@@ -18,7 +18,7 @@
           <li
             @click="routeTo(item.href)"
             role="tab"
-            class="mr-4 inline-block py-4 rounded-t-lg text-sm text-lightbase border-b-2 border-b-transparent"
+            class="cursor-pointer mr-4 inline-block py-4 rounded-t-lg text-sm text-lightbase border-b-2 border-b-transparent"
             v-bind:class="{ active: activeNavbar === item.name }"
             v-for="item in items"
             :key="item.name"
@@ -40,7 +40,7 @@
         :key="item.name"
         role="tab"
         v-bind:class="{ active: activeNavbar === item.name }"
-        class="w-full flex flex-col py-3 px-2 text-center hover:text-base transition duration-300"
+        class="cursor-pointer w-full flex flex-col py-3 px-2 text-center hover:text-base transition duration-300"
       >
         <font-awesome-icon :icon="item.icon" />
         <span class="text-xs">{{ item.name }}</span>

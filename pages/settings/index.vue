@@ -17,7 +17,7 @@
 
         <span
           v-if="myDid"
-          class="justify-self-center h-8 rounded-full w-40 bg-lightbase hover:bg-hoverlightbase p-2 flex items-center gap-2 justify-center"
+          class="cursor-pointer justify-self-center h-8 rounded-full w-40 bg-lightbase hover:bg-hoverlightbase p-2 flex items-center gap-2 justify-center"
           @click="copyDid"
           >{{ truncateString(myDid) }}
           <font-awesome-icon icon="fa-solid fa-copy"
@@ -27,7 +27,7 @@
           :key="setting.action"
           :to="setting.href"
           :target="setting.external ? '_blank' : ''"
-          class="flex items-center justify-between px-5 h-16 rounded-xl text-base bg-lightbase"
+          class="cursor-pointer flex items-center justify-between px-5 h-16 rounded-xl text-base bg-lightbase"
         >
           <div class="flex space-x-2 items-center">
             <div class="w-5">
