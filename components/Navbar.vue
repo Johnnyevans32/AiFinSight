@@ -83,9 +83,9 @@ export default defineComponent({
         href: "/budgets",
       },
       {
-        name: "Ask Ai",
-        icon: "fa-solid fa-user-tie",
-        href: "/ask-ai",
+        name: "Chat",
+        icon: "fa-solid fa-comments",
+        href: "/finance-genie",
       },
       {
         name: "Settings",

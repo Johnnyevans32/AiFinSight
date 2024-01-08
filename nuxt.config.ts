@@ -43,6 +43,7 @@ export default defineNuxtConfig({
     },
     monoApiUrl: "",
     monoSecretKey: "",
+    openaiApiKey: "",
   },
   vite: {
     plugins: [nodePolyfills()],

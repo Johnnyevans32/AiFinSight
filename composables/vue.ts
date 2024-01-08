@@ -81,7 +81,7 @@ export function useAppVueUtils() {
   const updateRecord = async (recordId: string, data: any, schema: string) => {
     const { record } = await $web5.dwn.records.read({
       message: {
-        filter: { recordId },
+        recordId,
       },
     });
     await record.update({ data });
@@ -101,7 +101,6 @@ export function useAppVueUtils() {
           schema: `http://some-schema-registry.org/${schema}`,
         },
         dateSort: DateSort.CreatedAscending,
-        pagination: { limit: itemsPerPage },
       },
     });
     const loadRecords = await Promise.all(

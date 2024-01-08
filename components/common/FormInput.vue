@@ -11,7 +11,7 @@
     />
     <span
       v-show="validationMessage"
-      :class="isErrorMessage ? `text-green-600` : `text-red-600`"
+      :class="isErrorMessage ? `text-red-600` : `text-green-600`"
     >
       {{ validationMessage }}
     </span>

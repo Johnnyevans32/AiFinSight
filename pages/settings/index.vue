@@ -56,6 +56,7 @@
 
 <script lang="ts">
 import { notify } from "@kyvg/vue3-notification";
+import useClipboard from "vue-clipboard3";
 
 import { defineComponent } from "vue";
 import { useAppStore } from "~/store";
@@ -65,6 +66,8 @@ export default defineComponent({
     const { $did } = useNuxtApp();
     const { appThemeColor } = storeToRefs(useAppStore());
     const myDid = ref<string>("");
+
+    const { toClipboard } = useClipboard();
 
     onBeforeMount(async () => {
       try {
@@ -91,11 +94,16 @@ export default defineComponent({
       },
     ]);
 
-    const copyDid = () => {
-      notify({
-        type: "success",
-        title: `copied`,
-      });
+    const copyDid = async () => {
+      try {
+        await toClipboard(myDid.value);
+        notify({
+          type: "success",
+          title: `copied`,
+        });
+      } catch (e) {
+        console.error(e);
+      }
     };
 
     return {

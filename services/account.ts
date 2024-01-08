@@ -116,6 +116,15 @@ class AccountService {
       meta: data,
     };
   }
+
+  async queryContextualGpt(context: string, prompt: string) {
+    const { useCustomFetch } = useAppVueUtils();
+    const response = await useCustomFetch<string>(`/api/contextual_gpt`, {
+      method: "post",
+      body: { context, prompt },
+    });
+    return response;
+  }
 }
 
 export default AccountService;
