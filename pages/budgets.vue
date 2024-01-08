@@ -294,15 +294,15 @@ export default defineComponent({
           currency: Currency.NGN,
           currencySign: currencySignMap[Currency.NGN],
         };
-        const { record } = await createRecord<BudgetDTO>(data, BUDGETS);
-        if (!record) {
+        const createdData = await createRecord<BudgetDTO>(data, BUDGETS);
+        if (!createdData) {
           notify({
             type: "error",
             title: "error creating budget",
           });
           return;
         }
-        setBudgets([...budgets.value, { ...data, recordId: record.id }]);
+        setBudgets([...budgets.value, createdData]);
       } finally {
         createBudgetBtnLoading.value = false;
         createBudgetModal.value = false;

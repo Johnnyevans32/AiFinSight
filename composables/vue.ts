@@ -48,14 +48,17 @@ export function useAppVueUtils() {
   };
 
   const createRecord = async <T>(data: T, schema: string) => {
-    const record = await $web5.dwn.records.create({
+    const { record } = await $web5.dwn.records.create({
       data,
       message: {
         schema: `http://some-schema-registry.org/${schema}`,
         dataFormat: "application/json",
       },
     });
-    return record;
+    if (!record) {
+      return;
+    }
+    return { ...data, recordId: record?.id };
   };
   const findRecords = async <T>(schema: string, recordId?: string) => {
     const { records } = await $web5.dwn.records.query({
