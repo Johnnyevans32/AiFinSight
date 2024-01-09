@@ -14,7 +14,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     ({ web5, did } = await Web5.connect({
       techPreview: { dwnEndpoints: ["https://dwn.tbddev.org/dwn3"] },
     }));
-    console.log({ did });
+    console.log("connected to web5");
   } catch (err) {
     console.error("error from web5", err);
     throw err;

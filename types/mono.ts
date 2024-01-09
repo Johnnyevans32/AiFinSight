@@ -26,12 +26,10 @@ export interface AccountStatement {
 }
 
 export type IAccountStatementResponse = {
-  meta: {
-    count: number;
-    requested_length?: number;
-    available_length: number;
-  };
-  data: AccountStatement[];
+  count: number;
+  requested_length?: number;
+  available_length: number;
+  statement: AccountStatement[];
 };
 
 export type IAccountTransactionResponse = {

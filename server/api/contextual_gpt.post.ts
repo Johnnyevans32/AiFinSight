@@ -10,8 +10,7 @@ export default defineEventHandler(async (event) => {
     const client = new OpenAI({
       apiKey: config.openaiApiKey,
     });
-    const answerToOutsideContextPrompts =
-      "I'm here to help with financial or administrative matters within my role. For topics beyond that scope, I might not have the information needed to provide accurate guidance.";
+    const answerToOutsideContextPrompts = "I have no idea boss";
 
     const response = await client.chat.completions.create({
       model: "gpt-3.5-turbo",

@@ -15,7 +15,7 @@
           title="Ask me anything about your finance:"
           :validation-message="promptErrorMsg"
           @keyup.enter="answerQuestion"
-          placeholder="What are the highest/lowest value transactions in the past month?"
+          placeholder="how much did i make last month?"
         />
         <div id="block" class="text-left text-base"></div>
         <span v-show="aiResponseLoading" class="text-left text-base"
@@ -32,10 +32,25 @@ import Typed from "typed.js";
 
 import { useAppStore } from "~/store";
 import { notify } from "@kyvg/vue3-notification";
+import moment from "moment";
 
+interface MonthlyTransaction {
+  income: number;
+  expenses: number;
+  differences: number;
+}
+
+interface MonthlyFigure {
+  period: string;
+  income: number;
+  expenses: number;
+  differences: number;
+}
 export default defineComponent({
   async setup() {
-    const { budgets, transactions, accounts } = storeToRefs(useAppStore());
+    const { budgets, transactions, accounts, assets } = storeToRefs(
+      useAppStore()
+    );
     const { $api } = useNuxtApp();
     const prompt = ref("");
     const promptErrorMsg = ref<string>("");
@@ -59,22 +74,41 @@ export default defineComponent({
       if (!transactions.value.length) {
         return "";
       }
-      const transactionText = transactions.value
-        .slice(0, 10)
-        .map((transaction) => {
-          return `Transaction: ${transaction.narration} | Amount: ${
-            transaction.amount
-          } | Type: ${transaction.type} | Category: ${
-            transaction.category || "Uncategorized"
-          } | Currency: ${
-            transaction.currency
-          } | Account Balance After Transaction | ${
-            transaction.balance
-          } |  Account Id: ${transaction.accountId} |  Date: ${
-            transaction.date
-          } `;
-        })
-        .join("\n");
+      const monthlyTransactions: Record<string, MonthlyTransaction> =
+        transactions.value.reduce((acc, transaction) => {
+          const transactionDate = moment(transaction.date);
+          const monthYear = transactionDate.format("YYYY-MM");
+
+          if (!acc[monthYear]) {
+            acc[monthYear] = {
+              income: 0,
+              expenses: 0,
+              differences: 0,
+            };
+          }
+
+          if (transaction.type === "credit") {
+            acc[monthYear].income += transaction.amount;
+          } else if (transaction.type === "debit") {
+            acc[monthYear].expenses += transaction.amount;
+          }
+
+          acc[monthYear].differences =
+            acc[monthYear].income - acc[monthYear].expenses;
+
+          return acc;
+        }, {} as Record<string, MonthlyTransaction>);
+
+      const monthlyFigures: MonthlyFigure[] = Object.entries(
+        monthlyTransactions
+      ).map(([monthYear, data]) => {
+        return {
+          period: monthYear,
+          income: data.income,
+          expenses: data.expenses,
+          differences: data.differences,
+        };
+      });
 
       const budgetText = budgets.value
         .map((budget) => {
@@ -84,19 +118,36 @@ export default defineComponent({
 
       const accountText = accounts.value
         .map((account) => {
-          return `Account Id: ${account.accountId} | Account: ${account.accountName} | Balance: ${account.balance} | Currency: ${account.currency}`;
+          return `Account: ${account.accountName} | Balance: ${account.balance} | Currency: ${account.currency}`;
+        })
+        .join("\n");
+
+      const assetText = assets.value
+        .map((asset) => {
+          return `Asset Name: ${asset.name} | type of asset: ${
+            asset.type || asset.meta.type
+          } | purchase price of asset: ${asset.price} | Currency: ${
+            asset.currency
+          } | Cost incurred on purchasing the asset: ${
+            asset.cost
+          } | quantity of asset owned: ${
+            asset.quantity
+          } | unrealized amount gained by the user: ${asset.return}`;
         })
         .join("\n");
 
       const context = `
-        User's Financial Context:
-        ${transactionText}
+        Monthly Financial Figures:
+        ${JSON.stringify(monthlyFigures)}
 
         User's Budgets:
         ${budgetText}
 
         User's Connected Bank Accounts:
         ${accountText}
+
+        User's Assets & Investments:
+        ${assetText}
       `;
 
       return context;

@@ -35,6 +35,7 @@ export type AccountAssetDTO = {
   recordId?: string;
   assetId: string;
   name: string;
+  type: string;
   cost: number;
   return: number;
   quantity: number;

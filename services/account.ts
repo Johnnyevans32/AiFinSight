@@ -32,13 +32,12 @@ class AccountService {
 
   async getAccountStatement(accountId: string) {
     const { useCustomFetch } = useAppVueUtils();
-    const { data } = await useCustomFetch<IAccountStatementResponse>(
-      `/api/accounts/${accountId}/statement`,
-      {
-        method: "get",
-      }
-    );
-    return data.map((d) => {
+    const { data } = await useCustomFetch<
+      AccountLinkProviderResponse<IAccountStatementResponse>
+    >(`/api/accounts/${accountId}/statement`, {
+      method: "get",
+    });
+    return data.statement.map((d) => {
       const currency = d.currency.toUpperCase() as Currency;
       return {
         accountId,
@@ -82,6 +81,7 @@ class AccountService {
         assetId: asset._id,
         name: asset.name,
         cost: asset.cost,
+        type: asset.type,
         return: asset.return,
         quantity: asset.quantity,
         currency,
