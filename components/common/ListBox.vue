@@ -1,7 +1,7 @@
 <template>
   <select
     v-model="selectedOption"
-    class="form-select rounded-xl p-2 border-2 border-base bg-lightbase"
+    class="form-select rounded-xl p-2 border-[1px] border-base bg-lightbase"
   >
     <option v-for="option in options" :key="option" :value="option">
       {{ option.replaceAll("_", " ") }}

@@ -1,3 +1,4 @@
+import { Currency } from "~/types/mono";
 import type {
   AccountDTO,
   AccountAssetDTO,
@@ -10,11 +11,17 @@ export enum AppThemeEnum {
   DARK = "dark",
   COFFEE = "coffee",
   CHERRY = "cherry",
+  WHITE = "white",
 }
 
 export const useAppStore = defineStore("appStore", () => {
   const appThemeColor = ref<string>("light");
   const loadingScreenEnabled = ref<boolean>(false);
+  const loadingScreenText = ref(
+    "Migrating financial data, it might take a while.... hang tight 👨🏽‍🔧"
+  );
+
+  const currency = ref(Currency.NGN);
 
   const accounts = ref<AccountDTO[]>([]);
   const assets = ref<AccountAssetDTO[]>([]);
@@ -23,6 +30,10 @@ export const useAppStore = defineStore("appStore", () => {
 
   function toggleAppTheme(theme: string) {
     appThemeColor.value = theme;
+  }
+
+  function setCurrency(_currency: Currency) {
+    currency.value = _currency;
   }
 
   function updateLoadingScreenStatus(status: boolean) {
@@ -51,11 +62,14 @@ export const useAppStore = defineStore("appStore", () => {
     budgets,
     appThemeColor,
     loadingScreenEnabled,
+    loadingScreenText,
+    currency,
     toggleAppTheme,
     updateLoadingScreenStatus,
     setTransactions,
     setAssets,
     setAccounts,
     setBudgets,
+    setCurrency,
   };
 });

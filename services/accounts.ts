@@ -93,7 +93,8 @@ class AccountService {
   }
 
   async getAccountDetail(accountId: string): Promise<AccountDTO> {
-    const { useCustomFetch, groupBy } = useAppVueUtils();
+    const { useCustomFetch, groupBy, extractBgColorsFromImage } =
+      useAppVueUtils();
     const { data } = await useCustomFetch<
       AccountLinkProviderResponse<AccountDetail>
     >(`/api/accounts/${accountId}/detail`, {
@@ -104,6 +105,13 @@ class AccountService {
     });
     const banksGroupedByCode = groupBy(banks, "code");
     const currency = data.currency.toUpperCase() as Currency;
+    const bankLogo = banksGroupedByCode[data.institution.bank_code]?.logo;
+
+    let result: any = {};
+    if (bankLogo) {
+      result = await extractBgColorsFromImage(bankLogo);
+    }
+
     return {
       accountId,
       bankName: data.institution.name,
@@ -111,7 +119,10 @@ class AccountService {
       accountNumber: data.account_number,
       accountName: data.name,
       currency,
-      bankLogo: banksGroupedByCode[data.institution.bank_code]?.logo,
+      bankLogo,
+      bankLogoMutedColor: result.mutedColor,
+      bankLogoTextColor: result.textColor,
+      bankLogoVibrantColor: result.vibrantColor,
       currencySign: currencySignMap[currency],
       meta: data,
     };

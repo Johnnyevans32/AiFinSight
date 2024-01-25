@@ -1,4 +1,12 @@
 import moment from "moment";
+import { ProtocolDefinition } from "@tbd54566975/dwn-sdk-js";
+
+import {
+  ACCOUNTS,
+  ACCOUNT_ASSETS,
+  ACCOUNT_TRANSACTIONS,
+  BUDGETS,
+} from "~/services/schemas";
 import { TransactionCategory } from "~/types/mono";
 
 export const formatMoney = (value: number) =>
@@ -112,4 +120,76 @@ export const shortenString = (str: string, maxLength = 20) => {
     return str;
   }
   return str.substring(0, maxLength) + "...";
+};
+
+export const schemaPathMap: any = {
+  [ACCOUNT_TRANSACTIONS]: `${ACCOUNTS}/${ACCOUNT_TRANSACTIONS}`,
+  [ACCOUNT_ASSETS]: `${ACCOUNTS}/${ACCOUNT_ASSETS}`,
+  [ACCOUNTS]: ACCOUNTS,
+  [BUDGETS]: BUDGETS,
+};
+
+export const protocolDefinition: ProtocolDefinition = {
+  protocol: "https://didcomm.org/finance-insight",
+  published: true,
+  types: {
+    ...Object.fromEntries(
+      [ACCOUNT_TRANSACTIONS, ACCOUNT_ASSETS, ACCOUNTS, BUDGETS].map(
+        (schema) => [
+          schema,
+          {
+            schema: `https://didcomm.org/finance-insight/schemas/${schema}.json`,
+            dataFormats: ["application/json"],
+          },
+        ]
+      )
+    ),
+  },
+  structure: {
+    [ACCOUNTS]: {
+      $actions: [
+        {
+          who: "author",
+          of: ACCOUNTS,
+          can: "read",
+        },
+        {
+          who: "anyone",
+          can: "write",
+        },
+      ],
+      ...Object.fromEntries(
+        [ACCOUNT_TRANSACTIONS, ACCOUNT_ASSETS].map((schema) => [
+          schema,
+          {
+            $actions: [
+              {
+                who: "author",
+                of: ACCOUNTS,
+                can: "write",
+              },
+              {
+                who: "author",
+                of: ACCOUNTS,
+                can: "read",
+              },
+            ],
+          },
+        ])
+      ),
+    },
+    [BUDGETS]: {
+      $actions: [
+        {
+          who: "author",
+          of: ACCOUNTS,
+          can: "read",
+        },
+        {
+          who: "anyone",
+          can: "write",
+        },
+      ],
+    },
+  },
 };

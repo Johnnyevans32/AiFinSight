@@ -1,33 +1,31 @@
 <template>
-  <div class="grid grid-cols-4 gap-y-4 h-screen">
+  <div class="grid grid-cols-4 gap-y-4 min-h-screen">
     <div class="col-span-4 md:col-start-2 md:col-span-2">
       <div class="grid grid-cols-1 gap-2 p-5">
-        <div class="mb-5 border-b-2 border-base text-left py-5">
+        <div class="mb-5 border-b-[1px] border-base text-left py-5">
           <CommonPageBar mainPage="Settings" />
         </div>
-        <div class="mb-5">
-          <h1 class="text-xl font-bold">Settings</h1>
-        </div>
+
         <img
           v-if="myDid"
           :src="`https://robohash.org/${myDid}`"
           alt="avatar"
-          class="w-28 h-28 rounded-full justify-self-center"
+          class="w-28 h-28 rounded-xl justify-self-center"
         />
 
         <span
           v-if="myDid"
-          class="cursor-pointer justify-self-center h-8 rounded-full w-40 bg-lightbase hover:bg-hoverlightbase p-2 flex items-center gap-2 justify-center"
+          class="cursor-pointer justify-self-center h-8 border-[1px] border-base rounded-xl w-40 bg-lightbase hover:bg-hoverlightbase p-2 flex items-center gap-2 justify-center"
           @click="copyDid"
           >{{ truncateString(myDid) }}
-          <font-awesome-icon icon="fa-solid fa-copy"
-        /></span>
+          <font-awesome-icon icon="fa-solid fa-copy" />
+        </span>
         <NuxtLink
           v-for="setting in settingsItems"
           :key="setting.action"
           :to="setting.href"
           :target="setting.external ? '_blank' : ''"
-          class="cursor-pointer flex items-center justify-between px-5 h-16 rounded-xl text-base bg-lightbase"
+          class="cursor-pointer flex items-center justify-between px-5 h-16 rounded-xl text-base bg-lightbase border-[1px] border-base"
         >
           <div class="flex space-x-2 items-center">
             <div class="w-5">
@@ -39,12 +37,12 @@
                 v-else
                 :src="setting.logo"
                 alt="qr"
-                class="w-10 rounded-full"
+                class="w-10 rounded-xl"
               />
             </div>
             <div class="flex flex-col text-left">
-              <span class="capitalize font-bold">{{ setting.action }}</span>
-              <span class="capitalize text-sm">{{ setting.value }}</span>
+              <span class="font-bold">{{ setting.action }}</span>
+              <span class="text-sm specialfont">{{ setting.value }}</span>
             </div>
           </div>
           <font-awesome-icon icon="fa-solid fa-arrow-right" />
@@ -56,33 +54,43 @@
 
 <script lang="ts">
 import { notify } from "@kyvg/vue3-notification";
-import useClipboard from "vue-clipboard3";
 
 import { defineComponent } from "vue";
 import { useAppStore } from "~/store";
 
 export default defineComponent({
   setup() {
+    useSeoMeta({
+      title: "Settings",
+      ogTitle: "Settings",
+    });
     const { $did } = useNuxtApp();
-    const { appThemeColor } = storeToRefs(useAppStore());
+    const { getCustomDwnEndpoint } = useAppVueUtils();
+    const { appThemeColor, currency } = storeToRefs(useAppStore());
     const myDid = ref<string>("");
 
-    const { toClipboard } = useClipboard();
-
-    onBeforeMount(async () => {
-      try {
-        myDid.value = $did;
-      } catch (err) {
-        console.log("before mount error", { err });
-      }
-    });
+    onBeforeMount(() => (myDid.value = $did));
     const settingsItems = ref([
+      {
+        logo: "server",
+        action: "dwn endpoint",
+        value: getCustomDwnEndpoint(),
+        logoType: "icon",
+        href: "/settings/dwn",
+      },
       {
         logo: "fa-solid fa-palette",
         action: "theme",
         value: appThemeColor.value,
         logoType: "icon",
         href: "/settings/theme",
+      },
+      {
+        logo: "dollar-sign",
+        action: "currency",
+        value: currency.value,
+        logoType: "icon",
+        href: "/settings/currency",
       },
       {
         logo: "fa-solid fa-bug",
@@ -96,7 +104,7 @@ export default defineComponent({
 
     const copyDid = async () => {
       try {
-        await toClipboard(myDid.value);
+        await navigator.clipboard.writeText(myDid.value);
         notify({
           type: "success",
           title: `copied`,

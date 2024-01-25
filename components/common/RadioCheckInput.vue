@@ -17,7 +17,7 @@
                 : '',
               checked ? ' text-white ' : 'bg-base ',
             ]"
-            class="cursor-pointer rounded-xl flex items-center justify-between px-5 py-1 w-full border-2 border-base bg-lightbase focus:outline-none"
+            class="cursor-pointer rounded-xl flex items-center justify-between px-5 py-1 w-full border-[1px] border-base bg-lightbase focus:outline-none"
           >
             <RadioGroupLabel as="p" class="text-base">
               {{ option }}

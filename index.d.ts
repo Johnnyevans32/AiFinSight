@@ -1,4 +1,4 @@
-import AccountService from "~/services/account";
+import AccountService from "~/services/accounts";
 
 interface ApiInstance {
   accountService: AccountService;

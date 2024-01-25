@@ -1,7 +1,7 @@
 <template>
-  <div class="grid grid-cols-4 gap-y-4">
+  <div class="grid grid-cols-4 gap-y-4 min-h-screen">
     <div class="col-span-4 md:col-start-2 md:col-span-2">
-      <div class="grid grid-cols-1 gap-2 text-center p-5">
+      <div class="grid grid-cols-1 gap-4 text-center p-5">
         <div class="flex gap-4 text-center items-center justify-between">
           <overview-card
             icon="fa-solid fa-shopping-cart"
@@ -9,7 +9,7 @@
               formatMoney(overviewData.thisMonth.expense[Currency.NGN] || 0)
             "
             :difference="overviewData.percentageDiff.expense[Currency.NGN] || 0"
-            label="this month expense"
+            label="Expense"
             :currency="currencySignMap[Currency.NGN]"
           />
 
@@ -19,21 +19,27 @@
               formatMoney(overviewData.thisMonth.income[Currency.NGN] || 0)
             "
             :difference="overviewData.percentageDiff.income[Currency.NGN] || 0"
-            label="this month income"
+            label="Income"
             :currency="currencySignMap[Currency.NGN]"
           />
         </div>
+        <CommonFormInput
+          v-model="searchQueryModel"
+          inputType="text"
+          :placeholder="String.fromCodePoint(0x1f50d) + ' search transactions'"
+          @keyup.enter="searchItem"
+        />
 
-        <div class="mb-5 grid grid-cols-2 justify-items-start">
-          <h1 class="text-xl font-bold">Transactions</h1>
-        </div>
-        <div v-if="!transactions.length">
+        <div v-if="!transactionsInPageView.length">
           <font-awesome-icon
             class="text-7xl mb-5"
             icon="fa-solid fa-magnifying-glass-dollar"
           />
           <p>No transactions yet</p>
-          <p>Your transactions will appear here once they arrive.</p>
+          <p>
+            Connect your bank accounts and start tracking your financial
+            activity to see insights here.
+          </p>
         </div>
         <div
           v-else
@@ -45,30 +51,47 @@
           <div
             v-for="txn in transactions"
             :key="txn.recordId"
-            class="p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase"
+            class="p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base"
             @click="viewSingleTransaction(txn)"
           >
             <div class="flex space-x-2 items-center">
-              <div class="text-xl">
+              <div class="text-sm transform translate-y-0">
+                <img
+                  v-if="accountsGroupedById[txn.accountId]"
+                  :src="accountsGroupedById[txn.accountId].bankLogo"
+                  class="w-10 h-10 rounded-xl justify-self-center"
+                  :alt="`${accountsGroupedById[
+                    txn.accountId
+                  ].bankName.toLowerCase()} logo`"
+                />
                 <font-awesome-icon
                   v-if="txn?.type === TransactionType.DEBIT"
-                  icon="fa-solid fa-square-caret-down"
-                  class="text-red-400"
+                  icon="fa-solid fa-circle-right"
+                  :style="{ transform: 'rotate(315deg)' }"
+                  class="text-red-600 rounded-xl bg-white absolute -bottom-[1px] -right-[1px] border-[1px] border-white"
                 />
                 <font-awesome-icon
                   v-else
-                  icon="fa-solid fa-square-caret-up"
-                  class="text-green-400"
+                  icon="fa-solid fa-circle-right"
+                  :style="{ transform: 'rotate(135deg)' }"
+                  class="text-green-600 rounded-xl bg-white absolute -bottom-[1px] -right-[1px] border-[1px] border-white"
                 />
               </div>
 
               <div class="flex flex-col text-left">
-                <span class="capitalize font-extrabold">{{ txn?.type }}</span>
+                <span class="capitalize font-extrabold">{{
+                  txn?.category?.replaceAll("_", " ") ||
+                  TransactionCategory.UNKNOWN
+                }}</span>
                 <span class="text-xs">{{ shortenString(txn.narration) }}</span>
               </div>
             </div>
             <div class="flex flex-col text-right">
-              <span class="font-bold"
+              <span
+                class="font-bold"
+                :class="
+                  txn?.type === TransactionType.CREDIT ? 'text-green-600' : ''
+                "
                 >{{ txn.currencySign }} {{ formatMoney(txn.amount) }}
               </span>
               <span class="font-thin text-sm"
@@ -78,80 +101,97 @@
           </div>
         </div>
         <CommonPaginationBar
-          v-show="transactions.length"
+          v-show="transactionsInPageView.length"
           :currentPage="currentPage"
-          :totalItems="transactions.length"
+          :totalItems="transactionsInPageView.length"
           @change-option="handlePageChange"
         />
       </div>
     </div>
     <CommonModal
+      v-if="modalTransaction"
       :open="updateTransactionModal"
       title="Transaction Details"
       @change-modal-status="changeModalStatus"
     >
-      <div class="flex flex-col gap-2">
-        <div class="flex flex-col">
-          <span
-            >You
-            {{
-              modalTransaction?.type === TransactionType.DEBIT
-                ? "sent"
-                : "received"
-            }}</span
-          >
-          <span class="font-bold"
-            >{{ modalTransaction?.currencySign }}
-            {{ formatMoney(modalTransaction?.amount || 0) }}</span
-          >
-        </div>
+      <template v-slot:content>
+        <div class="flex flex-col gap-2">
+          <div class="flex flex-col">
+            <span
+              >You
+              {{
+                modalTransaction?.type === TransactionType.DEBIT
+                  ? "sent"
+                  : "received"
+              }}:</span
+            >
+            <span class="font-bold"
+              >{{ modalTransaction?.currencySign }}
+              {{ formatMoney(modalTransaction?.amount || 0) }}</span
+            >
+          </div>
 
-        <div class="flex flex-col">
-          <span>Account Balance After:</span>
-          <span class="font-bold"
-            >{{ modalTransaction?.currencySign }}
-            {{ formatMoney(modalTransaction?.balance || 0) }}</span
-          >
-        </div>
+          <div class="flex flex-col">
+            <span>Source bank account:</span>
+            <span class="font-bold flex items-center gap-2">
+              <img
+                v-if="accountsGroupedById[modalTransaction.accountId]"
+                :src="accountsGroupedById[modalTransaction.accountId].bankLogo"
+                class="w-10 h-10 rounded-xl"
+                :alt="`${accountsGroupedById[
+                  modalTransaction.accountId
+                ].bankName.toLowerCase()} logo`"
+              />
+              {{
+                accountsGroupedById[modalTransaction.accountId]?.accountNumber
+              }}
+            </span>
+          </div>
+          <div class="flex flex-col">
+            <span>Bank account balance after:</span>
+            <span class="font-bold"
+              >{{ modalTransaction?.currencySign }}
+              {{ formatMoney(modalTransaction?.balance || 0) }}</span
+            >
+          </div>
 
-        <div class="flex flex-col">
-          <span>Description:</span>
-          <span class="font-bold">{{ modalTransaction?.narration }}</span>
-        </div>
+          <div class="flex flex-col">
+            <span>Description:</span>
+            <span class="font-bold">{{ modalTransaction?.narration }}</span>
+          </div>
 
-        <div class="flex flex-col">
-          <span>Date:</span>
-          <span class="font-bold">{{
-            modalTransaction?.date &&
-            formatDate(modalTransaction.date, "MMMM Do YYYY, h:mm:ss a")
-          }}</span>
-        </div>
+          <div class="flex flex-col">
+            <span>Date:</span>
+            <span class="font-bold">{{
+              modalTransaction?.date &&
+              formatDate(modalTransaction.date, "ddd, MMM Do YYYY, h:mm:ss a")
+            }}</span>
+          </div>
 
-        <div class="flex flex-col">
-          <span>Label transaction:</span>
-          <CommonListBox
-            :selected="modalTransaction?.category"
-            :options="Object.values(TransactionCategory)"
-            @change-option="handleModalTransactionCategoryChange"
-          />
+          <div class="flex flex-col">
+            <span>Label transaction:</span>
+            <CommonListBox
+              :selected="modalTransaction?.category"
+              :options="Object.values(TransactionCategory)"
+              @change-option="handleModalTransactionCategoryChange"
+            />
+          </div>
         </div>
+      </template>
 
-        <div
-          class="mt-5 flex space-x-3 font-bold border-t-[1px] border-base pt-5"
-        >
-          <CommonButton
-            text="Cancel"
-            @btn-action="updateTransactionModal = false"
-            custom-css="bg-red-400 w-full"
-          />
-          <CommonButton
-            text="Label Transaction"
-            @btn-action="updateTransaction"
-            custom-css="bg-green-400 w-full"
-            :loading="updateTransactionBtnLoading"
-          />
-        </div>
-      </div>
+      <template v-slot:footer>
+        <CommonButton
+          text="Cancel"
+          @btn-action="updateTransactionModal = false"
+          custom-css="bg-red-400 w-full"
+        />
+        <CommonButton
+          text="Label Transaction"
+          @btn-action="updateTransaction"
+          custom-css="bg-green-400 w-full"
+          :loading="updateTransactionBtnLoading"
+        />
+      </template>
     </CommonModal>
   </div>
 </template>
@@ -172,23 +212,45 @@ import { notify } from "@kyvg/vue3-notification";
 
 export default defineComponent({
   async setup() {
-    const { transactions } = storeToRefs(useAppStore());
+    const { transactions, accounts } = storeToRefs(useAppStore());
     const { setTransactions } = useAppStore();
-    const { updateRecord } = useAppVueUtils();
+    const { updateRecord, groupBy } = useAppVueUtils();
     const currentPage = ref(1);
 
+    const searchQueryModel = ref("");
     const updateTransactionModal = ref(false);
     const updateTransactionBtnLoading = ref(false);
     const modalTransaction = ref<AccountStatementDTO | null>(null);
 
+    const transactionsInPageView = ref<AccountStatementDTO[]>([]);
+
+    onBeforeMount(() => {
+      transactionsInPageView.value = transactions.value;
+    });
+
     const paginatedTransactions = computed(() => {
       return paginate<AccountStatementDTO>(
-        transactions.value,
+        transactionsInPageView.value,
         currentPage.value,
         10,
         "date"
       );
     });
+
+    const searchItem = () => {
+      const trimmedSearchQuery = searchQueryModel.value.trim();
+
+      const regex = new RegExp(trimmedSearchQuery, "gi");
+      transactionsInPageView.value = transactions.value.filter(
+        (txn) =>
+          regex.test(txn.category?.toString() || "") ||
+          regex.test(txn.narration)
+      );
+    };
+
+    const accountsGroupedById = computed(() =>
+      groupBy(accounts.value, "accountId")
+    );
 
     const formatedTransactions = computed<
       Record<string, AccountStatementDTO[]>
@@ -322,7 +384,6 @@ export default defineComponent({
     };
     return {
       TransactionType,
-      transactions,
       formatedTransactions,
       overviewData,
       ChartPeriodEnum,
@@ -338,6 +399,10 @@ export default defineComponent({
       TransactionCategory,
       handleModalTransactionCategoryChange,
       viewSingleTransaction,
+      accountsGroupedById,
+      searchQueryModel,
+      transactionsInPageView,
+      searchItem,
     };
   },
 });

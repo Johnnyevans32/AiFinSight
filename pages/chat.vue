@@ -1,18 +1,14 @@
 <template>
-  <div class="grid grid-cols-4 gap-y-4 h-screen">
+  <div class="grid grid-cols-4 gap-y-4 min-h-screen">
     <div class="col-span-4 md:col-start-2 md:col-span-2">
       <div class="grid grid-cols-1 gap-2 text-center p-5">
         <div class="mb-5 border-b-[1px] border-base text-left py-5">
-          <CommonPageBar mainPage="Finance Genie" />
+          <CommonPageBar mainPage="Chat" />
         </div>
-        <div class="mb-5 grid grid-cols-2 justify-items-start">
-          <h1 class="text-xl font-bold text-left">
-            Personalized Financial Assistant
-          </h1>
-        </div>
+
         <CommonFormInput
           v-model="prompt"
-          title="Ask me anything about your finance:"
+          title="Ask me anything about your finance"
           :validation-message="promptErrorMsg"
           @keyup.enter="answerQuestion"
           placeholder="how much did i make last month?"
@@ -40,14 +36,12 @@ interface MonthlyTransaction {
   differences: number;
 }
 
-interface MonthlyFigure {
-  period: string;
-  income: number;
-  expenses: number;
-  differences: number;
-}
 export default defineComponent({
   async setup() {
+    useSeoMeta({
+      title: "Chat",
+      ogTitle: "Chat",
+    });
     const { budgets, transactions, accounts, assets } = storeToRefs(
       useAppStore()
     );
@@ -77,7 +71,7 @@ export default defineComponent({
       const monthlyTransactions: Record<string, MonthlyTransaction> =
         transactions.value.reduce((acc, transaction) => {
           const transactionDate = moment(transaction.date);
-          const monthYear = transactionDate.format("YYYY-MM");
+          const monthYear = transactionDate.format("MMMM YYYY");
 
           if (!acc[monthYear]) {
             acc[monthYear] = {
@@ -99,16 +93,11 @@ export default defineComponent({
           return acc;
         }, {} as Record<string, MonthlyTransaction>);
 
-      const monthlyFigures: MonthlyFigure[] = Object.entries(
-        monthlyTransactions
-      ).map(([monthYear, data]) => {
-        return {
-          period: monthYear,
-          income: data.income,
-          expenses: data.expenses,
-          differences: data.differences,
-        };
-      });
+      const monthlyFigures = Object.entries(monthlyTransactions)
+        .map(([monthYear, data]) => {
+          return `Month and Year: ${monthYear} | Credits: ${data.income} | Debits: ${data.expenses}`;
+        })
+        .join("\n");
 
       const budgetText = budgets.value
         .map((budget) => {
@@ -138,7 +127,7 @@ export default defineComponent({
 
       const context = `
         Monthly Financial Figures:
-        ${JSON.stringify(monthlyFigures)}
+        ${monthlyFigures}
 
         User's Budgets:
         ${budgetText}

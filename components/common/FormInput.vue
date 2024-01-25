@@ -6,8 +6,8 @@
       :value="modelValue"
       @input="handleModelValueChangeAction($event)"
       :placeholder="placeholder"
-      :class="customCss"
-      class="form-input rounded-xl px-5 py-3 bg-lightbase w-full border-2 border-base"
+      :class="`${customCss} form-input rounded-xl px-5 py-3 bg-lightbase w-full border-[1px]
+    border-base`"
     />
     <span
       v-show="validationMessage"
@@ -46,7 +46,12 @@ export default defineComponent({
   emits: ["update:modelValue"],
   setup(props, ctx) {
     const handleModelValueChangeAction = (event: any) =>
-      ctx.emit("update:modelValue", event?.target?.value);
+      ctx.emit(
+        "update:modelValue",
+        props.inputType === "number"
+          ? Number(event?.target?.value)
+          : event?.target?.value
+      );
     return { handleModelValueChangeAction };
   },
 });

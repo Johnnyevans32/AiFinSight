@@ -1,9 +1,9 @@
 <template>
-  <div :class="appThemeColor" class="bg-bgbase">
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-
+  <div :class="appThemeColor" class="bg-bgbase text-base">
+    <Loading />
+    <Navbar />
+    <NuxtPage />
+    <FooterBar />
     <notifications position="top center" width="500px" animation-type="css">
       <template #body="props">
         <div
@@ -43,7 +43,7 @@
           <button
             type="button"
             @click="props.close"
-            class="ml-auto -mx-1.5 -my-1.5 text-white w-6 h-6 p-2 rounded-full focus:ring-2 focus:ring-gray-400 flex items-center justify-center"
+            class="ml-auto -mx-1.5 -my-1.5 text-white w-6 h-6 p-2 rounded-xl focus:ring-2 focus:ring-gray-400 flex items-center justify-center"
           >
             <font-awesome-icon icon="fa-solid fa-xmark" />
           </button>
@@ -70,8 +70,17 @@ import type {
 
 export default defineComponent({
   async setup() {
+    const config = useRuntimeConfig();
+    useHead({
+      titleTemplate: (titleChunk) => {
+        return titleChunk && titleChunk !== config.public.appName
+          ? `${config.public.appName}: ${titleChunk}`
+          : config.public.appName;
+      },
+    });
+
     const { appThemeColor } = storeToRefs(useAppStore());
-    const { findRecords } = useAppVueUtils();
+    const { findRecords, configureProtocol } = useAppVueUtils();
     const { setAccounts, setAssets, setTransactions } = useAppStore();
     onBeforeMount(async () => {
       try {
@@ -82,6 +91,8 @@ export default defineComponent({
         if (!document.querySelector(`[src="${monoJS}"]`)) {
           document.body.appendChild(script);
         }
+
+        await configureProtocol();
 
         const [dbAccounts, dbTransactions, dbAssets] = await Promise.all([
           findRecords<AccountDTO[]>(ACCOUNTS),
@@ -104,12 +115,11 @@ export default defineComponent({
 </script>
 
 <style>
-@font-face {
-  font-family: "Farfetch Basis Regular";
-  src: url("./assets/FarfetchBasisRegular.ttf") format("truetype");
-}
 html {
   font-family: "Farfetch Basis Regular";
+}
+.specialfont {
+  font-family: "Panchang", sans-serif;
 }
 
 *,

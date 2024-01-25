@@ -3,14 +3,14 @@
     <div class="col-span-4 md:col-start-2 md:col-span-2">
       <div class="grid grid-cols-1 gap-2 p-5">
         <div class="mb-5 border-b-[1px] border-base text-left py-5">
-          <CommonPageBar mainPage="Settings" currentPage="Theme" />
+          <CommonPageBar mainPage="Settings" currentPage="Currency" />
         </div>
         <div class="mb-5 text-left">
           <CommonRadioCheckInput
-            :selected="appThemeColor"
-            :options="themes"
-            name="app theme"
-            @change-option="handleThemeOptionChange"
+            :selected="currency"
+            :options="Object.values(Currency)"
+            name="currencies"
+            @change-option="handleCurrencyChange"
           />
         </div>
       </div>
@@ -19,9 +19,10 @@
 </template>
 
 <script lang="ts">
+import { Currency } from "~/types/mono";
 import { defineComponent } from "vue";
 
-import { AppThemeEnum, useAppStore } from "~/store";
+import { useAppStore } from "~/store";
 
 export default defineComponent({
   setup() {
@@ -29,17 +30,16 @@ export default defineComponent({
       title: "Settings",
       ogTitle: "Settings",
     });
-    const { toggleAppTheme } = useAppStore();
-    const { appThemeColor } = storeToRefs(useAppStore());
-    const themes = ref(Object.values(AppThemeEnum));
-    const handleThemeOptionChange = (newVal: string) => {
-      toggleAppTheme(newVal);
+    const { setCurrency } = useAppStore();
+    const { currency } = storeToRefs(useAppStore());
+    const handleCurrencyChange = (newVal: string) => {
+      setCurrency(newVal as Currency);
     };
 
     return {
-      themes,
-      appThemeColor,
-      handleThemeOptionChange,
+      currency,
+      Currency,
+      handleCurrencyChange,
     };
   },
 });

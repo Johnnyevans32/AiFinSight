@@ -1,13 +1,11 @@
 <template>
-  <div class="grid grid-cols-4 gap-y-4 h-screen">
+  <div class="grid grid-cols-4 gap-y-4 min-h-screen">
     <div class="col-span-4 md:col-start-2 md:col-span-2">
       <div class="grid grid-cols-1 gap-2 text-center p-5">
         <div class="mb-5 border-b-[1px] border-base text-left py-5">
           <CommonPageBar mainPage="Analysis" />
         </div>
-        <div class="mb-5 grid grid-cols-2 justify-items-start">
-          <h1 class="text-xl font-bold">Analysis</h1>
-        </div>
+
         <income-expenses-bar-chart :data="chartData" />
       </div>
     </div>
@@ -23,6 +21,10 @@ import { Currency, TransactionType } from "../types/mono";
 
 export default defineComponent({
   async setup() {
+    useSeoMeta({
+      title: "Analysis",
+      ogTitle: "Analysis",
+    });
     const { transactions } = storeToRefs(useAppStore());
 
     const chartData = computed(() => {

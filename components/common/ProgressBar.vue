@@ -1,9 +1,9 @@
 <template>
-  <div class="w-full bg-gray-200 rounded-full h-2.5">
+  <div class="w-full bg-gray-200 rounded-xl h-2.5">
     <div
       :class="progressBarColor"
-      class="h-2.5 rounded-full"
-      :style="'width:' + percentage + '%'"
+      class="h-2.5 rounded-xl"
+      :style="'width:' + Math.min(percentage, 100) + '%'"
     ></div>
   </div>
 </template>
@@ -21,11 +21,11 @@ export default defineComponent({
   setup(props, ctx) {
     const progressBarColor = computed(() => {
       if (props.percentage >= 70) {
-        return "bg-red-400";
+        return "bg-red-600";
       } else if (props.percentage >= 40 && props.percentage < 70) {
-        return "bg-yellow-400";
+        return "bg-yellow-600";
       } else {
-        return "bg-green-400";
+        return "bg-green-600";
       }
     });
 

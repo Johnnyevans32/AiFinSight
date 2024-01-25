@@ -5,11 +5,11 @@
   :root {
     --bg-bgbase: 255, 255, 255;
     --bg-base: 31, 41, 55;
-    --bg-lightbase: 209, 213, 219;
+    --bg-lightbase: 219, 223, 229;
     --bg-hoverlightbase: 209, 213, 219;
     --text-base: 31, 41, 55;
     --text-lightbase: 209, 213, 219;
-    --border-base: 31, 41, 55;
+    --border-base: 189, 193, 199;
     --border-lightbase: 209, 213, 219;
   }
   .cherry {
@@ -39,6 +39,16 @@
     --bg-hoverlightbase: 31, 31, 31;
     --text-base: 255, 255, 255;
     --text-lightbase: 255, 255, 255;
+    --border-base: 255, 255, 255;
+    --border-lightbase: 169, 169, 169;
+  }
+  .white {
+    --bg-bgbase: 255, 255, 255;
+    --bg-base: 255, 255, 255;
+    --bg-lightbase: 255, 255, 255;
+    --bg-hoverlightbase: 209, 213, 219;
+    --text-base: 0, 0, 0;
+    --text-lightbase: 209, 213, 219;
     --border-base: 0, 0, 0;
     --border-lightbase: 169, 169, 169;
   }

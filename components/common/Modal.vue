@@ -39,21 +39,26 @@
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div
-              class="inline-block transform overflow-hidden rounded-t-3xl md:rounded-b-3xl bg-bgbase px-4 py-5 h-full w-[50rem] text-left shadow-xl transition-all sm:align-middle"
+              class="inline-block transform overflow-hidden rounded-t-xl md:rounded-b-xl bg-bgbase py-3 h-full w-[50rem] text-left shadow-xl transition-all sm:align-middle"
             >
               <div
-                class="mb-5 pb-5 border-b-[1px] border-base flex items-center justify-between"
+                class="border-b-[1px] px-4 border-base flex items-center pb-3 justify-between"
               >
-                <h1 class="text-2xl font-black text-left">
+                <p class="font-black text-left">
                   {{ title }}
-                </h1>
+                </p>
                 <font-awesome-icon
                   icon="fa-solid fa-xmark"
-                  class="text-xl"
+                  class="bg-lightbase rounded-lg h-5 w-5 p-1"
                   @click="closeModal"
                 />
               </div>
-              <slot></slot>
+              <div class="p-4"><slot name="content"></slot></div>
+              <div
+                class="px-4 pt-3 flex gap-2 font-bold border-t-[1px] border-base"
+              >
+                <slot name="footer"></slot>
+              </div>
             </div>
           </TransitionChild>
         </div>

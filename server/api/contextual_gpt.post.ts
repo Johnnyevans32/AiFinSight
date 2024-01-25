@@ -17,15 +17,15 @@ export default defineEventHandler(async (event) => {
       messages: [
         {
           role: "system",
-          content: `Answer the question based on the context below, and if the question can\'t be answered based on the context, say "${answerToOutsideContextPrompts}"\n\n`,
+          content: `You are a virtual financial assistant. Answer questions based on the financial context provided. If a question can't be answered with the context, say "${answerToOutsideContextPrompts}"\n\n`,
         },
         {
           role: "user",
-          content: `Context: ${context}\n\n---\n\nQuestion: ${prompt}\nAnswer:`,
+          content: `Context:\n${context}\n\n---\n\nQuestion: ${prompt}\nAnswer:`,
         },
       ],
-      temperature: 0,
-      max_tokens: 150,
+      temperature: 0.7,
+      max_tokens: 250, // Adjust as needed
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,

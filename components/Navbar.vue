@@ -8,24 +8,24 @@
           v-if="myDid"
           :src="`https://robohash.org/${myDid}`"
           alt="avatar"
-          class="w-7 h-7 rounded-full"
+          class="w-7 h-7 rounded-xl"
         />
         <span class="text-xs">{{ formattedDid }}</span>
       </div>
 
       <div class="flex justify-center">
         <ul class="md:flex hidden">
-          <li
-            @click="routeTo(item.href)"
+          <NuxtLink
+            :to="item.href"
             role="tab"
-            class="cursor-pointer mr-4 inline-block py-4 rounded-t-lg text-sm text-lightbase border-b-2 border-b-transparent"
+            class="cursor-pointer mr-4 inline-block py-4 text-sm text-lightbase border-b-[1px] border-b-transparent"
             v-bind:class="{ active: activeNavbar === item.name }"
             v-for="item in items"
             :key="item.name"
           >
             <font-awesome-icon :icon="item.icon" />
             {{ item.name }}
-          </li>
+          </NuxtLink>
         </ul>
       </div>
     </nav>
@@ -34,9 +34,9 @@
     <nav
       class="md:hidden fixed bottom-0 inset-x-0 flex justify-between bg-bgbase text-lg text-lightbase border-t-[1px] border-base"
     >
-      <a
+      <NuxtLink
         v-for="item in items"
-        @click="routeTo(item.href)"
+        :to="item.href"
         :key="item.name"
         role="tab"
         v-bind:class="{ active: activeNavbar === item.name }"
@@ -44,7 +44,7 @@
       >
         <font-awesome-icon :icon="item.icon" />
         <span class="text-xs">{{ item.name }}</span>
-      </a>
+      </NuxtLink>
     </nav>
   </div>
 </template>
@@ -56,7 +56,6 @@ export default defineComponent({
   setup() {
     const { $did } = useNuxtApp();
 
-    const { routeTo } = useAppVueUtils();
     const route = useRoute();
     const myDid = ref<string>("");
 
@@ -85,7 +84,7 @@ export default defineComponent({
       {
         name: "Chat",
         icon: "fa-solid fa-comments",
-        href: "/finance-genie",
+        href: "/chat",
       },
       {
         name: "Settings",
@@ -95,13 +94,7 @@ export default defineComponent({
     ]);
     const accountMenuDropdownOn = ref(false);
 
-    onBeforeMount(async () => {
-      try {
-        myDid.value = $did;
-      } catch (err) {
-        console.log("before mount error", { err });
-      }
-    });
+    onBeforeMount(() => (myDid.value = $did));
 
     const formattedDid = computed<string>(() => truncateString(myDid.value));
 
@@ -122,7 +115,6 @@ export default defineComponent({
       items,
       accountMenuDropdownOn,
       activeNavbar,
-      routeTo,
       myDid,
       formattedDid,
     };

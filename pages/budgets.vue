@@ -1,26 +1,27 @@
 <template>
-  <div class="grid grid-cols-4 gap-y-4 h-screen">
+  <div class="grid grid-cols-4 gap-y-4 min-h-screen">
     <div class="col-span-4 md:col-start-2 md:col-span-2">
       <div class="grid grid-cols-1 gap-2 p-5">
-        <div class="mb-5 border-b-2 border-base text-left py-5">
+        <div class="mb-5 border-b-[1px] border-base text-left py-5">
           <CommonPageBar mainPage="Budgets" />
         </div>
-        <div class="mb-5">
+        <div class="mb-5 grid grid-cols-2 justify-items-start">
           <h1 class="text-xl font-bold">Budgets</h1>
+
+          <CommonButton
+            text="Create Budget"
+            @btn-action="createBudgetModal = true"
+            custom-css="justify-self-end"
+          />
         </div>
         <div
-          class="flex flex-col gap-2 p-5 rounded-3xl border-2 bg-lightbase border-base"
+          class="flex flex-col gap-2 p-5 rounded-xl border-[1px] bg-lightbase border-base"
         >
-          <div class="flex justify-between">
+          <div class="flex items-center justify-between">
             <div class="text-left">
               <p>Overall budget</p>
               <p>{{ budgetPeriod }}</p>
             </div>
-
-            <CommonButton
-              text="Create a budget"
-              @btn-action="createBudgetModal = true"
-            />
           </div>
           <CommonProgressBar
             :percentage="
@@ -32,7 +33,7 @@
           <div class="flex justify-between">
             <div class="flex flex-col text-left">
               <span>Amount Spent</span>
-              <span class="text-sm capitalize text-red-400"
+              <span class="text-sm capitalize text-red-600"
                 >{{ currencySignMap[Currency.NGN] }}
                 {{ formatMoney(formattedBudgets.overall.spent) }}</span
               >
@@ -51,10 +52,13 @@
         <div v-if="!budgets.length" class="text-center">
           <font-awesome-icon
             class="text-7xl mb-5"
-            icon="fa-solid fa-magnifying-glass-dollar"
+            icon="fa-solid fa-hand-holding-usd"
           />
-          <p>No budgets yet</p>
-          <p>Your budgets will appear here once they arrive.</p>
+          <p>Nothing to see here</p>
+          <p>
+            Start tracking your expenses by creating budgets based on your
+            transactions.
+          </p>
         </div>
         <div
           v-else
@@ -63,14 +67,14 @@
           )"
           :key="budget.recordId"
           @click="viewSingleBudget(budget)"
-          class="cursor-pointer p-5 flex space-x-3 items-center rounded-xl text-base bg-lightbase"
+          class="cursor-pointer px-5 py-3 flex space-x-3 items-center rounded-xl text-base bg-lightbase border-[1px] border-base"
         >
           <font-awesome-icon
             :icon="generateIconMap(budget.category)"
             class="text-xl"
           />
 
-          <div class="flex flex-col w-full gap-2 text-left">
+          <div class="flex flex-col w-full gap-1 text-left">
             <span class="capitalize font-bold">{{
               budget.category.replaceAll("_", " ")
             }}</span>
@@ -84,7 +88,7 @@
                 >{{ budget.currencySign }}
                 {{ formatMoney(budget.limit) }} limit</span
               >
-              <span class="capitalize text-sm"
+              <span class="text-sm"
                 >{{ budget.currencySign }}
                 {{
                   formatMoney(
@@ -103,7 +107,7 @@
       title="Create a Budget"
       @change-modal-status="changeModalStatus"
     >
-      <div>
+      <template v-slot:content>
         <div class="flex flex-col justify-between">
           <CommonFormInput
             v-model="limitModel"
@@ -117,58 +121,55 @@
             @change-option="handleBudgetCategoryChange"
           />
         </div>
-        <div
-          class="mt-5 flex space-x-3 font-bold border-t-[1px] border-base pt-5"
-        >
-          <CommonButton
-            text="Cancel"
-            @btn-action="createBudgetModal = false"
-            custom-css="bg-red-400 w-full"
-          />
-          <CommonButton
-            text="Create"
-            @btn-action="createBudget"
-            custom-css="bg-green-400 w-full"
-            :loading="createBudgetBtnLoading"
-          />
-        </div>
-      </div>
+      </template>
+      <template v-slot:footer>
+        <CommonButton
+          text="Cancel"
+          @btn-action="createBudgetModal = false"
+          custom-css="bg-red-400 w-full"
+        />
+        <CommonButton
+          text="Create"
+          @btn-action="createBudget"
+          custom-css="bg-green-400 w-full"
+          :loading="createBudgetBtnLoading"
+        />
+      </template>
     </CommonModal>
     <CommonModal
       :open="updateBudgetModal"
       title="Update Budget"
       @change-modal-status="changeModalStatus"
     >
-      <div class="flex flex-col gap-2">
-        <CommonFormInput
-          v-if="modalBudget?.limit"
-          v-model="modalBudget.limit"
-          inputType="number"
-          placeholder="0"
-          title="limit"
-        />
-        <CommonListBox
-          :selected="modalBudget?.category"
-          :options="Object.values(TransactionCategory)"
-          @change-option="handleBudgetCategoryUpdateChange"
-        />
-
-        <div
-          class="mt-5 flex space-x-3 font-bold border-t-[1px] border-base pt-5"
-        >
-          <CommonButton
-            text="Delete Budget"
-            @btn-action="deleteBudget"
-            custom-css="bg-red-400 w-full"
+      <template v-slot:content>
+        <div class="flex flex-col gap-2">
+          <CommonFormInput
+            v-if="modalBudget?.limit"
+            v-model="modalBudget.limit"
+            inputType="number"
+            placeholder="0"
+            title="limit"
           />
-          <CommonButton
-            text="Update Budget"
-            @btn-action="updateBudget"
-            custom-css="bg-green-400 w-full"
-            :loading="updateBudgetBtnLoading"
+          <CommonListBox
+            :selected="modalBudget?.category"
+            :options="Object.values(TransactionCategory)"
+            @change-option="handleBudgetCategoryUpdateChange"
           />
         </div>
-      </div>
+      </template>
+      <template v-slot:footer>
+        <CommonButton
+          text="Delete Budget"
+          @btn-action="deleteBudget"
+          custom-css="bg-red-400 w-full"
+        />
+        <CommonButton
+          text="Update Budget"
+          @btn-action="updateBudget"
+          custom-css="bg-green-400 w-full"
+          :loading="updateBudgetBtnLoading"
+        />
+      </template>
     </CommonModal>
   </div>
 </template>
@@ -185,6 +186,10 @@ import { notify } from "@kyvg/vue3-notification";
 
 export default defineComponent({
   async setup() {
+    useSeoMeta({
+      title: "Budgets",
+      ogTitle: "Budgets",
+    });
     const { findRecords, groupBy, createRecord, updateRecord, deleteRecord } =
       useAppVueUtils();
 
@@ -220,7 +225,6 @@ export default defineComponent({
           transaction.type === TransactionType.DEBIT &&
           !!transaction.category
       );
-
       const budgetsGroupedByCategory: Record<
         TransactionCategory,
         BudgetDTO & { amountSpentOnCategoryBudget?: number }
@@ -247,8 +251,8 @@ export default defineComponent({
       const overall = Object.values(budgetsGroupedByCategory).reduce(
         (acc, curr) => {
           return {
-            limit: acc.limit + Number(curr.limit || 0),
-            spent: acc.spent + Number(curr.amountSpentOnCategoryBudget || 0),
+            limit: acc.limit + (curr.limit || 0),
+            spent: acc.spent + (curr.amountSpentOnCategoryBudget || 0),
           };
         },
         {
@@ -324,12 +328,10 @@ export default defineComponent({
               updatedBudgets[i] = {
                 ...updatedBudgets[i],
                 ...modalBudget.value,
-                limit: Number(modalBudget.value.limit),
               };
               break;
             }
           }
-
           setBudgets(updatedBudgets);
 
           notify({
@@ -347,13 +349,10 @@ export default defineComponent({
         if (modalBudget.value && modalBudget.value.recordId) {
           deleteRecord(modalBudget.value.recordId, BUDGETS);
 
-          const updatedBudgets = budgets.value;
-          for (let i = 0; i < updatedBudgets.length; i++) {
-            if (updatedBudgets[i].recordId === modalBudget.value.recordId) {
-              updatedBudgets.splice(i, 1);
-              break;
-            }
-          }
+          const updatedBudgets = budgets.value.filter(
+            (budget) => budget.recordId !== modalBudget.value?.recordId
+          );
+
           setBudgets(updatedBudgets);
 
           notify({
@@ -373,6 +372,7 @@ export default defineComponent({
     };
 
     const viewSingleBudget = (budget: BudgetDTO) => {
+      delete budget.amountSpentOnCategoryBudget;
       modalBudget.value = budget;
       updateBudgetModal.value = true;
     };

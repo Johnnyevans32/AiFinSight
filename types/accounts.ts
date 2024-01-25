@@ -13,6 +13,9 @@ export type AccountDTO = {
   accountNumber: string;
   accountName: string;
   currency: Currency;
+  bankLogoVibrantColor?: string;
+  bankLogoMutedColor?: string;
+  bankLogoTextColor?: string;
   currencySign: string;
   meta: any;
 };
@@ -33,6 +36,7 @@ export type AccountStatementDTO = {
 };
 export type AccountAssetDTO = {
   recordId?: string;
+  accountId: string;
   assetId: string;
   name: string;
   type: string;
@@ -51,6 +55,7 @@ export type BudgetDTO = {
   limit: number;
   currency: Currency;
   currencySign: string;
+  amountSpentOnCategoryBudget?: number;
 };
 
 export const currencySignMap = {
