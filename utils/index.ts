@@ -110,9 +110,9 @@ export const paginate = <T>(
 };
 
 export const generateMailToLink = () => {
-  const subject = encodeURIComponent("issue with AiFinSight");
-  const email = "evanseburu32@gmail.com";
-  return `mailto:${email}?subject=${subject}`;
+  const config = useRuntimeConfig();
+  const subject = encodeURIComponent(`issue with ${config.public.appName}`);
+  return `mailto:${config.public.appContactEmail}?subject=${subject}`;
 };
 
 export const shortenString = (str: string, maxLength = 20) => {
