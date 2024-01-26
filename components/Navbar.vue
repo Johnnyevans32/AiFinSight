@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sticky top-0 z-10 bg-bgbase inset-x-0 px-4 py-2 border-b-[1px] md:border-b-0 border-base"
+    class="sticky top-0 z-10 bg-bgbase inset-x-0 px-4 py-2 md:py-0 border-b-[1px] md:border-b-0 border-base"
   >
     <nav class="grid grid-cols-3 justify-items-center">
       <div class="justify-self-start flex space-x-2 w-40 items-center">
@@ -124,6 +124,6 @@ export default defineComponent({
 
 <style scoped>
 [role="tab"].active {
-  @apply text-base border-b-base;
+  @apply text-base md:border-b-base;
 }
 </style>

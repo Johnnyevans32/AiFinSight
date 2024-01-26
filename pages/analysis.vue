@@ -1,15 +1,9 @@
 <template>
-  <div class="grid grid-cols-4 gap-y-4 min-h-screen">
-    <div class="col-span-4 md:col-start-2 md:col-span-2">
-      <div class="grid grid-cols-1 gap-2 text-center p-5">
-        <div class="mb-5 border-b-[1px] border-base text-left py-5">
-          <CommonPageBar mainPage="Analysis" />
-        </div>
-
-        <income-expenses-bar-chart :data="chartData" />
-      </div>
-    </div>
+  <div class="border-b-[1px] border-base text-left py-5">
+    <CommonPageBar mainPage="Analysis" />
   </div>
+
+  <income-expenses-bar-chart :data="chartData" />
 </template>
 
 <script lang="ts">

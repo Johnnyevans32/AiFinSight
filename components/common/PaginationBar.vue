@@ -1,17 +1,17 @@
 <template>
-  <div class="example-six">
+  <div class="example-six grid justify-center">
     <vue-awesome-paginate
       :total-items="totalItems"
       v-model="selectedOption"
       :items-per-page="itemsPerPage"
-      :max-pages-shown="5"
+      :max-pages-shown="3"
     >
       <template #prev-button>
-        <font-awesome-icon icon="fa-solid fa-arrow-right" />
+        <font-awesome-icon icon="arrow-right" />
       </template>
 
       <template #next-button>
-        <font-awesome-icon icon="fa-solid fa-arrow-right" />
+        <font-awesome-icon icon="arrow-right" />
       </template>
     </vue-awesome-paginate>
   </div>

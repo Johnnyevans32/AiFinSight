@@ -1,7 +1,7 @@
 <template>
   <select
     v-model="selectedOption"
-    class="form-select rounded-xl p-2 border-[1px] border-base bg-lightbase"
+    class="rounded-xl p-2 border-[1px] border-base bg-lightbase"
   >
     <option v-for="option in options" :key="option" :value="option">
       {{ option.replaceAll("_", " ") }}
@@ -11,20 +11,8 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue";
-import {
-  Listbox,
-  ListboxButton,
-  ListboxOptions,
-  ListboxOption,
-} from "@headlessui/vue";
 
 export default defineComponent({
-  components: {
-    Listbox,
-    ListboxButton,
-    ListboxOptions,
-    ListboxOption,
-  },
   emits: ["changeOption"],
   props: {
     options: {

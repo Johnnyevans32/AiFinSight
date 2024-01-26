@@ -1,199 +1,176 @@
 <template>
-  <div class="grid grid-cols-4 gap-y-4 min-h-screen">
-    <div class="col-span-4 md:col-start-2 md:col-span-2">
-      <div class="grid grid-cols-1 gap-4 text-center p-5">
-        <div class="flex gap-4 text-center items-center justify-between">
-          <overview-card
-            icon="fa-solid fa-shopping-cart"
-            :value="
-              formatMoney(overviewData.thisMonth.expense[Currency.NGN] || 0)
-            "
-            :difference="overviewData.percentageDiff.expense[Currency.NGN] || 0"
-            label="Expense"
-            :currency="currencySignMap[Currency.NGN]"
-          />
+  <div class="grid grid-cols-2 gap-4">
+    <overview-card
+      icon="fa-solid fa-shopping-cart"
+      :value="formatMoney(overviewData.thisMonth.expense[Currency.NGN] || 0)"
+      :difference="overviewData.percentageDiff.expense[Currency.NGN] || 0"
+      label="Expense"
+      :currency="currencySignMap[Currency.NGN]"
+    />
 
-          <overview-card
-            icon="fa-solid fa-money-bill-trend-up"
-            :value="
-              formatMoney(overviewData.thisMonth.income[Currency.NGN] || 0)
-            "
-            :difference="overviewData.percentageDiff.income[Currency.NGN] || 0"
-            label="Income"
-            :currency="currencySignMap[Currency.NGN]"
-          />
-        </div>
-        <CommonFormInput
-          v-model="searchQueryModel"
-          inputType="text"
-          :placeholder="String.fromCodePoint(0x1f50d) + ' search transactions'"
-          @keyup.enter="searchItem"
-        />
+    <overview-card
+      icon="fa-solid fa-money-bill-trend-up"
+      :value="formatMoney(overviewData.thisMonth.income[Currency.NGN] || 0)"
+      :difference="overviewData.percentageDiff.income[Currency.NGN] || 0"
+      label="Income"
+      :currency="currencySignMap[Currency.NGN]"
+    />
+  </div>
+  <CommonFormInput
+    v-model="searchQueryModel"
+    inputType="text"
+    :placeholder="String.fromCodePoint(0x1f50d) + ' search transactions'"
+    @keyup.enter="searchItem"
+  />
 
-        <div v-if="!transactionsInPageView.length">
+  <div v-if="!transactionsInPageView.length">
+    <font-awesome-icon
+      class="text-7xl mb-5"
+      icon="fa-solid fa-magnifying-glass-dollar"
+    />
+    <p>No transactions yet</p>
+    <p>
+      Connect your bank accounts and start tracking your financial activity to
+      see insights here.
+    </p>
+  </div>
+  <div
+    v-else
+    v-for="(transactions, date) in formatedTransactions"
+    :key="date"
+    class="text-left"
+  >
+    <span>{{ date }}</span>
+    <div
+      v-for="txn in transactions"
+      :key="txn.recordId"
+      class="p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base"
+      @click="viewSingleTransaction(txn)"
+    >
+      <div class="flex space-x-2 items-center">
+        <div class="text-sm transform translate-y-0">
+          <CommonImage
+            :image="accountsGroupedById[txn.accountId].bankLogo"
+            :alt="accountsGroupedById[txn.accountId].bankName"
+          />
           <font-awesome-icon
-            class="text-7xl mb-5"
-            icon="fa-solid fa-magnifying-glass-dollar"
+            v-if="txn?.type === TransactionType.DEBIT"
+            icon="fa-solid fa-circle-right"
+            :style="{ transform: 'rotate(315deg)' }"
+            class="text-red-600 rounded-xl bg-white absolute -bottom-[1px] -right-[1px] border-[1px] border-white"
           />
-          <p>No transactions yet</p>
-          <p>
-            Connect your bank accounts and start tracking your financial
-            activity to see insights here.
-          </p>
+          <font-awesome-icon
+            v-else
+            icon="fa-solid fa-circle-right"
+            :style="{ transform: 'rotate(135deg)' }"
+            class="text-green-600 rounded-xl bg-white absolute -bottom-[1px] -right-[1px] border-[1px] border-white"
+          />
         </div>
-        <div
-          v-else
-          v-for="(transactions, date) in formatedTransactions"
-          :key="date"
-          class="text-left"
-        >
-          <span>{{ date }}</span>
-          <div
-            v-for="txn in transactions"
-            :key="txn.recordId"
-            class="p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base"
-            @click="viewSingleTransaction(txn)"
-          >
-            <div class="flex space-x-2 items-center">
-              <div class="text-sm transform translate-y-0">
-                <img
-                  v-if="accountsGroupedById[txn.accountId]"
-                  :src="accountsGroupedById[txn.accountId].bankLogo"
-                  class="w-10 h-10 rounded-xl justify-self-center"
-                  :alt="`${accountsGroupedById[
-                    txn.accountId
-                  ].bankName.toLowerCase()} logo`"
-                />
-                <font-awesome-icon
-                  v-if="txn?.type === TransactionType.DEBIT"
-                  icon="fa-solid fa-circle-right"
-                  :style="{ transform: 'rotate(315deg)' }"
-                  class="text-red-600 rounded-xl bg-white absolute -bottom-[1px] -right-[1px] border-[1px] border-white"
-                />
-                <font-awesome-icon
-                  v-else
-                  icon="fa-solid fa-circle-right"
-                  :style="{ transform: 'rotate(135deg)' }"
-                  class="text-green-600 rounded-xl bg-white absolute -bottom-[1px] -right-[1px] border-[1px] border-white"
-                />
-              </div>
 
-              <div class="flex flex-col text-left">
-                <span class="capitalize font-extrabold">{{
-                  txn?.category?.replaceAll("_", " ") ||
-                  TransactionCategory.UNKNOWN
-                }}</span>
-                <span class="text-xs">{{ shortenString(txn.narration) }}</span>
-              </div>
-            </div>
-            <div class="flex flex-col text-right">
-              <span
-                class="font-bold"
-                :class="
-                  txn?.type === TransactionType.CREDIT ? 'text-green-600' : ''
-                "
-                >{{ txn.currencySign }} {{ formatMoney(txn.amount) }}
-              </span>
-              <span class="font-thin text-sm"
-                >{{ txn.currencySign }} {{ formatMoney(txn.balance) }}</span
-              >
-            </div>
-          </div>
+        <div class="flex flex-col text-left">
+          <span class="capitalize font-extrabold">{{
+            txn?.category?.replaceAll("_", " ") || TransactionCategory.UNKNOWN
+          }}</span>
+          <span class="text-xs">{{ shortenString(txn.narration) }}</span>
         </div>
-        <CommonPaginationBar
-          v-show="transactionsInPageView.length"
-          :currentPage="currentPage"
-          :totalItems="transactionsInPageView.length"
-          @change-option="handlePageChange"
-        />
+      </div>
+      <div class="flex flex-col text-right">
+        <span
+          class="font-bold"
+          :class="txn?.type === TransactionType.CREDIT ? 'text-green-600' : ''"
+          >{{ txn.currencySign }} {{ formatMoney(txn.amount) }}
+        </span>
+        <span class="font-thin text-sm"
+          >{{ txn.currencySign }} {{ formatMoney(txn.balance) }}</span
+        >
       </div>
     </div>
-    <CommonModal
-      v-if="modalTransaction"
-      :open="updateTransactionModal"
-      title="Transaction Details"
-      @change-modal-status="changeModalStatus"
-    >
-      <template v-slot:content>
-        <div class="flex flex-col gap-2">
-          <div class="flex flex-col">
-            <span
-              >You
-              {{
-                modalTransaction?.type === TransactionType.DEBIT
-                  ? "sent"
-                  : "received"
-              }}:</span
-            >
-            <span class="font-bold"
-              >{{ modalTransaction?.currencySign }}
-              {{ formatMoney(modalTransaction?.amount || 0) }}</span
-            >
-          </div>
-
-          <div class="flex flex-col">
-            <span>Source bank account:</span>
-            <span class="font-bold flex items-center gap-2">
-              <img
-                v-if="accountsGroupedById[modalTransaction.accountId]"
-                :src="accountsGroupedById[modalTransaction.accountId].bankLogo"
-                class="w-10 h-10 rounded-xl"
-                :alt="`${accountsGroupedById[
-                  modalTransaction.accountId
-                ].bankName.toLowerCase()} logo`"
-              />
-              {{
-                accountsGroupedById[modalTransaction.accountId]?.accountNumber
-              }}
-            </span>
-          </div>
-          <div class="flex flex-col">
-            <span>Bank account balance after:</span>
-            <span class="font-bold"
-              >{{ modalTransaction?.currencySign }}
-              {{ formatMoney(modalTransaction?.balance || 0) }}</span
-            >
-          </div>
-
-          <div class="flex flex-col">
-            <span>Description:</span>
-            <span class="font-bold">{{ modalTransaction?.narration }}</span>
-          </div>
-
-          <div class="flex flex-col">
-            <span>Date:</span>
-            <span class="font-bold">{{
-              modalTransaction?.date &&
-              formatDate(modalTransaction.date, "ddd, MMM Do YYYY, h:mm:ss a")
-            }}</span>
-          </div>
-
-          <div class="flex flex-col">
-            <span>Label transaction:</span>
-            <CommonListBox
-              :selected="modalTransaction?.category"
-              :options="Object.values(TransactionCategory)"
-              @change-option="handleModalTransactionCategoryChange"
-            />
-          </div>
-        </div>
-      </template>
-
-      <template v-slot:footer>
-        <CommonButton
-          text="Cancel"
-          @btn-action="updateTransactionModal = false"
-          custom-css="bg-red-400 w-full"
-        />
-        <CommonButton
-          text="Label Transaction"
-          @btn-action="updateTransaction"
-          custom-css="bg-green-400 w-full"
-          :loading="updateTransactionBtnLoading"
-        />
-      </template>
-    </CommonModal>
   </div>
+  <CommonPaginationBar
+    v-show="transactionsInPageView.length"
+    :currentPage="currentPage"
+    :totalItems="transactionsInPageView.length"
+    @change-option="handlePageChange"
+  />
+  <CommonModal
+    v-if="modalTransaction"
+    :open="updateTransactionModal"
+    title="Transaction details"
+    @change-modal-status="changeModalStatus"
+  >
+    <template v-slot:content>
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-col">
+          <span
+            >You
+            {{
+              modalTransaction?.type === TransactionType.DEBIT
+                ? "sent"
+                : "received"
+            }}:</span
+          >
+          <span class="font-bold"
+            >{{ modalTransaction?.currencySign }}
+            {{ formatMoney(modalTransaction?.amount || 0) }}</span
+          >
+        </div>
+
+        <div class="flex flex-col">
+          <span>Source bank account:</span>
+          <span class="font-bold flex items-center gap-2">
+            <CommonImage
+              :image="accountsGroupedById[modalTransaction.accountId].bankLogo"
+              :alt="accountsGroupedById[modalTransaction.accountId].bankName"
+            />
+            {{ accountsGroupedById[modalTransaction.accountId]?.accountNumber }}
+          </span>
+        </div>
+        <div class="flex flex-col">
+          <span>Bank account balance after:</span>
+          <span class="font-bold"
+            >{{ modalTransaction?.currencySign }}
+            {{ formatMoney(modalTransaction?.balance || 0) }}</span
+          >
+        </div>
+
+        <div class="flex flex-col">
+          <span>Description:</span>
+          <span class="font-bold">{{ modalTransaction?.narration }}</span>
+        </div>
+
+        <div class="flex flex-col">
+          <span>Date:</span>
+          <span class="font-bold">{{
+            modalTransaction?.date &&
+            formatDate(modalTransaction.date, "ddd, MMM Do YYYY, h:mm:ss a")
+          }}</span>
+        </div>
+
+        <div class="flex flex-col">
+          <span>Label transaction category:</span>
+          <CommonListBox
+            :selected="modalTransaction?.category"
+            :options="Object.values(TransactionCategory)"
+            @change-option="handleModalTransactionCategoryChange"
+          />
+        </div>
+      </div>
+    </template>
+
+    <template v-slot:footer>
+      <CommonButton
+        text="Cancel"
+        @btn-action="updateTransactionModal = false"
+        custom-css="bg-red-400 w-full"
+      />
+      <CommonButton
+        text="Label Transaction"
+        @btn-action="updateTransaction"
+        custom-css="bg-green-400 w-full"
+        :loading="updateTransactionBtnLoading"
+      />
+    </template>
+  </CommonModal>
 </template>
 
 <script lang="ts">
@@ -364,13 +341,11 @@ export default defineComponent({
             ACCOUNT_TRANSACTIONS
           );
 
-          const updatedTxns = transactions.value;
-          for (const txn of updatedTxns) {
-            if (txn.recordId === modalTransaction.value.recordId) {
-              txn.category = modalTransaction.value.category;
-              break;
-            }
-          }
+          const updatedTxns = transactions.value.map((txn) =>
+            txn.recordId === modalTransaction.value?.recordId
+              ? { ...txn, category: modalTransaction.value?.category }
+              : txn
+          );
           setTransactions(updatedTxns);
 
           notify({

@@ -39,7 +39,7 @@
     --bg-hoverlightbase: 31, 31, 31;
     --text-base: 255, 255, 255;
     --text-lightbase: 255, 255, 255;
-    --border-base: 255, 255, 255;
+    --border-base: 209, 213, 219;
     --border-lightbase: 169, 169, 169;
   }
   .white {
@@ -49,7 +49,7 @@
     --bg-hoverlightbase: 209, 213, 219;
     --text-base: 0, 0, 0;
     --text-lightbase: 209, 213, 219;
-    --border-base: 0, 0, 0;
+    --border-base: 209, 213, 219;
     --border-lightbase: 169, 169, 169;
   }
 }

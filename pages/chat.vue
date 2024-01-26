@@ -1,25 +1,45 @@
 <template>
-  <div class="grid grid-cols-4 gap-y-4 min-h-screen">
-    <div class="col-span-4 md:col-start-2 md:col-span-2">
-      <div class="grid grid-cols-1 gap-2 text-center p-5">
-        <div class="mb-5 border-b-[1px] border-base text-left py-5">
-          <CommonPageBar mainPage="Chat" />
-        </div>
+  <div class="border-b-[1px] border-base text-left py-5">
+    <CommonPageBar mainPage="Chat" />
+  </div>
 
-        <CommonFormInput
-          v-model="prompt"
-          title="Ask me anything about your finance"
-          :validation-message="promptErrorMsg"
-          @keyup.enter="answerQuestion"
-          placeholder="how much did i make last month?"
-        />
-        <div id="block" class="text-left text-base"></div>
-        <span v-show="aiResponseLoading" class="text-left text-base"
-          >crunching numbers for your answer... hang tight!</span
-        >
+  <div class="grid grid-cols-2 gap-2">
+    <div
+      v-for="(promptItem, index) in suggestedPrompts"
+      :key="index"
+      class="prompt flex justify-between items-center h-16 py-2 px-4 rounded-xl bg-bgbase border-[1px] border-base cursor-pointer hover:bg-lightbase"
+      @mouseover="hoveredIndex = index"
+      @mouseout="hoveredIndex = null"
+      @click="
+        () => {
+          prompt = `${promptItem.title} ${promptItem.others}`;
+          answerQuestion();
+        }
+      "
+    >
+      <div class="text-left text-sm">
+        <p class="font-extrabold">
+          {{ promptItem.title }}
+        </p>
+        <p>{{ promptItem.others }}</p>
       </div>
+      <font-awesome-icon
+        v-show="hoveredIndex === index"
+        icon="arrow-up"
+        class="bg-bgbase rounded-lg h-5 w-5 p-1"
+      />
     </div>
   </div>
+  <CommonFormInput
+    v-model="prompt"
+    :validation-message="promptErrorMsg"
+    @keyup.enter="answerQuestion"
+    placeholder="Ask me anything about your finance"
+  />
+  <div id="block" class="text-left text-base"></div>
+  <span v-show="aiResponseLoading" class="text-left text-base"
+    >crunching numbers for your answer... hang tight!</span
+  >
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
@@ -45,6 +65,16 @@ export default defineComponent({
     const { budgets, transactions, accounts, assets } = storeToRefs(
       useAppStore()
     );
+
+    const hoveredIndex = ref<null | number>(null);
+
+    const suggestedPrompts = ref([
+      { title: "whats my", others: "income for last month" },
+      { title: "whats my", others: "income for last month" },
+      { title: "whats my", others: "income for last month" },
+      { title: "whats my", others: "income for last month" },
+    ]);
+
     const { $api } = useNuxtApp();
     const prompt = ref("");
     const promptErrorMsg = ref<string>("");
@@ -199,7 +229,16 @@ export default defineComponent({
       answerQuestion,
       aiResponseLoading,
       typeCharacter,
+      suggestedPrompts,
+      hoveredIndex,
     };
   },
 });
 </script>
+
+<style>
+.prompt:hover font-awesome-icon {
+  display: block;
+  color: blue;
+}
+</style>

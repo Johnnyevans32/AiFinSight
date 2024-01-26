@@ -1,26 +1,20 @@
 <template>
-  <div class="grid grid-cols-4 gap-y-4 min-h-screen">
-    <div class="col-span-4 md:col-start-2 md:col-span-2">
-      <div class="grid grid-cols-1 gap-2 p-5">
-        <div class="mb-5 border-b-[1px] border-base text-left py-5">
-          <CommonPageBar mainPage="Settings" currentPage="DWN Endpoint" />
-        </div>
-        <div class="mb-5 text-left">
-          <CommonFormInput
-            inputType="text"
-            v-model="dwnEndpoint"
-            title="set your dwn endpoint"
-            custom-css="specialfont"
-          />
-          <CommonButton
-            text="Apply"
-            @btn-action="applyCustomDwnEndpoint"
-            custom-css="!bg-blue-400 w-full"
-            :loading="updateDwnEndpointBtnLoading"
-          />
-        </div>
-      </div>
-    </div>
+  <div class="border-b-[1px] border-base text-left py-5">
+    <CommonPageBar mainPage="Settings" currentPage="DWN Endpoint" />
+  </div>
+  <div class="text-left">
+    <CommonFormInput
+      inputType="text"
+      v-model="dwnEndpoint"
+      title="set your dwn endpoint"
+      custom-css="specialfont"
+    />
+    <CommonButton
+      text="Apply"
+      @btn-action="applyCustomDwnEndpoint"
+      custom-css="!bg-blue-400 w-full"
+      :loading="updateDwnEndpointBtnLoading"
+    />
   </div>
 </template>
 

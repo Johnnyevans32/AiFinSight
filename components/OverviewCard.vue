@@ -19,27 +19,6 @@
   </div>
 </template>
 
-<!-- <template>
-  <div class="rounded-xl w-full border-[1px] bg-lightbase border-base">
-    <div class="text-left py-1 px-5 border-b-[1px] border-base">
-      <span class="text-sm">{{ label }}</span>
-    </div>
-    <div class="flex justify-between items-center w-full p-5">
-      <h2 class="text-xl">{{ currency }}{{ value }}</h2>
-      <div class="self-end text-xs flex items-center gap-1">
-        <span
-          :class="differenceClass"
-          class="px-2 rounded-xl flex items-center gap-1"
-        >
-          <font-awesome-icon :icon="differenceIcon" :class="trendIconClass" />
-          {{ Math.abs(difference) }}%
-        </span>
-        <p>vs previous month</p>
-      </div>
-    </div>
-  </div>
-</template> -->
-
 <script lang="ts">
 import { defineComponent } from "vue";
 export default defineComponent({

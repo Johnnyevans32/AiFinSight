@@ -24,13 +24,10 @@
             </RadioGroupLabel>
 
             <div class="text-base text-3xl">
-              <font-awesome-icon
-                v-if="checked"
-                icon="fa-solid fa-circle-check"
-              />
+              <font-awesome-icon v-if="checked" icon="circle-check" />
               <font-awesome-icon
                 v-else
-                icon="fa-solid fa-circle-minus"
+                icon="circle-minus"
                 class="text-white"
               />
             </div>

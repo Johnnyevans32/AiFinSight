@@ -3,7 +3,7 @@
     class="text-sm items-center font-bold capitalize cursor-pointer"
     @click="router.back()"
   >
-    <font-awesome-icon icon="fa-solid fa-arrow-left" /> {{ mainPage }} /
+    <font-awesome-icon icon="arrow-left" /> {{ mainPage }} /
     {{ currentPage }}
   </NuxtLink>
 </template>

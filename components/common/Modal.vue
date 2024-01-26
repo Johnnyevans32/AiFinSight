@@ -39,23 +39,25 @@
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div
-              class="inline-block transform overflow-hidden rounded-t-xl md:rounded-b-xl bg-bgbase py-3 h-full w-[50rem] text-left shadow-xl transition-all sm:align-middle"
+              class="inline-block transform overflow-hidden h-full w-[50rem] text-left shadow-xl rounded-xl transition-all sm:align-middle"
             >
               <div
-                class="border-b-[1px] px-4 border-base flex items-center pb-3 justify-between"
+                class="border-b-[1px] border-base rounded-t-xl px-4 py-2 bg-bgbase flex items-center justify-between"
               >
-                <p class="font-black text-left">
+                <p class="font-black">
                   {{ title }}
                 </p>
                 <font-awesome-icon
-                  icon="fa-solid fa-xmark"
+                  icon="xmark"
                   class="bg-lightbase rounded-lg h-5 w-5 p-1"
                   @click="closeModal"
                 />
               </div>
-              <div class="p-4"><slot name="content"></slot></div>
+              <div class="px-4 py-2 bg-bgbase">
+                <slot name="content"></slot>
+              </div>
               <div
-                class="px-4 pt-3 flex gap-2 font-bold border-t-[1px] border-base"
+                class="border-t-[1px] border-base md:rounded-b-xl px-4 py-2 bg-bgbase flex gap-2"
               >
                 <slot name="footer"></slot>
               </div>
@@ -66,7 +68,6 @@
     </TransitionRoot>
   </div>
 </template>
-
 <script lang="ts">
 import {
   Dialog,

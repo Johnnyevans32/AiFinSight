@@ -40,6 +40,12 @@ export const useAppStore = defineStore("appStore", () => {
     loadingScreenEnabled.value = status;
   }
 
+  function updateLoadingScreenText(
+    _loadingScreenText: string = "Migrating financial data, it might take a while.... hang tight 👨🏽‍🔧"
+  ) {
+    loadingScreenText.value = _loadingScreenText;
+  }
+
   function setTransactions(_transactions: AccountStatementDTO[]) {
     transactions.value = _transactions;
   }
@@ -71,5 +77,6 @@ export const useAppStore = defineStore("appStore", () => {
     setAccounts,
     setBudgets,
     setCurrency,
+    updateLoadingScreenText,
   };
 });

@@ -1,177 +1,166 @@
 <template>
-  <div class="grid grid-cols-4 gap-y-4 min-h-screen">
-    <div class="col-span-4 md:col-start-2 md:col-span-2">
-      <div class="grid grid-cols-1 gap-2 p-5">
-        <div class="mb-5 border-b-[1px] border-base text-left py-5">
-          <CommonPageBar mainPage="Budgets" />
-        </div>
-        <div class="mb-5 grid grid-cols-2 justify-items-start">
-          <h1 class="text-xl font-bold">Budgets</h1>
+  <div class="border-b-[1px] border-base text-left py-5">
+    <CommonPageBar mainPage="Budgets" />
+  </div>
+  <div class="grid grid-cols-2 justify-items-start">
+    <h1 class="text-xl font-bold">Budgets</h1>
 
-          <CommonButton
-            text="Create Budget"
-            @btn-action="createBudgetModal = true"
-            custom-css="justify-self-end"
-          />
-        </div>
-        <div
-          class="flex flex-col gap-2 p-5 rounded-xl border-[1px] bg-lightbase border-base"
-        >
-          <div class="flex items-center justify-between">
-            <div class="text-left">
-              <p>Overall budget</p>
-              <p>{{ budgetPeriod }}</p>
-            </div>
-          </div>
-          <CommonProgressBar
-            :percentage="
-              (formattedBudgets.overall.spent /
-                formattedBudgets.overall.limit) *
-              100
-            "
-          />
-          <div class="flex justify-between">
-            <div class="flex flex-col text-left">
-              <span>Amount Spent</span>
-              <span class="text-sm capitalize text-red-600"
-                >{{ currencySignMap[Currency.NGN] }}
-                {{ formatMoney(formattedBudgets.overall.spent) }}</span
-              >
-            </div>
-
-            <div class="flex flex-col text-right">
-              <span>Overall Budget</span>
-              <span class="text-sm capitalize"
-                >{{ currencySignMap[Currency.NGN] }}
-                {{ formatMoney(formattedBudgets.overall.limit) }}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="!budgets.length" class="text-center">
-          <font-awesome-icon
-            class="text-7xl mb-5"
-            icon="fa-solid fa-hand-holding-usd"
-          />
-          <p>Nothing to see here</p>
-          <p>
-            Start tracking your expenses by creating budgets based on your
-            transactions.
-          </p>
-        </div>
-        <div
-          v-else
-          v-for="budget in Object.values(
-            formattedBudgets.budgetsGroupedByCategory
-          )"
-          :key="budget.recordId"
-          @click="viewSingleBudget(budget)"
-          class="cursor-pointer px-5 py-3 flex space-x-3 items-center rounded-xl text-base bg-lightbase border-[1px] border-base"
-        >
-          <font-awesome-icon
-            :icon="generateIconMap(budget.category)"
-            class="text-xl"
-          />
-
-          <div class="flex flex-col w-full gap-1 text-left">
-            <span class="capitalize font-bold">{{
-              budget.category.replaceAll("_", " ")
-            }}</span>
-            <CommonProgressBar
-              :percentage="
-                ((budget.amountSpentOnCategoryBudget || 0) / budget.limit) * 100
-              "
-            />
-            <div class="flex justify-between">
-              <span class="text-sm"
-                >{{ budget.currencySign }}
-                {{ formatMoney(budget.limit) }} limit</span
-              >
-              <span class="text-sm"
-                >{{ budget.currencySign }}
-                {{
-                  formatMoney(
-                    budget.limit - (budget.amountSpentOnCategoryBudget || 0)
-                  )
-                }}
-                left</span
-              >
-            </div>
-          </div>
-        </div>
+    <CommonButton
+      text="Create Budget"
+      @btn-action="createBudgetModal = true"
+      custom-css="justify-self-end"
+    />
+  </div>
+  <div
+    class="flex flex-col gap-2 p-5 rounded-xl border-[1px] bg-lightbase border-base"
+  >
+    <div class="flex items-center justify-between">
+      <div class="text-left">
+        <p>Overall budget</p>
+        <p>{{ budgetPeriod }}</p>
       </div>
     </div>
-    <CommonModal
-      :open="createBudgetModal"
-      title="Create a Budget"
-      @change-modal-status="changeModalStatus"
-    >
-      <template v-slot:content>
-        <div class="flex flex-col justify-between">
-          <CommonFormInput
-            v-model="limitModel"
-            inputType="number"
-            placeholder="0"
-            title="limit"
-          />
-          <CommonListBox
-            :selected="categoryModel"
-            :options="Object.values(TransactionCategory)"
-            @change-option="handleBudgetCategoryChange"
-          />
-        </div>
-      </template>
-      <template v-slot:footer>
-        <CommonButton
-          text="Cancel"
-          @btn-action="createBudgetModal = false"
-          custom-css="bg-red-400 w-full"
-        />
-        <CommonButton
-          text="Create"
-          @btn-action="createBudget"
-          custom-css="bg-green-400 w-full"
-          :loading="createBudgetBtnLoading"
-        />
-      </template>
-    </CommonModal>
-    <CommonModal
-      :open="updateBudgetModal"
-      title="Update Budget"
-      @change-modal-status="changeModalStatus"
-    >
-      <template v-slot:content>
-        <div class="flex flex-col gap-2">
-          <CommonFormInput
-            v-if="modalBudget?.limit"
-            v-model="modalBudget.limit"
-            inputType="number"
-            placeholder="0"
-            title="limit"
-          />
-          <CommonListBox
-            :selected="modalBudget?.category"
-            :options="Object.values(TransactionCategory)"
-            @change-option="handleBudgetCategoryUpdateChange"
-          />
-        </div>
-      </template>
-      <template v-slot:footer>
-        <CommonButton
-          text="Delete Budget"
-          @btn-action="deleteBudget"
-          custom-css="bg-red-400 w-full"
-        />
-        <CommonButton
-          text="Update Budget"
-          @btn-action="updateBudget"
-          custom-css="bg-green-400 w-full"
-          :loading="updateBudgetBtnLoading"
-        />
-      </template>
-    </CommonModal>
+    <CommonProgressBar
+      :percentage="
+        (formattedBudgets.overall.spent / formattedBudgets.overall.limit) * 100
+      "
+    />
+    <div class="flex justify-between">
+      <div class="flex flex-col text-left">
+        <span>Amount Spent</span>
+        <span class="text-sm capitalize text-red-600"
+          >{{ currencySignMap[Currency.NGN] }}
+          {{ formatMoney(formattedBudgets.overall.spent) }}</span
+        >
+      </div>
+
+      <div class="flex flex-col text-right">
+        <span>Overall Budget</span>
+        <span class="text-sm capitalize"
+          >{{ currencySignMap[Currency.NGN] }}
+          {{ formatMoney(formattedBudgets.overall.limit) }}
+        </span>
+      </div>
+    </div>
   </div>
+
+  <div v-if="!budgets.length" class="text-center">
+    <font-awesome-icon
+      class="text-7xl mb-5"
+      icon="fa-solid fa-hand-holding-usd"
+    />
+    <p>Nothing to see here</p>
+    <p>
+      Start tracking your expenses by creating budgets based on your
+      transactions.
+    </p>
+  </div>
+  <div
+    v-else
+    v-for="budget in Object.values(formattedBudgets.budgetsGroupedByCategory)"
+    :key="budget.recordId"
+    @click="viewSingleBudget(budget)"
+    class="cursor-pointer px-5 py-3 flex space-x-3 items-center rounded-xl text-base bg-lightbase border-[1px] border-base"
+  >
+    <font-awesome-icon
+      :icon="generateIconMap(budget.category)"
+      class="text-xl"
+    />
+
+    <div class="flex flex-col w-full gap-1 text-left">
+      <span class="capitalize font-bold">{{
+        budget.category.replaceAll("_", " ")
+      }}</span>
+      <CommonProgressBar
+        :percentage="
+          ((budget.amountSpentOnCategoryBudget || 0) / budget.limit) * 100
+        "
+      />
+      <div class="flex justify-between">
+        <span class="text-sm"
+          >{{ budget.currencySign }} {{ formatMoney(budget.limit) }} limit</span
+        >
+        <span class="text-sm"
+          >{{ budget.currencySign }}
+          {{
+            formatMoney(
+              budget.limit - (budget.amountSpentOnCategoryBudget || 0)
+            )
+          }}
+          left</span
+        >
+      </div>
+    </div>
+  </div>
+  <CommonModal
+    :open="createBudgetModal"
+    title="Create budget"
+    @change-modal-status="changeModalStatus"
+  >
+    <template v-slot:content>
+      <div class="flex flex-col">
+        <CommonFormInput
+          v-model="limitModel"
+          inputType="number"
+          placeholder="0"
+          title="limit"
+        />
+        <CommonListBox
+          :selected="categoryModel"
+          :options="Object.values(TransactionCategory)"
+          @change-option="handleBudgetCategoryChange"
+        />
+      </div>
+    </template>
+    <template v-slot:footer>
+      <CommonButton
+        text="Cancel"
+        @btn-action="createBudgetModal = false"
+        custom-css="bg-red-400 w-full"
+      />
+      <CommonButton
+        text="Create"
+        @btn-action="createBudget"
+        custom-css="bg-green-400 w-full"
+        :loading="createBudgetBtnLoading"
+      />
+    </template>
+  </CommonModal>
+  <CommonModal
+    :open="updateBudgetModal"
+    title="Update budget"
+    @change-modal-status="changeModalStatus"
+  >
+    <template v-slot:content>
+      <div class="flex flex-col">
+        <CommonFormInput
+          v-if="modalBudget?.limit"
+          v-model="modalBudget.limit"
+          inputType="number"
+          placeholder="0"
+          title="limit"
+        />
+        <CommonListBox
+          :selected="modalBudget?.category"
+          :options="Object.values(TransactionCategory)"
+          @change-option="handleBudgetCategoryUpdateChange"
+        />
+      </div>
+    </template>
+    <template v-slot:footer>
+      <CommonButton
+        text="Delete Budget"
+        @btn-action="deleteBudget"
+        custom-css="bg-red-400 w-full"
+      />
+      <CommonButton
+        text="Update Budget"
+        @btn-action="updateBudget"
+        custom-css="bg-green-400 w-full"
+        :loading="updateBudgetBtnLoading"
+      />
+    </template>
+  </CommonModal>
 </template>
 
 <script lang="ts">
@@ -322,16 +311,11 @@ export default defineComponent({
         if (modalBudget.value && modalBudget.value.recordId) {
           updateRecord(modalBudget.value.recordId, modalBudget.value, BUDGETS);
 
-          const updatedBudgets = budgets.value;
-          for (let i = 0; i < updatedBudgets.length; i++) {
-            if (updatedBudgets[i].recordId === modalBudget.value.recordId) {
-              updatedBudgets[i] = {
-                ...updatedBudgets[i],
-                ...modalBudget.value,
-              };
-              break;
-            }
-          }
+          const updatedBudgets = budgets.value.map((budget) =>
+            budget.recordId === modalBudget.value?.recordId
+              ? { ...budget, ...modalBudget.value }
+              : budget
+          );
           setBudgets(updatedBudgets);
 
           notify({

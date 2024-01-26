@@ -1,9 +1,8 @@
 <template>
   <div :class="appThemeColor" class="bg-bgbase text-base">
-    <Loading />
-    <Navbar />
-    <NuxtPage />
-    <FooterBar />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
     <notifications position="top center" width="500px" animation-type="css">
       <template #body="props">
         <div
