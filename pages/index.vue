@@ -22,76 +22,101 @@
     :placeholder="String.fromCodePoint(0x1f50d) + ' search transactions'"
     @keyup.enter="searchItem"
   />
+  <div v-if="recordIsInPullingState[ACCOUNT_TRANSACTIONS]">
+    <div v-for="i in 2" :key="i">
+      <div class="h-2 w-20 bg-base rounded mb-2"></div>
+      <div
+        v-for="i in 2"
+        :key="i"
+        class="p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base animate-pulse"
+      >
+        <div class="flex space-x-2 items-center">
+          <div class="bg-base h-10 w-10 rounded-xl"></div>
 
-  <div v-if="!transactionsInPageView.length">
-    <font-awesome-icon
-      class="text-7xl mb-5"
-      icon="fa-solid fa-magnifying-glass-dollar"
-    />
+          <div class="flex flex-col gap-2">
+            <div class="h-2 w-20 bg-base rounded"></div>
+            <div class="h-2 w-28 bg-base rounded"></div>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <div class="h-2 w-28 bg-base rounded"></div>
+          <div class="h-2 w-20 bg-base rounded self-end"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div v-else-if="!Object.keys(formatedTransactions).length">
+    <font-awesome-icon class="text-7xl mb-5" icon="magnifying-glass-dollar" />
     <p>No transactions yet</p>
     <p>
       Connect your bank accounts and start tracking your financial activity to
       see insights here.
     </p>
   </div>
-  <div
-    v-else
-    v-for="(transactions, date) in formatedTransactions"
-    :key="date"
-    class="text-left"
-  >
-    <span>{{ date }}</span>
-    <div
-      v-for="txn in transactions"
-      :key="txn.recordId"
-      class="p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base"
-      @click="viewSingleTransaction(txn)"
-    >
-      <div class="flex space-x-2 items-center">
-        <div class="text-sm transform translate-y-0">
-          <CommonImage
-            :image="accountsGroupedById[txn.accountId].bankLogo"
-            :alt="accountsGroupedById[txn.accountId].bankName"
-          />
-          <font-awesome-icon
-            v-if="txn?.type === TransactionType.DEBIT"
-            icon="fa-solid fa-circle-right"
-            :style="{ transform: 'rotate(315deg)' }"
-            class="text-red-600 rounded-xl bg-white absolute -bottom-[1px] -right-[1px] border-[1px] border-white"
-          />
-          <font-awesome-icon
-            v-else
-            icon="fa-solid fa-circle-right"
-            :style="{ transform: 'rotate(135deg)' }"
-            class="text-green-600 rounded-xl bg-white absolute -bottom-[1px] -right-[1px] border-[1px] border-white"
-          />
-        </div>
 
-        <div class="flex flex-col text-left">
-          <span class="capitalize font-extrabold">{{
-            txn?.category?.replaceAll("_", " ") || TransactionCategory.UNKNOWN
-          }}</span>
-          <span class="text-xs">{{ shortenString(txn.narration) }}</span>
+  <div v-else>
+    <div
+      v-for="(transactions, date) in formatedTransactions"
+      :key="date"
+      class="text-left"
+    >
+      <span>{{ date }}</span>
+      <div
+        v-for="txn in transactions"
+        :key="txn.recordId"
+        class="p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base"
+        @click="viewSingleTransaction(txn)"
+      >
+        <div class="flex space-x-2 items-center">
+          <div class="text-sm transform translate-y-0">
+            <CommonImage
+              :image="accountsGroupedById[txn.accountId].bankLogo"
+              :alt="accountsGroupedById[txn.accountId].bankName"
+            />
+            <font-awesome-icon
+              v-if="txn?.type === TransactionType.DEBIT"
+              icon="fa-solid fa-circle-right"
+              :style="{ transform: 'rotate(315deg)' }"
+              class="text-red-600 rounded-xl bg-white absolute -bottom-[1px] -right-[1px] border-[1px] border-white"
+            />
+            <font-awesome-icon
+              v-else
+              icon="fa-solid fa-circle-right"
+              :style="{ transform: 'rotate(135deg)' }"
+              class="text-green-600 rounded-xl bg-white absolute -bottom-[1px] -right-[1px] border-[1px] border-white"
+            />
+          </div>
+
+          <div class="flex flex-col text-left">
+            <span class="capitalize font-extrabold">{{
+              txn?.category?.replaceAll("_", " ") || TransactionCategory.UNKNOWN
+            }}</span>
+            <span class="text-xs">{{ shortenString(txn.narration) }}</span>
+          </div>
         </div>
-      </div>
-      <div class="flex flex-col text-right">
-        <span
-          class="font-bold"
-          :class="txn?.type === TransactionType.CREDIT ? 'text-green-600' : ''"
-          >{{ txn.currencySign }} {{ formatMoney(txn.amount) }}
-        </span>
-        <span class="font-thin text-sm"
-          >{{ txn.currencySign }} {{ formatMoney(txn.balance) }}</span
-        >
+        <div class="flex flex-col text-right">
+          <span
+            class="font-bold"
+            :class="
+              txn?.type === TransactionType.CREDIT ? 'text-green-600' : ''
+            "
+            >{{ txn.currencySign }} {{ formatMoney(txn.amount) }}
+          </span>
+          <span class="font-thin text-sm"
+            >{{ txn.currencySign }} {{ formatMoney(txn.balance) }}</span
+          >
+        </div>
       </div>
     </div>
+    <CommonPaginationBar
+      v-show="transactionsInPageView.length"
+      :currentPage="currentPage"
+      :totalItems="transactionsInPageView.length"
+      @change-option="handlePageChange"
+    />
   </div>
-  <CommonPaginationBar
-    v-show="transactionsInPageView.length"
-    :currentPage="currentPage"
-    :totalItems="transactionsInPageView.length"
-    @change-option="handlePageChange"
-  />
+
   <CommonModal
     v-if="modalTransaction"
     :open="updateTransactionModal"
@@ -189,7 +214,9 @@ import { notify } from "@kyvg/vue3-notification";
 
 export default defineComponent({
   async setup() {
-    const { transactions, accounts } = storeToRefs(useAppStore());
+    const { transactions, accounts, recordIsInPullingState } = storeToRefs(
+      useAppStore()
+    );
     const { setTransactions } = useAppStore();
     const { updateRecord, groupBy } = useAppVueUtils();
     const currentPage = ref(1);
@@ -199,11 +226,13 @@ export default defineComponent({
     const updateTransactionBtnLoading = ref(false);
     const modalTransaction = ref<AccountStatementDTO | null>(null);
 
-    const transactionsInPageView = ref<AccountStatementDTO[]>([]);
+    const transactionsInPageView = ref<AccountStatementDTO[]>(
+      transactions.value
+    );
 
-    onBeforeMount(() => {
-      transactionsInPageView.value = transactions.value;
-    });
+    // onBeforeMount(() => {
+    //   transactionsInPageView.value = transactions.value;
+    // });
 
     const paginatedTransactions = computed(() => {
       return paginate<AccountStatementDTO>(
@@ -378,6 +407,8 @@ export default defineComponent({
       searchQueryModel,
       transactionsInPageView,
       searchItem,
+      recordIsInPullingState,
+      ACCOUNT_TRANSACTIONS,
     };
   },
 });

@@ -44,7 +44,26 @@
     </div>
   </div>
 
-  <div v-if="!budgets.length" class="text-center">
+  <div v-if="recordIsInPullingState[BUDGETS]">
+    <div
+      v-for="i in 2"
+      :key="i"
+      class="px-5 py-3 flex space-x-3 mb-2 items-center rounded-xl text-base bg-lightbase border-[1px] border-base animate-pulse"
+    >
+      <div class="bg-base h-10 w-10 rounded-xl"></div>
+
+      <div class="flex flex-col w-full gap-2">
+        <div class="h-2 w-20 bg-base rounded"></div>
+        <div class="h-2 w-full bg-base rounded"></div>
+        <div class="flex justify-between">
+          <div class="h-2 w-20 bg-base rounded"></div>
+          <div class="h-2 w-28 bg-base rounded"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div v-else-if="!budgets.length" class="text-center">
     <font-awesome-icon
       class="text-7xl mb-5"
       icon="fa-solid fa-hand-holding-usd"
@@ -64,7 +83,7 @@
   >
     <font-awesome-icon
       :icon="generateIconMap(budget.category)"
-      class="text-xl"
+      class="h-10 w-10 rounded-xl text-2xl"
     />
 
     <div class="flex flex-col w-full gap-1 text-left">
@@ -191,8 +210,10 @@ export default defineComponent({
     const modalBudget = ref<BudgetDTO | null>(null);
 
     const createBudgetModal = ref(false);
-    const { budgets, transactions } = storeToRefs(useAppStore());
-    const { setBudgets } = useAppStore();
+    const { budgets, transactions, recordIsInPullingState } = storeToRefs(
+      useAppStore()
+    );
+    const { setBudgets, updateRecordPullingStatus } = useAppStore();
     const startOfMonth = ref(moment().startOf("month"));
 
     const endOfMonth = ref(moment().endOf("month"));
@@ -255,12 +276,15 @@ export default defineComponent({
 
     onBeforeMount(async () => {
       try {
+        updateRecordPullingStatus(BUDGETS, true);
         const [dbBudgets] = await Promise.all([
           findRecords<BudgetDTO[]>(BUDGETS),
         ]);
         setBudgets(dbBudgets);
       } catch (err) {
         console.log("before mount error", { err });
+      } finally {
+        updateRecordPullingStatus(BUDGETS, false);
       }
     });
 
@@ -382,6 +406,8 @@ export default defineComponent({
       deleteBudget,
       viewSingleBudget,
       handleBudgetCategoryUpdateChange,
+      recordIsInPullingState,
+      BUDGETS,
     };
   },
 });

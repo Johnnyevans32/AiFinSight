@@ -80,7 +80,12 @@ export default defineComponent({
 
     const { appThemeColor } = storeToRefs(useAppStore());
     const { findRecords, configureProtocol } = useAppVueUtils();
-    const { setAccounts, setAssets, setTransactions } = useAppStore();
+    const {
+      setAccounts,
+      setAssets,
+      setTransactions,
+      updateRecordPullingStatus,
+    } = useAppStore();
     onBeforeMount(async () => {
       try {
         const monoJS = "https://connect.withmono.com/connect.js";
@@ -91,6 +96,8 @@ export default defineComponent({
           document.body.appendChild(script);
         }
 
+        updateRecordPullingStatus(ACCOUNT_TRANSACTIONS, true);
+        updateRecordPullingStatus(ACCOUNTS, true);
         await configureProtocol();
 
         const [dbAccounts, dbTransactions, dbAssets] = await Promise.all([
@@ -103,6 +110,9 @@ export default defineComponent({
         setAssets(dbAssets);
       } catch (err) {
         console.log("before mount error", { err });
+      } finally {
+        updateRecordPullingStatus(ACCOUNT_TRANSACTIONS, false);
+        updateRecordPullingStatus(ACCOUNTS, false);
       }
     });
 

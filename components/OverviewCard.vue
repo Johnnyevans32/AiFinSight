@@ -3,15 +3,19 @@
     class="flex justify-between w-full p-5 rounded-xl border-[1px] bg-lightbase border-base"
   >
     <div class="flex flex-col items-start">
-      <span class="text-sm">{{ label }}</span>
-      <h2 class="text-xl">{{ currency }}{{ value }}</h2>
+      <span class="md:text-sm text-xs">{{ label }}</span>
+      <h2 class="md:text-xl text-sm">{{ currency }}{{ value }}</h2>
     </div>
     <div class="md:self-end self-start text-xs flex items-center gap-1">
       <span
         :class="differenceClass"
         class="px-2 rounded-xl flex items-center gap-1"
       >
-        <font-awesome-icon :icon="differenceIcon" :class="trendIconClass" />
+        <font-awesome-icon
+          :icon="differenceIcon"
+          :class="trendIconClass"
+          class="md:text-sm text-tiny"
+        />
         {{ Math.abs(difference) }}%
       </span>
       <p class="md:flex hidden">vs previous month</p>

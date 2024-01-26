@@ -3,7 +3,7 @@
     <CommonPageBar mainPage="Chat" />
   </div>
 
-  <div class="grid grid-cols-2 gap-2">
+  <div class="grid grid-cols-2 md:grid-cols-2 gap-2">
     <div
       v-for="(promptItem, index) in suggestedPrompts"
       :key="index"

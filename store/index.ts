@@ -5,6 +5,7 @@ import type {
   AccountStatementDTO,
   BudgetDTO,
 } from "~/types/accounts";
+import { ACCOUNT_TRANSACTIONS, ACCOUNTS, BUDGETS } from "~/services/schemas";
 
 export enum AppThemeEnum {
   LIGHT = "light",
@@ -21,6 +22,12 @@ export const useAppStore = defineStore("appStore", () => {
     "Migrating financial data, it might take a while.... hang tight 👨🏽‍🔧"
   );
 
+  const recordIsInPullingState = ref<{ [schema: string]: boolean }>({
+    [ACCOUNT_TRANSACTIONS]: false,
+    [ACCOUNTS]: false,
+    [BUDGETS]: false,
+  });
+
   const currency = ref(Currency.NGN);
 
   const accounts = ref<AccountDTO[]>([]);
@@ -34,6 +41,10 @@ export const useAppStore = defineStore("appStore", () => {
 
   function setCurrency(_currency: Currency) {
     currency.value = _currency;
+  }
+
+  function updateRecordPullingStatus(record: string, status: boolean) {
+    recordIsInPullingState.value[record] = status;
   }
 
   function updateLoadingScreenStatus(status: boolean) {
@@ -70,6 +81,7 @@ export const useAppStore = defineStore("appStore", () => {
     loadingScreenEnabled,
     loadingScreenText,
     currency,
+    recordIsInPullingState,
     toggleAppTheme,
     updateLoadingScreenStatus,
     setTransactions,
@@ -78,5 +90,6 @@ export const useAppStore = defineStore("appStore", () => {
     setBudgets,
     setCurrency,
     updateLoadingScreenText,
+    updateRecordPullingStatus,
   };
 });

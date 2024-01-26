@@ -11,7 +11,24 @@
       customCss="justify-self-end"
     />
   </div>
-  <div v-if="!accounts.length">
+  <div v-if="recordIsInPullingState[ACCOUNTS]">
+    <div
+      v-for="i in 2"
+      :key="i"
+      class="p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base animate-pulse"
+    >
+      <div class="flex space-x-2 items-center">
+        <div class="bg-base h-10 w-10 rounded-xl"></div>
+
+        <div class="flex flex-col gap-2">
+          <div class="h-2 w-20 bg-base rounded"></div>
+          <div class="h-2 w-28 bg-base rounded"></div>
+        </div>
+      </div>
+      <div class="h-2 w-28 bg-base rounded"></div>
+    </div>
+  </div>
+  <div v-else-if="!accounts.length">
     <font-awesome-icon class="text-7xl mb-5" icon="university" />
     <p>Nothing to see here</p>
     <p>Connect your accounts to get started with your financial insights.</p>
@@ -133,7 +150,8 @@ export default defineComponent({
     const { $api } = useNuxtApp();
     const { createRecord, $launchMono, findRecords, deleteRecord } =
       useAppVueUtils();
-    const { accounts, transactions, assets } = storeToRefs(useAppStore());
+    const { accounts, transactions, assets, recordIsInPullingState } =
+      storeToRefs(useAppStore());
     const { updateLoadingScreenText } = useAppStore();
     const viewSingleAccountModal = ref(false);
     const unlinkBtnLoading = ref(false);
@@ -310,6 +328,8 @@ export default defineComponent({
       viewSingleAccount,
       unlinkAccount,
       confirmUnlinkModal,
+      ACCOUNTS,
+      recordIsInPullingState,
     };
   },
 });
