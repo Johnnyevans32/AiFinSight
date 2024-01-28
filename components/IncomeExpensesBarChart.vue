@@ -1,5 +1,5 @@
 <template>
-  <div id="main" class="w-full h-96"></div>
+  <div id="main" class="h-96"></div>
 </template>
 
 <script lang="ts">
@@ -50,6 +50,14 @@ export default defineComponent({
         );
       }
 
+      const axisLabel = {
+        textStyle: {
+          fontFamily: "Farfetch Basis Regular",
+          fontSize: 10,
+          fontWeight: "normal",
+        },
+      };
+
       const options = {
         tooltip: {
           trigger: "axis",
@@ -77,6 +85,7 @@ export default defineComponent({
             axisPointer: {
               type: "shadow",
             },
+            axisLabel,
           },
         ],
         yAxis: [
@@ -85,6 +94,7 @@ export default defineComponent({
             splitLine: { show: false },
             axisLabel: {
               formatter: "₦{value}",
+              ...axisLabel,
             },
           },
         ],

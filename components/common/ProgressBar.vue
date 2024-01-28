@@ -21,11 +21,11 @@ export default defineComponent({
   setup(props, ctx) {
     const progressBarColor = computed(() => {
       if (props.percentage >= 70) {
-        return "bg-red-600";
+        return "bg-[#f80000]";
       } else if (props.percentage >= 40 && props.percentage < 70) {
-        return "bg-yellow-600";
+        return "bg-[#feed01]";
       } else {
-        return "bg-green-600";
+        return "bg-green-400";
       }
     });
 

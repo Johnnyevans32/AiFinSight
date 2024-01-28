@@ -55,7 +55,7 @@ export default defineComponent({
           type: "success",
           title: "dwn endpoint updated",
         });
-        // reloadNuxtApp({ path: "" });
+        reloadNuxtApp({ path: "/" });
       } finally {
         updateDwnEndpointBtnLoading.value = false;
       }

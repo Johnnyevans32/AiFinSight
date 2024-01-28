@@ -2,8 +2,11 @@
   <div class="border-b-[1px] border-base text-left py-5">
     <CommonPageBar mainPage="Budgets" />
   </div>
-  <div class="grid grid-cols-2 justify-items-start">
-    <h1 class="text-xl font-bold">Budgets - {{ budgetPeriod }}</h1>
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <h1 class="text-xl font-bold">Budgets</h1>
+      <p>- {{ budgetPeriod }}</p>
+    </div>
 
     <CommonButton
       text="Create Budget"
@@ -42,7 +45,7 @@
     <div
       v-for="i in 2"
       :key="i"
-      class="px-5 py-2 flex space-x-3 mb-2 items-center rounded-xl text-base bg-lightbase border-[1px] border-base animate-pulse"
+      class="px-5 py-2 cursor-progress flex space-x-3 mb-2 items-center rounded-xl text-base bg-lightbase border-[1px] border-base animate-pulse"
     >
       <div class="bg-base h-10 w-10 rounded-xl"></div>
 

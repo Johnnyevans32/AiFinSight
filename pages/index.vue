@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between">
+  <div class="flex items-center justify-between">
     <h1 class="text-xl font-bold">Overview</h1>
     <CommonFormSelect
       :selected="overviewMonth"
@@ -32,7 +32,7 @@
       :currency="currencySignMap[Currency.NGN]"
     />
   </div>
-  <div class="flex justify-between">
+  <div class="flex items-center justify-between">
     <h1 class="text-xl font-bold">Transactions</h1>
     <CommonFormInput
       v-model="searchQueryModel"
@@ -48,7 +48,7 @@
       <div
         v-for="i in 2"
         :key="i"
-        class="p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base animate-pulse"
+        class="cursor-progress p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base animate-pulse"
       >
         <div class="flex space-x-2 items-center">
           <div class="bg-base h-10 w-10 rounded-xl"></div>
@@ -85,7 +85,7 @@
       <div
         v-for="txn in transactions"
         :key="txn.recordId"
-        class="p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base"
+        class="cursor-pointer p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base"
         @click="viewSingleTransaction(txn)"
       >
         <div class="flex space-x-2 items-center">

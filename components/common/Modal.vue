@@ -49,7 +49,7 @@
                 </p>
                 <font-awesome-icon
                   icon="xmark"
-                  class="bg-lightbase rounded-lg h-5 w-5 p-1"
+                  class="bg-lightbase rounded-lg h-5 w-5 p-1 cursor-pointer"
                   @click="closeModal"
                 />
               </div>

@@ -2,7 +2,7 @@
   <div class="border-b-[1px] border-base text-left py-5">
     <CommonPageBar mainPage="Accounts" />
   </div>
-  <div class="grid grid-cols-2 justify-items-start">
+  <div class="flex items-center justify-between">
     <h1 class="text-xl font-bold">Accounts</h1>
 
     <CommonButton
@@ -15,7 +15,7 @@
     <div
       v-for="i in 2"
       :key="i"
-      class="p-5 flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base animate-pulse"
+      class="p-5 cursor-progress flex mb-2 items-center h-16 justify-between rounded-xl text-base bg-lightbase border-[1px] border-base animate-pulse"
     >
       <div class="flex space-x-2 items-center">
         <div class="bg-base h-10 w-10 rounded-xl"></div>
