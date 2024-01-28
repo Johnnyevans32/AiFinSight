@@ -7,7 +7,7 @@
     <div
       v-for="(promptItem, index) in suggestedPrompts"
       :key="index"
-      class="prompt flex justify-between items-center h-16 py-2 px-4 rounded-xl bg-bgbase border-[1px] border-base cursor-pointer hover:bg-lightbase"
+      class="prompt flex justify-between items-center h-16 py-2 px-5 rounded-xl bg-bgbase border-[1px] border-base cursor-pointer hover:bg-lightbase"
       @mouseover="hoveredIndex = index"
       @mouseout="hoveredIndex = null"
       @click="
@@ -43,12 +43,13 @@
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
-
+import { notify } from "@kyvg/vue3-notification";
+import moment from "moment";
 import Typed from "typed.js";
 
 import { useAppStore } from "~/store";
-import { notify } from "@kyvg/vue3-notification";
-import moment from "moment";
+import { BudgetDTO } from "~/types/accounts";
+import { TransactionType, TransactionCategory } from "~/types/mono";
 
 interface MonthlyTransaction {
   income: number;
@@ -62,12 +63,13 @@ export default defineComponent({
       title: "Chat",
       ogTitle: "Chat",
     });
+
     const { budgets, transactions, accounts, assets } = storeToRefs(
       useAppStore()
     );
+    const { groupBy } = useAppVueUtils();
 
     const hoveredIndex = ref<null | number>(null);
-
     const suggestedPrompts = ref([
       { title: "whats my", others: "income for last month" },
       { title: "whats my", others: "income for last month" },
@@ -77,22 +79,25 @@ export default defineComponent({
 
     const { $api } = useNuxtApp();
     const prompt = ref("");
-    const promptErrorMsg = ref<string>("");
-
-    const aiResponseLoading = ref(false);
-
-    let typed: Typed;
     watch(prompt, (newVal, prevVal) => {
       !newVal
         ? (promptErrorMsg.value = "your prompt is required")
         : (promptErrorMsg.value = "");
     });
+    const promptErrorMsg = ref<string>("");
 
+    const aiResponseLoading = ref(false);
+
+    let typed: Typed;
     onBeforeUnmount(() => {
       if (typed) {
         typed.destroy();
       }
     });
+
+    const startOfMonth = ref(moment().startOf("month"));
+
+    const endOfMonth = ref(moment().endOf("month"));
 
     const userFinanceContext = computed(() => {
       if (!transactions.value.length) {
@@ -129,9 +134,49 @@ export default defineComponent({
         })
         .join("\n");
 
-      const budgetText = budgets.value
+      const transactionsForPeriod = transactions.value.filter(
+        (transaction) =>
+          moment(transaction.date).isBetween(
+            startOfMonth.value,
+            endOfMonth.value,
+            undefined,
+            "[]"
+          ) &&
+          transaction.type === TransactionType.DEBIT &&
+          !!transaction.category
+      );
+      const budgetsGroupedByCategory: Record<
+        TransactionCategory,
+        BudgetDTO & { amountSpentOnCategoryBudget?: number }
+      > = groupBy(budgets.value, "category");
+
+      transactionsForPeriod.forEach((transaction) => {
+        const { category, amount, currency } = transaction;
+        if (
+          category &&
+          budgetsGroupedByCategory[category] &&
+          budgetsGroupedByCategory[category].currency === currency
+        ) {
+          const amountSpentOnCategoryBudget =
+            (budgetsGroupedByCategory[category].amountSpentOnCategoryBudget ||
+              0) + amount;
+
+          budgetsGroupedByCategory[category] = {
+            ...budgetsGroupedByCategory[category],
+            amountSpentOnCategoryBudget,
+          };
+        }
+      });
+
+      const budgetText = Object.values(budgetsGroupedByCategory)
         .map((budget) => {
-          return `Budget: ${budget.category} | Limit: ${budget.limit} | Currency: ${budget.currency}`;
+          return `Budget: ${budget.category} | Limit: ${
+            budget.limit
+          } | Amount Spent: ${budget.amountSpentOnCategoryBudget} | Currency: ${
+            budget.currency
+          } | Period: From ${startOfMonth.value.format(
+            "MMMM Do"
+          )} to ${endOfMonth.value.format("MMMM Do")}`;
         })
         .join("\n");
 

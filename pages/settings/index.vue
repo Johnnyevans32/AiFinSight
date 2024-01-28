@@ -15,14 +15,14 @@
     class="cursor-pointer justify-self-center h-8 border-[1px] border-base rounded-xl w-40 bg-lightbase hover:bg-hoverlightbase p-2 flex items-center gap-2 justify-center"
     @click="copyDid"
     >{{ truncateString(myDid) }}
-    <font-awesome-icon icon="fa-solid fa-copy" />
+    <font-awesome-icon icon="clone" />
   </span>
   <NuxtLink
     v-for="setting in settingsItems"
     :key="setting.action"
     :to="setting.href"
     :target="setting.external ? '_blank' : ''"
-    class="cursor-pointer flex items-center justify-between px-5 h-16 rounded-xl text-base bg-lightbase border-[1px] border-base"
+    class="cursor-pointer flex items-center justify-between px-5 py-2 rounded-xl text-base bg-lightbase border-[1px] border-base"
   >
     <div class="flex space-x-2 items-center">
       <div class="w-5">
@@ -44,6 +44,7 @@
 <script lang="ts">
 import { notify } from "@kyvg/vue3-notification";
 
+import { useAppUserConfigStore } from "~/store/config";
 import { defineComponent } from "vue";
 import { useAppStore } from "~/store";
 
@@ -54,8 +55,8 @@ export default defineComponent({
       ogTitle: "Settings",
     });
     const { $did } = useNuxtApp();
-    const { getCustomDwnEndpoint } = useAppVueUtils();
     const { appThemeColor, currency } = storeToRefs(useAppStore());
+    const { dwnEndpoint } = storeToRefs(useAppUserConfigStore());
     const myDid = ref<string>("");
 
     onBeforeMount(() => (myDid.value = $did));
@@ -63,7 +64,7 @@ export default defineComponent({
       {
         logo: "server",
         action: "dwn endpoint",
-        value: getCustomDwnEndpoint(),
+        value: dwnEndpoint.value,
         logoType: "icon",
         href: "/settings/dwn",
       },

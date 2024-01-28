@@ -212,12 +212,10 @@ export default defineComponent({
 
     const trackMigrationProgress = async (promises: Promise<any>[]) => {
       const totalPromises = promises.length;
-      console.log("totalPromises", totalPromises);
       let completedPromises = 0;
       let loadingProgress = 0;
 
       const updateProgress = () => {
-        console.log("loadingProgress", loadingProgress);
         completedPromises++;
         loadingProgress = Math.floor((completedPromises / totalPromises) * 100);
         updateLoadingScreenText(
@@ -228,7 +226,7 @@ export default defineComponent({
       await Promise.allSettled(
         promises.map((promise) => promise.then(updateProgress))
       );
-      console.log("completedPromises", completedPromises);
+      updateLoadingScreenText();
     };
 
     const launchMono = async () => {

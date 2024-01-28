@@ -1,12 +1,12 @@
 <template>
-  <div class="mb-5 text-left">
+  <div class="text-left">
     <span v-show="title" class="text-sm"> {{ title }}:</span>
     <input
       :type="inputType"
       :value="modelValue"
       @input="handleModelValueChangeAction($event)"
       :placeholder="placeholder"
-      :class="`${customCss} form-input rounded-xl px-5 py-3 bg-lightbase w-full border-[1px]
+      :class="`${customCss} form-input rounded-xl px-5 py-2 bg-lightbase w-full border-[1px]
     border-base`"
     />
     <span

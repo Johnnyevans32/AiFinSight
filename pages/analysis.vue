@@ -29,10 +29,10 @@ export default defineComponent({
       const expenses: number[] = [];
       const differences: number[] = [];
 
-      for (let i = 0; i < 12; i++) {
+      for (let i = 12; i >= 0; i--) {
         const date = currentDate.clone().subtract(i, "months").startOf("month");
         last12Months.push(date);
-        periods.push(date.format("MMM-YYYY"));
+        periods.push(date.format("MMM YY"));
       }
 
       // Filter transactions within the last 12 months

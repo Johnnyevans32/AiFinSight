@@ -4,7 +4,7 @@
       :total-items="totalItems"
       v-model="selectedOption"
       :items-per-page="itemsPerPage"
-      :max-pages-shown="3"
+      :max-pages-shown="1"
     >
       <template #prev-button>
         <font-awesome-icon icon="arrow-right" />
@@ -43,51 +43,32 @@ export default defineComponent({
 </script>
 <style>
 .example-six .pagination-container {
-  column-gap: 10px;
-  align-items: center;
+  @apply flex gap-2;
 }
 .example-six .paginate-buttons {
-  height: 35px;
-  width: 35px;
-  cursor: pointer;
-  border-radius: 4px;
-  background-color: transparent;
-  border: none;
-  color: gray;
+  @apply bg-lightbase rounded-xl h-10 w-10 p-2;
 }
 
 .example-six .back-button,
 .example-six .next-button {
-  background-color: black;
-  color: white;
-  border-radius: 8px;
-  height: 45px;
-  width: 45px;
+  @apply bg-lightbase rounded-xl text-base;
 }
 .example-six .active-page {
-  background-color: #e5e5e5;
+  @apply bg-base text-lightbase;
 }
 .example-six .paginate-buttons:hover {
-  background-color: #f5f5f5;
+  @apply bg-hoverlightbase;
 }
 .example-six .active-page:hover {
-  background-color: #e5e5e5;
+  @apply bg-hoverlightbase text-base;
 }
 
 .example-six .back-button svg {
   transform: rotate(180deg) translateY(-2px);
 }
-.example-six .next-button svg {
-  transform: translateY(2px);
-}
 
 .example-six .back-button:hover,
 .example-six .next-button:hover {
-  background-color: rgb(45, 45, 45);
-}
-
-.example-six .back-button:active,
-.example-six .next-button:active {
-  background-color: rgb(85, 85, 85);
+  @apply bg-hoverlightbase;
 }
 </style>

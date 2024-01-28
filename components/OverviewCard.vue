@@ -2,23 +2,32 @@
   <div
     class="flex justify-between w-full p-5 rounded-xl border-[1px] bg-lightbase border-base"
   >
-    <div class="flex flex-col items-start">
+    <div class="flex flex-col justify-between items-start">
       <span class="md:text-sm text-xs">{{ label }}</span>
       <h2 class="md:text-xl text-sm">{{ currency }}{{ value }}</h2>
     </div>
-    <div class="md:self-end self-start text-xs flex items-center gap-1">
-      <span
-        :class="differenceClass"
-        class="px-2 rounded-xl flex items-center gap-1"
-      >
-        <font-awesome-icon
-          :icon="differenceIcon"
-          :class="trendIconClass"
-          class="md:text-sm text-tiny"
-        />
-        {{ Math.abs(difference) }}%
-      </span>
-      <p class="md:flex hidden">vs previous month</p>
+
+    <div class="flex flex-col justify-between items-end">
+      <trend-chart
+        :data="data"
+        :periods="periods"
+        class="md:block hidden"
+        :label="label"
+      />
+      <div class="md:self-end self-start text-xs flex items-center gap-1">
+        <span
+          :class="differenceClass"
+          class="px-2 rounded-xl flex items-center gap-1"
+        >
+          <font-awesome-icon
+            :icon="differenceIcon"
+            :class="trendIconClass"
+            class="md:text-sm text-tiny"
+          />
+          {{ Math.abs(difference) }}%
+        </span>
+        <p class="md:flex hidden">vs previous month</p>
+      </div>
     </div>
   </div>
 </template>
@@ -33,8 +42,19 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
-    label: String,
+    label: {
+      type: String,
+      required: true,
+    },
     currency: String,
+    data: {
+      type: Array<Number>,
+      default: [],
+    },
+    periods: {
+      type: Array<String>,
+      default: [],
+    },
   },
   async setup(props) {
     const differenceIcon = computed(() => {

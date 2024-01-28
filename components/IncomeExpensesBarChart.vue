@@ -62,14 +62,13 @@ export default defineComponent({
         },
         toolbox: {
           feature: {
-            dataView: { show: true, readOnly: false },
             magicType: { show: true, type: ["line", "bar"] },
             restore: { show: true },
             saveAsImage: { show: true },
           },
         },
         legend: {
-          data: ["Income", "Expenses", "Differences"],
+          data: ["Income", "Expense", "P&L"],
         },
         xAxis: [
           {
@@ -83,9 +82,9 @@ export default defineComponent({
         yAxis: [
           {
             type: "value",
-            name: "Income",
+            splitLine: { show: false },
             axisLabel: {
-              formatter: "{value} ₦",
+              formatter: "₦{value}",
             },
           },
         ],
@@ -93,36 +92,48 @@ export default defineComponent({
           {
             name: "Income",
             type: "bar",
+            stack: "total",
             tooltip: {
               valueFormatter: function (value: string) {
-                return value + " ₦";
+                return `₦${value}`;
               },
             },
             itemStyle: {
-              color: "green",
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 1, color: "rgb(173, 255, 47)" },
+                { offset: 0, color: "rgb(0, 128, 0)" },
+              ]),
             },
             data: props.data.incomes,
           },
           {
-            name: "Expenses",
+            name: "Expense",
+            stack: "total",
             type: "bar",
             tooltip: {
               valueFormatter: function (value: string) {
-                return value + " ₦";
+                return `₦${value}`;
               },
             },
             itemStyle: {
-              color: "red",
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: "rgb(255, 192, 203)" },
+                { offset: 1, color: "rgb(255, 0, 0)" },
+              ]),
             },
             data: props.data.expenses,
           },
           {
-            name: "Differences",
+            name: "P&L",
             type: "line",
+            symbol: "none",
             tooltip: {
               valueFormatter: function (value: string) {
-                return value + " ₦";
+                return `₦${value}`;
               },
+            },
+            itemStyle: {
+              color: "#facc15",
             },
             data: props.data.differences,
           },

@@ -23,7 +23,7 @@
               {{ option }}
             </RadioGroupLabel>
 
-            <div class="text-base text-3xl">
+            <div class="text-base text-2xl">
               <font-awesome-icon v-if="checked" icon="circle-check" />
               <font-awesome-icon
                 v-else

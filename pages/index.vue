@@ -1,10 +1,24 @@
 <template>
+  <div class="flex justify-between">
+    <h1 class="text-xl font-bold">Overview</h1>
+    <CommonFormSelect
+      :selected="overviewMonth"
+      :options="overviewMonthOptions"
+      @change-option="
+        (newVal) => {
+          overviewMonth = newVal;
+        }
+      "
+    />
+  </div>
   <div class="grid grid-cols-2 gap-4">
     <overview-card
       icon="fa-solid fa-shopping-cart"
       :value="formatMoney(overviewData.thisMonth.expense[Currency.NGN] || 0)"
       :difference="overviewData.percentageDiff.expense[Currency.NGN] || 0"
       label="Expense"
+      :data="overviewData.expenses"
+      :periods="overviewData.periods"
       :currency="currencySignMap[Currency.NGN]"
     />
 
@@ -13,15 +27,21 @@
       :value="formatMoney(overviewData.thisMonth.income[Currency.NGN] || 0)"
       :difference="overviewData.percentageDiff.income[Currency.NGN] || 0"
       label="Income"
+      :data="overviewData.incomes"
+      :periods="overviewData.periods"
       :currency="currencySignMap[Currency.NGN]"
     />
   </div>
-  <CommonFormInput
-    v-model="searchQueryModel"
-    inputType="text"
-    :placeholder="String.fromCodePoint(0x1f50d) + ' search transactions'"
-    @keyup.enter="searchItem"
-  />
+  <div class="flex justify-between">
+    <h1 class="text-xl font-bold">Transactions</h1>
+    <CommonFormInput
+      v-model="searchQueryModel"
+      inputType="text"
+      :placeholder="String.fromCodePoint(0x1f50d) + ' search transactions'"
+      @keyup.enter="searchItem"
+    />
+  </div>
+
   <div v-if="recordIsInPullingState[ACCOUNT_TRANSACTIONS]">
     <div v-for="i in 2" :key="i">
       <div class="h-2 w-20 bg-base rounded mb-2"></div>
@@ -173,7 +193,7 @@
 
         <div class="flex flex-col">
           <span>Label transaction category:</span>
-          <CommonListBox
+          <CommonFormSelect
             :selected="modalTransaction?.category"
             :options="Object.values(TransactionCategory)"
             @change-option="handleModalTransactionCategoryChange"
@@ -221,6 +241,12 @@ export default defineComponent({
     const { updateRecord, groupBy } = useAppVueUtils();
     const currentPage = ref(1);
 
+    const overviewMonthOptions = Array.from({ length: 12 }, (_, index) =>
+      moment().clone().subtract(index, "months").startOf("month")
+    ).map((date) => date.format("MMMM YYYY"));
+
+    const overviewMonth = ref(overviewMonthOptions[0]);
+
     const searchQueryModel = ref("");
     const updateTransactionModal = ref(false);
     const updateTransactionBtnLoading = ref(false);
@@ -229,10 +255,6 @@ export default defineComponent({
     const transactionsInPageView = ref<AccountStatementDTO[]>(
       transactions.value
     );
-
-    // onBeforeMount(() => {
-    //   transactionsInPageView.value = transactions.value;
-    // });
 
     const paginatedTransactions = computed(() => {
       return paginate<AccountStatementDTO>(
@@ -258,29 +280,67 @@ export default defineComponent({
       groupBy(accounts.value, "accountId")
     );
 
+    const incomeMap = new Map<string, number>();
+    const expenseMap = new Map<string, number>();
+
     const formatedTransactions = computed<
       Record<string, AccountStatementDTO[]>
     >(() => groupByDate(paginatedTransactions.value, "date"));
 
     const overviewData = computed(() => {
-      const startOfThisMonth = moment().startOf("month");
-      const endOfThisMonth = moment().endOf("month");
-      const startOfLastMonth = moment().subtract(1, "months").startOf("month");
-      const endOfLastMonth = moment().subtract(1, "months").endOf("month");
+      const startOfOverviewMonth = moment(
+        overviewMonth.value,
+        "MMMM YYYY"
+      ).startOf("month");
+      const endOfOverviewMonth = moment(overviewMonth.value, "MMMM YYYY").endOf(
+        "month"
+      );
+      const startOfLastMonth = moment(overviewMonth.value, "MMMM YYYY")
+        .subtract(1, "months")
+        .startOf("month");
+      const endOfLastMonth = moment(overviewMonth.value, "MMMM YYYY")
+        .subtract(1, "months")
+        .endOf("month");
 
       let thisMonthIncome: Record<string, number> = {};
       let thisMonthExpense: Record<string, number> = {};
       let lastMonthIncome: Record<string, number> = {};
       let lastMonthExpense: Record<string, number> = {};
 
+      const currentDate = moment();
+      const periods: string[] = Array.from(
+        { length: 12 },
+        (_, index) => 11 - index
+      ).map((i) => {
+        const date = currentDate.clone().subtract(i, "months").startOf("month");
+
+        return date.format("MMM-YYYY");
+      });
+
+      const incomes: number[] = [];
+      const expenses: number[] = [];
+
       transactions.value.forEach((transaction) => {
         const { date, type, amount, currency } = transaction;
         const transactionDate = moment(date);
 
+        const key = moment(date).format("MMM-YYYY");
+
+        if (!incomeMap.has(key)) {
+          incomeMap.set(key, 0);
+          expenseMap.set(key, 0);
+        }
+
+        if (transaction.type === TransactionType.CREDIT) {
+          incomeMap.set(key, incomeMap.get(key)! + transaction.amount);
+        } else if (transaction.type === TransactionType.DEBIT) {
+          expenseMap.set(key, expenseMap.get(key)! + transaction.amount);
+        }
+
         if (
           transactionDate.isBetween(
-            startOfThisMonth,
-            endOfThisMonth,
+            startOfOverviewMonth,
+            endOfOverviewMonth,
             undefined,
             "[]"
           )
@@ -310,6 +370,14 @@ export default defineComponent({
         }
       });
 
+      for (const key of periods) {
+        const income = incomeMap.get(key) || 0;
+        const expense = expenseMap.get(key) || 0;
+
+        incomes.push(income);
+        expenses.push(expense);
+      }
+
       const calculatePercentageDiff = (
         thisMonth: { [x: string]: number },
         lastMonth: { [x: string]: number }
@@ -336,6 +404,9 @@ export default defineComponent({
           income: calculatePercentageDiff(thisMonthIncome, lastMonthIncome),
           expense: calculatePercentageDiff(thisMonthExpense, lastMonthExpense),
         },
+        incomes,
+        expenses,
+        periods,
       };
     });
 
@@ -409,6 +480,8 @@ export default defineComponent({
       searchItem,
       recordIsInPullingState,
       ACCOUNT_TRANSACTIONS,
+      overviewMonthOptions,
+      overviewMonth,
     };
   },
 });

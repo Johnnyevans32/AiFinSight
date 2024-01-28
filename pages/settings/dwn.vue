@@ -2,10 +2,10 @@
   <div class="border-b-[1px] border-base text-left py-5">
     <CommonPageBar mainPage="Settings" currentPage="DWN Endpoint" />
   </div>
-  <div class="text-left">
+  <div class="flex flex-col gap-4 text-left">
     <CommonFormInput
       inputType="text"
-      v-model="dwnEndpoint"
+      v-model="customDwnEndpoint"
       title="set your dwn endpoint"
       custom-css="specialfont"
     />
@@ -20,6 +20,8 @@
 
 <script lang="ts">
 import { notify } from "@kyvg/vue3-notification";
+
+import { useAppUserConfigStore } from "~/store/config";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -28,37 +30,38 @@ export default defineComponent({
       title: "Settings",
       ogTitle: "Settings",
     });
-    const { getCustomDwnEndpoint, setCustomDwnEndpoint, validateDwnEnpoint } =
-      useAppVueUtils();
-    const dwnEndpoint = ref("");
+    const { validateDwnEnpoint } = useAppVueUtils();
+    const { setDwnEndpoint } = useAppUserConfigStore();
+    const { dwnEndpoint } = storeToRefs(useAppUserConfigStore());
+    const customDwnEndpoint = ref(dwnEndpoint.value);
 
     const updateDwnEndpointBtnLoading = ref(false);
-
-    onBeforeMount(() => (dwnEndpoint.value = getCustomDwnEndpoint() as string));
 
     const applyCustomDwnEndpoint = async () => {
       try {
         updateDwnEndpointBtnLoading.value = true;
-        const isDwnEnpointValid = await validateDwnEnpoint(dwnEndpoint.value);
-        if (!isDwnEnpointValid || !dwnEndpoint.value) {
+        const isDwnEnpointValid = await validateDwnEnpoint(
+          customDwnEndpoint.value
+        );
+        if (!isDwnEnpointValid || !customDwnEndpoint.value) {
           notify({
             type: "error",
             title: "dwn url not valid",
           });
           return;
         }
-        setCustomDwnEndpoint(dwnEndpoint.value);
+        setDwnEndpoint(customDwnEndpoint.value);
         notify({
           type: "success",
           title: "dwn endpoint updated",
         });
-        reloadNuxtApp({ path: "" });
+        // reloadNuxtApp({ path: "" });
       } finally {
         updateDwnEndpointBtnLoading.value = false;
       }
     };
     return {
-      dwnEndpoint,
+      customDwnEndpoint,
       applyCustomDwnEndpoint,
       updateDwnEndpointBtnLoading,
     };

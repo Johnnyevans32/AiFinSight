@@ -5,7 +5,6 @@ import Vibrant from "node-vibrant";
 export function useAppVueUtils() {
   const config = useRuntimeConfig();
   const { $web5 } = useNuxtApp();
-  const { defaultDwnEndpoint } = useAppConfig();
 
   const groupBy = <T extends Record<string | number, any>>(
     array: T[],
@@ -70,18 +69,6 @@ export function useAppVueUtils() {
     connect.open();
   };
 
-  const getCustomDwnEndpoint = () => {
-    const dwnEndpoint = localStorage.getItem("customDwnEndpoint");
-    if (!dwnEndpoint) {
-      return `${defaultDwnEndpoint}`;
-    }
-    return `${dwnEndpoint}`;
-  };
-
-  const setCustomDwnEndpoint = (dwnEndpoint: string) => {
-    localStorage.setItem("customDwnEndpoint", dwnEndpoint);
-  };
-
   const validateDwnEnpoint = async (dwnUrl: string) => {
     try {
       const healthCheck = await fetch(`${dwnUrl}/health`);
@@ -106,7 +93,6 @@ export function useAppVueUtils() {
         type: "error",
         title: "error querying protocols",
       });
-      console.error("Error querying protocols", status);
       return;
     }
 
@@ -120,8 +106,6 @@ export function useAppVueUtils() {
           definition: protocolDefinition,
         },
       });
-
-    console.log("Protocol configured", configureStatus, protocol);
   };
 
   const createRecord = async <T>(
@@ -147,30 +131,25 @@ export function useAppVueUtils() {
     return { ...data, recordId: record?.id };
   };
   const findRecords = async <T>(schema: string, recordId?: string) => {
-    try {
-      const { records } = await $web5.dwn.records.query({
-        message: {
-          filter: {
-            schema: protocolDefinition.types[schema].schema,
-          },
-          dateSort: DateSort.CreatedAscending,
-          ...(recordId ? { recordId } : {}),
+    const { records } = await $web5.dwn.records.query({
+      message: {
+        filter: {
+          schema: protocolDefinition.types[schema].schema,
         },
-      });
-      const loadRecords = await Promise.all(
-        (records || []).map(
-          async (record: { data: { json: () => any }; id: any }) => {
-            const data = await record.data.json();
-            return { recordId: record.id, ...data };
-          }
-        )
-      );
+        dateSort: DateSort.CreatedAscending,
+        ...(recordId ? { recordId } : {}),
+      },
+    });
+    const loadRecords = await Promise.all(
+      (records || []).map(
+        async (record: { data: { json: () => any }; id: any }) => {
+          const data = await record.data.json();
+          return { recordId: record.id, ...data };
+        }
+      )
+    );
 
-      return loadRecords as T;
-    } catch (err) {
-      console.error("error from web5 query", err);
-      throw err;
-    }
+    return loadRecords as T;
   };
   const updateRecord = async (recordId: string, data: any, schema: string) => {
     const { record } = await $web5.dwn.records.read({
@@ -181,12 +160,11 @@ export function useAppVueUtils() {
     await record.update({ data });
   };
   const deleteRecord = async (recordId: string, schema: string) => {
-    const delRes = await $web5.dwn.records.delete({
+    await $web5.dwn.records.delete({
       message: {
         recordId,
       },
     });
-    console.log({ delRes });
   };
 
   return {
@@ -199,8 +177,6 @@ export function useAppVueUtils() {
     groupBy,
     extractBgColorsFromImage,
     configureProtocol,
-    getCustomDwnEndpoint,
-    setCustomDwnEndpoint,
     validateDwnEnpoint,
   };
 }

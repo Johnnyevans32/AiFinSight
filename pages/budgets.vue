@@ -3,7 +3,7 @@
     <CommonPageBar mainPage="Budgets" />
   </div>
   <div class="grid grid-cols-2 justify-items-start">
-    <h1 class="text-xl font-bold">Budgets</h1>
+    <h1 class="text-xl font-bold">Budgets - {{ budgetPeriod }}</h1>
 
     <CommonButton
       text="Create Budget"
@@ -12,19 +12,8 @@
     />
   </div>
   <div
-    class="flex flex-col gap-2 p-5 rounded-xl border-[1px] bg-lightbase border-base"
+    class="flex flex-col gap-2 px-5 py-3 rounded-xl border-[1px] bg-lightbase border-base"
   >
-    <div class="flex items-center justify-between">
-      <div class="text-left">
-        <p>Overall budget</p>
-        <p>{{ budgetPeriod }}</p>
-      </div>
-    </div>
-    <CommonProgressBar
-      :percentage="
-        (formattedBudgets.overall.spent / formattedBudgets.overall.limit) * 100
-      "
-    />
     <div class="flex justify-between">
       <div class="flex flex-col text-left">
         <span>Amount Spent</span>
@@ -42,13 +31,18 @@
         </span>
       </div>
     </div>
+    <CommonProgressBar
+      :percentage="
+        (formattedBudgets.overall.spent / formattedBudgets.overall.limit) * 100
+      "
+    />
   </div>
 
   <div v-if="recordIsInPullingState[BUDGETS]">
     <div
       v-for="i in 2"
       :key="i"
-      class="px-5 py-3 flex space-x-3 mb-2 items-center rounded-xl text-base bg-lightbase border-[1px] border-base animate-pulse"
+      class="px-5 py-2 flex space-x-3 mb-2 items-center rounded-xl text-base bg-lightbase border-[1px] border-base animate-pulse"
     >
       <div class="bg-base h-10 w-10 rounded-xl"></div>
 
@@ -79,7 +73,7 @@
     v-for="budget in Object.values(formattedBudgets.budgetsGroupedByCategory)"
     :key="budget.recordId"
     @click="viewSingleBudget(budget)"
-    class="cursor-pointer px-5 py-3 flex space-x-3 items-center rounded-xl text-base bg-lightbase border-[1px] border-base"
+    class="cursor-pointer px-5 py-2 flex space-x-3 items-center rounded-xl text-base bg-lightbase border-[1px] border-base"
   >
     <font-awesome-icon
       :icon="generateIconMap(budget.category)"
@@ -117,14 +111,14 @@
     @change-modal-status="changeModalStatus"
   >
     <template v-slot:content>
-      <div class="flex flex-col">
+      <div class="flex flex-col gap-4">
         <CommonFormInput
           v-model="limitModel"
           inputType="number"
           placeholder="0"
           title="limit"
         />
-        <CommonListBox
+        <CommonFormSelect
           :selected="categoryModel"
           :options="Object.values(TransactionCategory)"
           @change-option="handleBudgetCategoryChange"
@@ -151,7 +145,7 @@
     @change-modal-status="changeModalStatus"
   >
     <template v-slot:content>
-      <div class="flex flex-col">
+      <div class="flex flex-col gap-4">
         <CommonFormInput
           v-if="modalBudget?.limit"
           v-model="modalBudget.limit"
@@ -159,7 +153,7 @@
           placeholder="0"
           title="limit"
         />
-        <CommonListBox
+        <CommonFormSelect
           :selected="modalBudget?.category"
           :options="Object.values(TransactionCategory)"
           @change-option="handleBudgetCategoryUpdateChange"
@@ -218,9 +212,7 @@ export default defineComponent({
 
     const endOfMonth = ref(moment().endOf("month"));
     const budgetPeriod = computed(() => {
-      return `From ${startOfMonth.value.format(
-        "MMMM Do"
-      )} to ${endOfMonth.value.format("MMMM Do")}`;
+      return startOfMonth.value.format("MMMM YYYY");
     });
 
     const formattedBudgets = computed(() => {
