@@ -112,7 +112,7 @@
       <CommonButton
         text="Close Modal"
         @btn-action="viewSingleAccountModal = false"
-        custom-css="bg-green-400 w-full"
+        custom-css="!bg-blue-400 w-full"
       />
     </template>
   </CommonModal>

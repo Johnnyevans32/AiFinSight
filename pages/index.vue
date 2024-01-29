@@ -211,7 +211,7 @@
       <CommonButton
         text="Label Transaction"
         @btn-action="updateTransaction"
-        custom-css="bg-green-400 w-full"
+        custom-css="!bg-blue-400 w-full"
         :loading="updateTransactionBtnLoading"
       />
     </template>

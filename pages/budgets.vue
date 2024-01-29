@@ -3,11 +3,7 @@
     <CommonPageBar mainPage="Budgets" />
   </div>
   <div class="flex items-center justify-between">
-    <div class="flex items-center gap-2">
-      <h1 class="text-xl font-bold">Budgets</h1>
-      <p>- {{ budgetPeriod }}</p>
-    </div>
-
+    <h1 class="text-xl font-bold">Budgets</h1>
     <CommonButton
       text="Create Budget"
       @btn-action="createBudgetModal = true"
@@ -27,7 +23,7 @@
       </div>
 
       <div class="flex flex-col text-right">
-        <span>Overall Budget</span>
+        <span> {{ budgetPeriod }} Budget</span>
         <span class="text-sm capitalize"
           >{{ currencySignMap[Currency.NGN] }}
           {{ formatMoney(formattedBudgets.overall.limit) }}
@@ -96,7 +92,12 @@
         <span class="text-sm"
           >{{ budget.currencySign }} {{ formatMoney(budget.limit) }} limit</span
         >
-        <span class="text-sm"
+        <span
+          class="text-sm"
+          :class="
+            budget.limit - (budget.amountSpentOnCategoryBudget || 0) < 0 &&
+            'text-red-600'
+          "
           >{{ budget.currencySign }}
           {{
             formatMoney(
@@ -137,7 +138,7 @@
       <CommonButton
         text="Create"
         @btn-action="createBudget"
-        custom-css="bg-green-400 w-full"
+        custom-css="!bg-blue-400 w-full"
         :loading="createBudgetBtnLoading"
       />
     </template>
@@ -172,7 +173,7 @@
       <CommonButton
         text="Update Budget"
         @btn-action="updateBudget"
-        custom-css="bg-green-400 w-full"
+        custom-css="!bg-blue-400 w-full"
         :loading="updateBudgetBtnLoading"
       />
     </template>
@@ -352,11 +353,13 @@ export default defineComponent({
         if (modalBudget.value && modalBudget.value.recordId) {
           deleteRecord(modalBudget.value.recordId, BUDGETS);
 
+          console.log("udgets.gege.", budgets.value);
           const updatedBudgets = budgets.value.filter(
             (budget) => budget.recordId !== modalBudget.value?.recordId
           );
 
           setBudgets(updatedBudgets);
+          console.log("udgets.value.", budgets.value);
 
           notify({
             type: "success",

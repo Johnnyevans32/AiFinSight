@@ -17,7 +17,7 @@
       <CommonButton
         text="Cancel"
         @btn-action="changeModalStatus(false)"
-        custom-css="bg-green-400 w-full"
+        custom-css="!bg-green-400 w-full"
       />
     </template>
   </CommonModal>
