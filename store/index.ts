@@ -1,4 +1,3 @@
-import { Currency } from "~/types/mono";
 import type {
   AccountDTO,
   AccountAssetDTO,
@@ -7,16 +6,7 @@ import type {
 } from "~/types/accounts";
 import { ACCOUNT_TRANSACTIONS, ACCOUNTS, BUDGETS } from "~/services/schemas";
 
-export enum AppThemeEnum {
-  LIGHT = "light",
-  DARK = "dark",
-  COFFEE = "coffee",
-  CHERRY = "cherry",
-  WHITE = "white",
-}
-
 export const useAppStore = defineStore("appStore", () => {
-  const appThemeColor = ref<string>("light");
   const loadingScreenEnabled = ref<boolean>(false);
   const loadingScreenText = ref(
     "Migrating financial data, it might take a while.... hang tight 👨🏽‍🔧"
@@ -28,20 +18,10 @@ export const useAppStore = defineStore("appStore", () => {
     [BUDGETS]: false,
   });
 
-  const currency = ref(Currency.NGN);
-
   const accounts = ref<AccountDTO[]>([]);
   const assets = ref<AccountAssetDTO[]>([]);
   const transactions = ref<AccountStatementDTO[]>([]);
   const budgets = ref<BudgetDTO[]>([]);
-
-  function toggleAppTheme(theme: string) {
-    appThemeColor.value = theme;
-  }
-
-  function setCurrency(_currency: Currency) {
-    currency.value = _currency;
-  }
 
   function updateRecordPullingStatus(record: string, status: boolean) {
     recordIsInPullingState.value[record] = status;
@@ -77,18 +57,14 @@ export const useAppStore = defineStore("appStore", () => {
     assets,
     transactions,
     budgets,
-    appThemeColor,
     loadingScreenEnabled,
     loadingScreenText,
-    currency,
     recordIsInPullingState,
-    toggleAppTheme,
     updateLoadingScreenStatus,
     setTransactions,
     setAssets,
     setAccounts,
     setBudgets,
-    setCurrency,
     updateLoadingScreenText,
     updateRecordPullingStatus,
   };

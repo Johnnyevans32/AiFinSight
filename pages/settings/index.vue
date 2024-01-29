@@ -46,7 +46,6 @@ import { notify } from "@kyvg/vue3-notification";
 
 import { useAppUserConfigStore } from "~/store/config";
 import { defineComponent } from "vue";
-import { useAppStore } from "~/store";
 
 export default defineComponent({
   setup() {
@@ -55,8 +54,9 @@ export default defineComponent({
       ogTitle: "Settings",
     });
     const { $did } = useNuxtApp();
-    const { appThemeColor, currency } = storeToRefs(useAppStore());
-    const { dwnEndpoint } = storeToRefs(useAppUserConfigStore());
+    const { dwnEndpoint, appThemeColor, currency } = storeToRefs(
+      useAppUserConfigStore()
+    );
     const myDid = ref<string>("");
 
     onBeforeMount(() => (myDid.value = $did));

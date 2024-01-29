@@ -39,7 +39,8 @@
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div
-              class="inline-block transform overflow-hidden h-full w-[50rem] text-left shadow-xl rounded-xl transition-all sm:align-middle"
+              :class="appThemeColor"
+              class="text-base inline-block transform overflow-hidden h-full w-[50rem] text-left shadow-xl rounded-xl transition-all sm:align-middle"
             >
               <div
                 class="border-b-[1px] border-base rounded-t-xl px-4 py-2 bg-bgbase flex items-center justify-between"
@@ -76,6 +77,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
+import { useAppUserConfigStore } from "~/store/config";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -96,9 +98,10 @@ export default defineComponent({
   },
   emits: ["changeModalStatus"],
   setup(props, ctx) {
+    const { appThemeColor } = storeToRefs(useAppUserConfigStore());
     const closeModal = () => ctx.emit("changeModalStatus", false);
 
-    return { closeModal };
+    return { closeModal, appThemeColor };
   },
 });
 </script>

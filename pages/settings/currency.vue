@@ -16,7 +16,7 @@
 import { Currency } from "~/types/mono";
 import { defineComponent } from "vue";
 
-import { useAppStore } from "~/store";
+import { useAppUserConfigStore } from "~/store/config";
 
 export default defineComponent({
   setup() {
@@ -24,8 +24,8 @@ export default defineComponent({
       title: "Settings",
       ogTitle: "Settings",
     });
-    const { setCurrency } = useAppStore();
-    const { currency } = storeToRefs(useAppStore());
+    const { setCurrency } = useAppUserConfigStore();
+    const { currency } = storeToRefs(useAppUserConfigStore());
     const handleCurrencyChange = (newVal: string) => {
       setCurrency(newVal as Currency);
     };

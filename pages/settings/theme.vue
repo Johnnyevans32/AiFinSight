@@ -13,9 +13,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-
-import { AppThemeEnum, useAppStore } from "~/store";
+import { AppThemeEnum, useAppUserConfigStore } from "~/store/config";
 
 export default defineComponent({
   setup() {
@@ -23,8 +21,8 @@ export default defineComponent({
       title: "Settings",
       ogTitle: "Settings",
     });
-    const { toggleAppTheme } = useAppStore();
-    const { appThemeColor } = storeToRefs(useAppStore());
+    const { toggleAppTheme } = useAppUserConfigStore();
+    const { appThemeColor } = storeToRefs(useAppUserConfigStore());
     const themes = ref(Object.values(AppThemeEnum));
     const handleThemeOptionChange = (newVal: string) => {
       toggleAppTheme(newVal);

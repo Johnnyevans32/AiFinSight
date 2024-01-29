@@ -15,7 +15,7 @@
   >
     <div class="flex justify-between">
       <div class="flex flex-col text-left">
-        <span>Amount Spent</span>
+        <span>Total Amount Spent</span>
         <span class="text-sm capitalize text-red-600"
           >{{ currencySignMap[Currency.NGN] }}
           {{ formatMoney(formattedBudgets.overall.spent) }}</span
@@ -23,7 +23,7 @@
       </div>
 
       <div class="flex flex-col text-right">
-        <span> {{ budgetPeriod }} Budget</span>
+        <span>Total {{ budgetPeriod }} Budget</span>
         <span class="text-sm capitalize"
           >{{ currencySignMap[Currency.NGN] }}
           {{ formatMoney(formattedBudgets.overall.limit) }}
@@ -133,12 +133,12 @@
       <CommonButton
         text="Cancel"
         @btn-action="createBudgetModal = false"
-        custom-css="bg-red-400 w-full"
+        custom-css="bg-red-400 w-full text-black"
       />
       <CommonButton
         text="Create"
         @btn-action="createBudget"
-        custom-css="!bg-blue-400 w-full"
+        custom-css="!bg-blue-400 w-full text-black"
         :loading="createBudgetBtnLoading"
       />
     </template>
@@ -168,12 +168,12 @@
       <CommonButton
         text="Delete Budget"
         @btn-action="deleteBudget"
-        custom-css="bg-red-400 w-full"
+        custom-css="bg-red-400 w-full text-black"
       />
       <CommonButton
         text="Update Budget"
         @btn-action="updateBudget"
-        custom-css="!bg-blue-400 w-full"
+        custom-css="!bg-blue-400 w-full text-black"
         :loading="updateBudgetBtnLoading"
       />
     </template>

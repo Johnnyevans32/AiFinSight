@@ -12,7 +12,7 @@
     <CommonButton
       text="Apply"
       @btn-action="applyCustomDwnEndpoint"
-      custom-css="!bg-blue-400 w-full"
+      custom-css="!bg-blue-400 w-full text-black"
       :loading="updateDwnEndpointBtnLoading"
     />
   </div>

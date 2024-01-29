@@ -206,12 +206,12 @@
       <CommonButton
         text="Cancel"
         @btn-action="updateTransactionModal = false"
-        custom-css="bg-red-400 w-full"
+        custom-css="bg-red-400 w-full text-black"
       />
       <CommonButton
         text="Label Transaction"
         @btn-action="updateTransaction"
-        custom-css="!bg-blue-400 w-full"
+        custom-css="!bg-blue-400 w-full text-black"
         :loading="updateTransactionBtnLoading"
       />
     </template>

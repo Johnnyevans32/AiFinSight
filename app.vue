@@ -60,7 +60,8 @@ import {
   ACCOUNTS,
   ACCOUNT_ASSETS,
 } from "./services/schemas";
-import { useAppStore } from "./store";
+import { useAppStore } from "~/store";
+import { useAppUserConfigStore } from "~/store/config";
 import type {
   AccountStatementDTO,
   AccountDTO,
@@ -78,7 +79,7 @@ export default defineComponent({
       },
     });
 
-    const { appThemeColor } = storeToRefs(useAppStore());
+    const { appThemeColor } = storeToRefs(useAppUserConfigStore());
     const { findRecords, configureProtocol } = useAppVueUtils();
     const {
       setAccounts,

@@ -107,12 +107,12 @@
             confirmUnlinkModal = true;
           }
         "
-        custom-css="bg-red-400 w-full"
+        custom-css="bg-red-400 w-full text-black"
       />
       <CommonButton
         text="Close Modal"
         @btn-action="viewSingleAccountModal = false"
-        custom-css="!bg-blue-400 w-full"
+        custom-css="!bg-blue-400 w-full text-black"
       />
     </template>
   </CommonModal>
