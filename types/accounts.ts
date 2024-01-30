@@ -75,3 +75,10 @@ export enum ChartPeriodEnum {
   Last7Days = "last 7 days",
   Last12Months = "last 12 months",
 }
+
+export type ConversationDTO = {
+  recordId?: string;
+  user: string;
+  ai: string;
+  date: string;
+};

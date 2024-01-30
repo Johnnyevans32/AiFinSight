@@ -3,6 +3,7 @@ import type {
   AccountAssetDTO,
   AccountStatementDTO,
   BudgetDTO,
+  ConversationDTO,
 } from "~/types/accounts";
 import { ACCOUNT_TRANSACTIONS, ACCOUNTS, BUDGETS } from "~/services/schemas";
 
@@ -22,6 +23,7 @@ export const useAppStore = defineStore("appStore", () => {
   const assets = ref<AccountAssetDTO[]>([]);
   const transactions = ref<AccountStatementDTO[]>([]);
   const budgets = ref<BudgetDTO[]>([]);
+  const conversations = ref<ConversationDTO[]>([]);
 
   function updateRecordPullingStatus(record: string, status: boolean) {
     recordIsInPullingState.value[record] = status;
@@ -52,6 +54,9 @@ export const useAppStore = defineStore("appStore", () => {
     budgets.value = _budgets;
   }
 
+  function setConversations(_conversations: ConversationDTO[]) {
+    conversations.value = _conversations;
+  }
   return {
     accounts,
     assets,
@@ -60,6 +65,7 @@ export const useAppStore = defineStore("appStore", () => {
     loadingScreenEnabled,
     loadingScreenText,
     recordIsInPullingState,
+    conversations,
     updateLoadingScreenStatus,
     setTransactions,
     setAssets,
@@ -67,5 +73,6 @@ export const useAppStore = defineStore("appStore", () => {
     setBudgets,
     updateLoadingScreenText,
     updateRecordPullingStatus,
+    setConversations,
   };
 });

@@ -1,31 +1,26 @@
 <template>
   <TabGroup>
-    <TabList
-      class="flex space-x-1 rounded-xl w-full md:w-[50%] bg-lightbase p-1"
-    >
+    <TabList class="flex rounded-xl w-full bg-lightbase p-2">
       <Tab
         v-for="menu in tabMenu"
         as="template"
-        :key="menu"
+        :key="menu.title"
         v-slot="{ selected }"
       >
-        <button
+        <div
           :class="[
-            'w-full rounded-xl py-2.5 leading-3 uppercase',
-            'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
-            selected
-              ? 'bg-white shadow'
-              : ' hover:bg-white/[0.12] hover:text-white',
+            'w-full rounded-xl py-1 cursor-pointer ',
+            selected && 'bg-base shadow',
           ]"
         >
-          {{ menu }}
-        </button>
+          {{ menu.title }}
+        </div>
       </Tab>
     </TabList>
-    <TabPanels class="mt-5">
-      <TabPanel class="grid md:grid-cols-4 gap-4">Content 1</TabPanel>
-      <TabPanel class="grid md:grid-cols-4 gap-4">Content 2</TabPanel>
-      <TabPanel class="grid md:grid-cols-4 gap-4">Content 3</TabPanel>
+    <TabPanels class="mt-4">
+      <TabPanel v-for="menu in tabMenu" :key="menu.title">
+        <component :is="menu.content" />
+      </TabPanel>
     </TabPanels>
   </TabGroup>
 </template>
@@ -41,13 +36,14 @@ export default defineComponent({
     TabPanels,
     TabPanel,
   },
-  setup(props) {
-    const { $api } = useNuxtApp();
-    const tabMenu = ref(["home", "postions"]);
-
-    return {
-      tabMenu,
-    };
+  props: {
+    tabMenu: {
+      type: Array<{ title: string; content: any }>,
+      default: [],
+    },
+  },
+  setup() {
+    return {};
   },
 });
 </script>

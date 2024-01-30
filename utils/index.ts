@@ -6,6 +6,7 @@ import {
   ACCOUNT_ASSETS,
   ACCOUNT_TRANSACTIONS,
   BUDGETS,
+  CONVERSATIONS,
 } from "~/services/schemas";
 import { TransactionCategory } from "~/types/mono";
 
@@ -18,9 +19,13 @@ export const formatMoney = (value: number) =>
 export const formatDate = (date: string, format = "MMM Do YY") =>
   moment(date).format(format);
 
-export const groupByDate = <T>(array: T[], dateField: keyof T) => {
+export const groupByDate = <T>(
+  array: T[],
+  dateField: keyof T,
+  format = "MMM Do YY"
+) => {
   return array.reduce((result: Record<string, T[]>, item: T) => {
-    const key = formatDate(item[dateField] as string);
+    const key = formatDate(item[dateField] as string, format);
     if (!result[key]) {
       result[key] = [];
     }
@@ -182,7 +187,20 @@ export const protocolDefinition: ProtocolDefinition = {
       $actions: [
         {
           who: "author",
-          of: ACCOUNTS,
+          of: BUDGETS,
+          can: "read",
+        },
+        {
+          who: "anyone",
+          can: "write",
+        },
+      ],
+    },
+    [CONVERSATIONS]: {
+      $actions: [
+        {
+          who: "author",
+          of: CONVERSATIONS,
           can: "read",
         },
         {
