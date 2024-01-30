@@ -17,15 +17,16 @@
       <div class="flex flex-col text-left">
         <span>Total Amount Spent</span>
         <span class="text-sm capitalize text-red-600"
-          >{{ currencySignMap[Currency.NGN] }}
+          >{{ currencySignMap[currency] }}
           {{ formatMoney(formattedBudgets.overall.spent) }}</span
         >
       </div>
 
+      <p>{{ budgetPeriod }}</p>
       <div class="flex flex-col text-right">
-        <span>Total {{ budgetPeriod }} Budget</span>
+        <span>Total Budget Limit</span>
         <span class="text-sm capitalize"
-          >{{ currencySignMap[Currency.NGN] }}
+          >{{ currencySignMap[currency] }}
           {{ formatMoney(formattedBudgets.overall.limit) }}
         </span>
       </div>
@@ -183,12 +184,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import moment from "moment";
+import { notify } from "@kyvg/vue3-notification";
 
 import { BUDGETS } from "~/services/schemas";
 import { useAppStore } from "~/store";
 import { type BudgetDTO, currencySignMap } from "~/types/accounts";
-import { TransactionCategory, TransactionType, Currency } from "../types/mono";
-import { notify } from "@kyvg/vue3-notification";
+import { TransactionCategory, TransactionType, Currency } from "~/types/mono";
+import { useAppUserConfigStore } from "~/store/config";
 
 export default defineComponent({
   async setup() {
@@ -196,7 +198,7 @@ export default defineComponent({
       title: "Budgets",
       ogTitle: "Budgets",
     });
-    const { findRecords, groupBy, createRecord, updateRecord, deleteRecord } =
+    const { findRecords, createRecord, updateRecord, deleteRecord } =
       useAppVueUtils();
 
     const limitModel = ref<number>(1000);
@@ -211,6 +213,7 @@ export default defineComponent({
     const { budgets, transactions, recordIsInPullingState } = storeToRefs(
       useAppStore()
     );
+    const { currency } = storeToRefs(useAppUserConfigStore());
     const { setBudgets, updateRecordPullingStatus } = useAppStore();
     const startOfMonth = ref(moment().startOf("month"));
 
@@ -304,8 +307,8 @@ export default defineComponent({
         const data = {
           limit: limitModel.value,
           category: categoryModel.value,
-          currency: Currency.NGN,
-          currencySign: currencySignMap[Currency.NGN],
+          currency: currency.value,
+          currencySign: currencySignMap[currency.value],
         };
         const createdData = await createRecord<BudgetDTO>(data, BUDGETS);
         if (!createdData) {
@@ -406,6 +409,7 @@ export default defineComponent({
       handleBudgetCategoryUpdateChange,
       recordIsInPullingState,
       BUDGETS,
+      currency,
     };
   },
 });

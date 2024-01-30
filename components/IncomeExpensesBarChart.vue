@@ -16,7 +16,6 @@ import {
   GridComponent,
 } from "echarts/components";
 
-// Register necessary components
 echarts.use([
   BarChart,
   LineChart,
@@ -44,7 +43,7 @@ export default defineComponent({
     const chart = ref<echarts.ECharts | null>(null);
 
     onMounted(() => {
-      if (chart.value === null) {
+      if (!chart.value) {
         chart.value = echarts.init(
           document.getElementById("main") as HTMLDivElement
         );
@@ -113,7 +112,7 @@ export default defineComponent({
                 { offset: 1, color: "rgb(173, 255, 47)" },
                 { offset: 0, color: "rgb(0, 128, 0)" },
               ]),
-              barBorderRadius: [12, 12, 0, 0],
+              barBorderRadius: [10, 10, 0, 0],
             },
             data: props.data.incomes,
           },
@@ -131,7 +130,7 @@ export default defineComponent({
                 { offset: 0, color: "rgb(255, 192, 203)" },
                 { offset: 1, color: "rgb(255, 0, 0)" },
               ]),
-              barBorderRadius: [0, 0, 12, 12],
+              barBorderRadius: [0, 0, 10, 10],
             },
             data: props.data.expenses,
           },

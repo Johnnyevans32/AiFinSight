@@ -14,22 +14,22 @@
   <div class="grid grid-cols-2 gap-4">
     <overview-card
       icon="fa-solid fa-shopping-cart"
-      :value="formatMoney(overviewData.thisMonth.expense[Currency.NGN] || 0)"
-      :difference="overviewData.percentageDiff.expense[Currency.NGN] || 0"
+      :value="formatMoney(overviewData.thisMonth.expense[currency] || 0)"
+      :difference="overviewData.percentageDiff.expense[currency] || 0"
       label="Expense"
       :data="overviewData.expenses"
       :periods="overviewData.periods"
-      :currency="currencySignMap[Currency.NGN]"
+      :currency="currencySignMap[currency]"
     />
 
     <overview-card
       icon="fa-solid fa-money-bill-trend-up"
-      :value="formatMoney(overviewData.thisMonth.income[Currency.NGN] || 0)"
-      :difference="overviewData.percentageDiff.income[Currency.NGN] || 0"
+      :value="formatMoney(overviewData.thisMonth.income[currency] || 0)"
+      :difference="overviewData.percentageDiff.income[currency] || 0"
       label="Income"
       :data="overviewData.incomes"
       :periods="overviewData.periods"
-      :currency="currencySignMap[Currency.NGN]"
+      :currency="currencySignMap[currency]"
     />
   </div>
   <div class="flex items-center justify-between">
@@ -221,6 +221,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import moment from "moment";
+import { notify } from "@kyvg/vue3-notification";
 
 import { ACCOUNT_TRANSACTIONS } from "~/services/schemas";
 import { useAppStore } from "~/store";
@@ -229,16 +230,17 @@ import {
   ChartPeriodEnum,
   currencySignMap,
 } from "~/types/accounts";
-import { TransactionType, Currency, TransactionCategory } from "../types/mono";
-import { notify } from "@kyvg/vue3-notification";
+import { TransactionType, Currency, TransactionCategory } from "~/types/mono";
+import { useAppUserConfigStore } from "~/store/config";
 
 export default defineComponent({
   async setup() {
     const { transactions, accounts, recordIsInPullingState } = storeToRefs(
       useAppStore()
     );
+    const { currency } = storeToRefs(useAppUserConfigStore());
     const { setTransactions } = useAppStore();
-    const { updateRecord, groupBy } = useAppVueUtils();
+    const { updateRecord } = useAppVueUtils();
     const currentPage = ref(1);
 
     const overviewMonthOptions = Array.from({ length: 12 }, (_, index) =>
@@ -481,7 +483,7 @@ export default defineComponent({
       recordIsInPullingState,
       ACCOUNT_TRANSACTIONS,
       overviewMonthOptions,
-      overviewMonth,
+      overviewMonth,currency
     };
   },
 });

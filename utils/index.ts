@@ -193,3 +193,16 @@ export const protocolDefinition: ProtocolDefinition = {
     },
   },
 };
+
+export const groupBy = <T extends Record<string | number, any>>(
+  array: T[],
+  property: keyof T
+): Record<string | number, T> => {
+  return array.reduce((acc: Record<string | number, T>, obj: T) => {
+    const key = obj[property];
+    if (!acc[key]) {
+      acc[key] = obj;
+    }
+    return acc;
+  }, {} as Record<string | number, T>);
+};

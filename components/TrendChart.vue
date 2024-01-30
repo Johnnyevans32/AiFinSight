@@ -29,7 +29,7 @@ export default defineComponent({
     const chart = ref<echarts.ECharts | null>(null);
 
     onMounted(() => {
-      if (chart.value === null) {
+      if (!chart.value) {
         chart.value = echarts.init(
           document.getElementById(props.label) as HTMLDivElement
         );

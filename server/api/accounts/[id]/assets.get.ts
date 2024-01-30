@@ -1,9 +1,12 @@
+import { currencySignMap } from "~/types/accounts";
+import { Currency, IAccountAssetResponse } from "~/types/mono";
+
 export default defineEventHandler(async (event) => {
   try {
     const config = useRuntimeConfig();
     const accountId = getRouterParam(event, "id");
 
-    const response = await $fetch(
+    const { assets } = await $fetch<IAccountAssetResponse>(
       `${config.monoApiUrl}/accounts/${accountId}/assets`,
       {
         headers: {
@@ -15,7 +18,22 @@ export default defineEventHandler(async (event) => {
         method: "GET",
       }
     );
-    return response;
+    return assets.map((asset) => {
+      const currency = asset.currency.toUpperCase() as Currency;
+      return {
+        accountId,
+        assetId: asset._id,
+        name: asset.name,
+        cost: asset.cost,
+        type: asset.type,
+        return: asset.return,
+        quantity: asset.quantity,
+        currency,
+        price: asset.details.price,
+        currencySign: currencySignMap[currency],
+        meta: asset,
+      };
+    });
   } catch (err) {
     throw createError({
       statusCode: 400,

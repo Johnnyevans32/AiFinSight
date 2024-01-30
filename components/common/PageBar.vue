@@ -3,8 +3,16 @@
     class="text-sm items-center font-bold capitalize cursor-pointer"
     @click="router.back()"
   >
-    <font-awesome-icon icon="arrow-left" /> {{ mainPage }} /
-    {{ currentPage }}
+    <div class="flex items-center gap-1">
+      <font-awesome-icon icon="arrow-left" />
+      <p :class="currentPage && 'text-lightbase'">
+        {{ mainPage }}
+      </p>
+      <p v-show="currentPage">
+        /
+        {{ currentPage }}
+      </p>
+    </div>
   </NuxtLink>
 </template>
 
@@ -19,7 +27,7 @@ export default defineComponent({
     },
     mainPage: {
       type: String,
-      default: "Defi",
+      default: "Dashboard",
     },
   },
   setup() {

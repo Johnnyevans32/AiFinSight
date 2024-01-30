@@ -11,7 +11,8 @@ import { defineComponent } from "vue";
 import moment from "moment";
 
 import { useAppStore } from "~/store";
-import { Currency, TransactionType } from "../types/mono";
+import { TransactionType } from "~/types/mono";
+import { useAppUserConfigStore } from "~/store/config";
 
 export default defineComponent({
   async setup() {
@@ -20,6 +21,7 @@ export default defineComponent({
       ogTitle: "Analysis",
     });
     const { transactions } = storeToRefs(useAppStore());
+    const { currency } = storeToRefs(useAppUserConfigStore());
 
     const chartData = computed(() => {
       const last12Months: moment.Moment[] = [];
@@ -40,7 +42,7 @@ export default defineComponent({
         (transaction) =>
           moment(transaction.date).isSameOrAfter(
             currentDate.clone().subtract(11, "months").startOf("month")
-          ) && transaction.currency === Currency.NGN
+          ) && transaction.currency === currency.value
       );
 
       // Initialize income and expense totals for each period

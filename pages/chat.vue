@@ -67,7 +67,6 @@ export default defineComponent({
     const { budgets, transactions, accounts, assets } = storeToRefs(
       useAppStore()
     );
-    const { groupBy } = useAppVueUtils();
 
     const hoveredIndex = ref<null | number>(null);
     const suggestedPrompts = ref([
@@ -134,6 +133,22 @@ export default defineComponent({
         })
         .join("\n");
 
+      const transactionText = transactions.value
+        .map((transaction) => {
+          return `Transaction: ${transaction.narration} | Amount: ${
+            transaction.amount
+          } | Type: ${transaction.type} | Category: ${
+            transaction.category || "Uncategorized"
+          } | Currency: ${
+            transaction.currency
+          } | Account Balance After Transaction | ${
+            transaction.balance
+          } |  Account Id: ${transaction.accountId} |  Date: ${
+            transaction.date
+          } `;
+        })
+        .join("\n");
+
       const transactionsForPeriod = transactions.value.filter(
         (transaction) =>
           moment(transaction.date).isBetween(
@@ -182,7 +197,7 @@ export default defineComponent({
 
       const accountText = accounts.value
         .map((account) => {
-          return `Account: ${account.accountName} | Balance: ${account.balance} | Currency: ${account.currency}`;
+          return `Account: ${account.accountName} | Balance: ${account.balance} | Currency: ${account.currency} | Bank Name: ${account.bankName}`;
         })
         .join("\n");
 
@@ -200,9 +215,12 @@ export default defineComponent({
         })
         .join("\n");
 
+      // Monthly Financial Figures:
+      // ${monthlyFigures}
+
       const context = `
-        Monthly Financial Figures:
-        ${monthlyFigures}
+        User's Transactions:
+        ${transactionText}
 
         User's Budgets:
         ${budgetText}
