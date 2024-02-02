@@ -68,48 +68,51 @@
       transactions.
     </p>
   </div>
-  <div
-    v-else
-    v-for="budget in Object.values(formattedBudgets.budgetsGroupedByCategory)"
-    :key="budget.recordId"
-    @click="viewSingleBudget(budget)"
-    class="cursor-pointer px-5 py-2 flex space-x-3 items-center rounded-xl text-base bg-lightbase border-[1px] border-base"
-  >
-    <font-awesome-icon
-      :icon="generateIconMap(budget.category)"
-      class="h-10 w-10 rounded-xl text-2xl"
-    />
-
-    <div class="flex flex-col w-full gap-1 text-left">
-      <span class="capitalize font-bold">{{
-        budget.category.replaceAll("_", " ")
-      }}</span>
-      <CommonProgressBar
-        :percentage="
-          ((budget.amountSpentOnCategoryBudget || 0) / budget.limit) * 100
-        "
+  <div v-else class="flex flex-col gap-2">
+    <div
+      v-for="budget in Object.values(formattedBudgets.budgetsGroupedByCategory)"
+      :key="budget.recordId"
+      @click="viewSingleBudget(budget)"
+      class="cursor-pointer px-5 py-2 flex space-x-3 items-center rounded-xl text-base bg-lightbase border-[1px] border-base"
+    >
+      <font-awesome-icon
+        :icon="generateIconMap(budget.category)"
+        class="h-10 w-10 rounded-xl text-2xl"
       />
-      <div class="flex justify-between">
-        <span class="text-sm"
-          >{{ budget.currencySign }} {{ formatMoney(budget.limit) }} limit</span
-        >
-        <span
-          class="text-sm"
-          :class="
-            budget.limit - (budget.amountSpentOnCategoryBudget || 0) < 0 &&
-            'text-red-600'
+
+      <div class="flex flex-col w-full gap-1 text-left">
+        <span class="capitalize font-bold">{{
+          budget.category.replaceAll("_", " ")
+        }}</span>
+        <CommonProgressBar
+          :percentage="
+            ((budget.amountSpentOnCategoryBudget || 0) / budget.limit) * 100
           "
-          >{{ budget.currencySign }}
-          {{
-            formatMoney(
-              budget.limit - (budget.amountSpentOnCategoryBudget || 0)
-            )
-          }}
-          left</span
-        >
+        />
+        <div class="flex justify-between">
+          <span class="text-sm"
+            >{{ budget.currencySign }}
+            {{ formatMoney(budget.limit) }} limit</span
+          >
+          <span
+            class="text-sm"
+            :class="
+              budget.limit - (budget.amountSpentOnCategoryBudget || 0) < 0 &&
+              'text-red-600'
+            "
+            >{{ budget.currencySign }}
+            {{
+              formatMoney(
+                budget.limit - (budget.amountSpentOnCategoryBudget || 0)
+              )
+            }}
+            left</span
+          >
+        </div>
       </div>
     </div>
   </div>
+
   <CommonModal
     :open="createBudgetModal"
     title="Create budget"

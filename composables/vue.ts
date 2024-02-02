@@ -1,9 +1,14 @@
 import { notify } from "@kyvg/vue3-notification";
 import { DateSort } from "@tbd54566975/dwn-sdk-js";
+import { Record } from "@web5/api/dist/types/record";
+import { Protocol } from "@web5/api/dist/types/protocol";
+import { useAppStore } from "~/store";
 
 export function useAppVueUtils() {
   const config = useRuntimeConfig();
   const { $web5 } = useNuxtApp();
+
+  const { myDid } = storeToRefs(useAppStore());
 
   const useCustomFetch = async <T>(url: string, options?: any): Promise<T> => {
     const res = await $fetch<T>(url, {
@@ -44,6 +49,7 @@ export function useAppVueUtils() {
         },
       },
     });
+    console.log({ status, protocols });
 
     if (status.code !== 200) {
       notify({
@@ -53,9 +59,9 @@ export function useAppVueUtils() {
       return;
     }
 
-    if (protocols.length > 0) {
-      return;
-    }
+    // if (protocols.length > 0) {
+    //   return;
+    // }
 
     const { status: configureStatus, protocol } =
       await $web5.dwn.protocols.configure({
@@ -63,6 +69,17 @@ export function useAppVueUtils() {
           definition: protocolDefinition,
         },
       });
+
+    if (!protocol) {
+      notify({
+        type: "error",
+        title: "error configuring protocol",
+      });
+      return;
+    }
+    syncToUserDwn(protocol);
+
+    console.log({ configureStatus, protocol });
   };
 
   const createRecord = async <T>(
@@ -70,27 +87,38 @@ export function useAppVueUtils() {
     schema: string,
     parentId?: string
   ) => {
-    const { record } = await $web5.dwn.records.create({
-      data,
+    try {
+      const { record, status } = await $web5.dwn.records.write({
+        data,
+        message: {
+          protocol: protocolDefinition.protocol,
+          protocolPath: schemaPathMap[schema],
+          schema: protocolDefinition.types[schema].schema,
+          dataFormat: protocolDefinition.types[schema].dataFormats?.[0],
+          ...(parentId ? { parentId, contextId: parentId } : {}),
+        },
+      });
+      if (status.code !== 202) {
+        throw Error(status.detail);
+      }
 
-      message: {
-        protocol: protocolDefinition.protocol,
-        protocolPath: schemaPathMap[schema],
-        schema: protocolDefinition.types[schema].schema,
-        dataFormat: protocolDefinition.types[schema].dataFormats?.[0],
-        ...(parentId ? { parentId, contextId: parentId } : {}),
-      },
-    });
+      if (!record) {
+        return;
+      }
+      syncToUserDwn(record);
 
-    if (!record) {
-      return;
+      return { ...data, recordId: record?.id };
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
-    return { ...data, recordId: record?.id };
   };
   const findRecords = async <T>(schema: string, recordId?: string) => {
     const { records } = await $web5.dwn.records.query({
+      from: myDid.value,
       message: {
         filter: {
+          protocol: protocolDefinition.protocol,
           schema: protocolDefinition.types[schema].schema,
         },
         dateSort: DateSort.CreatedAscending,
@@ -115,6 +143,7 @@ export function useAppVueUtils() {
       },
     });
     await record.update({ data });
+    syncToUserDwn(record);
   };
   const deleteRecord = async (recordId: string, schema: string) => {
     await $web5.dwn.records.delete({
@@ -122,6 +151,20 @@ export function useAppVueUtils() {
         recordId,
       },
     });
+  };
+
+  const syncToUserDwn = async (
+    record: Record | Protocol,
+    targetDid: string = myDid.value
+  ) => {
+    const { status: sendStatus } = await record.send(targetDid);
+
+    if (sendStatus.code !== 202) {
+      console.log("Unable to send to target did:" + sendStatus);
+      return;
+    } else {
+      console.log("record sent to user remote dwn");
+    }
   };
 
   return {

@@ -3,23 +3,20 @@
     <CommonPageBar mainPage="Chat" />
   </div>
 
-  <CommonTabSwitch :tabMenu="tabMenu" />
+  <ChatContent />
 </template>
 <script lang="ts">
-import ChatContent from "~/components/chat/ChatContent.vue";
-import ChatConversation from "~/components/chat/ChatConversation.vue";
 export default defineComponent({
   async setup() {
     useSeoMeta({
       title: "Chat",
       ogTitle: "Chat",
     });
-    const tabMenu = shallowRef([
-      { title: "Chat", content: ChatContent },
-      { title: "Conversations", content: ChatConversation },
-    ]);
+    definePageMeta({
+      layout: "chat",
+    });
 
-    return { tabMenu };
+    return {};
   },
 });
 </script>

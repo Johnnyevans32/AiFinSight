@@ -42,6 +42,7 @@ export default defineNuxtConfig({
   build: {
     transpile: ["@headlessui/vue", "@fortawesome/vue-fontawesome"],
   },
+
   runtimeConfig: {
     public: {
       monoPublicKey: process.env.MONO_PUBLIC_KEY,

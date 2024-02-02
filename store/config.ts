@@ -9,7 +9,9 @@ export enum AppThemeEnum {
   OCEAN = "ocean",
   FOREST = "forest",
   MIDNIGHT = "midnight",
-  SUNFLOWER = "sunflower",
+  OCEAN_BREEZE = "ocean-breeze",
+  ROYAL_PURPLE = "royal-purple",
+  LAVENDER_DREAM = "lavender-dream",
 }
 
 export const useAppUserConfigStore = defineStore(

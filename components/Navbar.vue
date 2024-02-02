@@ -40,10 +40,10 @@
         :key="item.name"
         role="tab"
         v-bind:class="{ active: activeNavbar === item.name }"
-        class="cursor-pointer w-full flex flex-col py-3 px-2 text-center hover:text-base transition duration-300"
+        class="cursor-pointer w-full flex flex-col py-4 px-2 text-center hover:text-base transition duration-300"
       >
         <font-awesome-icon :icon="item.icon" />
-        <span class="text-xs">{{ item.name }}</span>
+        <!-- <span class="text-xs">{{ item.name }}</span> -->
       </NuxtLink>
     </nav>
   </div>
@@ -51,14 +51,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { useAppStore } from "~/store";
 
 export default defineComponent({
   setup() {
-    const { $did } = useNuxtApp();
-
     const route = useRoute();
-    const myDid = ref<string>("");
 
+    const { myDid } = storeToRefs(useAppStore());
     const active = ref(true);
     const items = ref([
       {
@@ -93,8 +92,6 @@ export default defineComponent({
       },
     ]);
     const accountMenuDropdownOn = ref(false);
-
-    onBeforeMount(() => (myDid.value = $did));
 
     const formattedDid = computed<string>(() => truncateString(myDid.value));
 

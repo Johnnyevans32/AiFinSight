@@ -92,4 +92,34 @@
     --border-base: 255, 195, 18;
     --border-lightbase: 255, 235, 59;
   }
+  .ocean-breeze {
+    --bg-bgbase: 255, 255, 255;
+    --bg-base: 70, 130, 180;
+    --bg-lightbase: 135, 206, 250;
+    --bg-hoverlightbase: 135, 206, 250;
+    --text-base: 70, 130, 180;
+    --text-lightbase: 135, 206, 250;
+    --border-base: 70, 130, 180;
+    --border-lightbase: 135, 206, 250;
+  }
+  .royal-purple {
+    --bg-bgbase: 255, 255, 255;
+    --bg-base: 75, 0, 130;
+    --bg-lightbase: 138, 43, 226;
+    --bg-hoverlightbase: 138, 43, 226;
+    --text-base: 75, 0, 130;
+    --text-lightbase: 138, 43, 226;
+    --border-base: 75, 0, 130;
+    --border-lightbase: 138, 43, 226;
+  }
+  .lavender-dream {
+    --bg-bgbase: 255, 255, 255;
+    --bg-base: 230, 230, 250;
+    --bg-lightbase: 230, 230, 250;
+    --bg-hoverlightbase: 221, 160, 221;
+    --text-base: 128, 0, 128;
+    --text-lightbase: 147, 112, 219;
+    --border-base: 128, 0, 128;
+    --border-lightbase: 147, 112, 219;
+  }
 }

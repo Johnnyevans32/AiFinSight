@@ -8,7 +8,6 @@ import * as echarts from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { BarChart, LineChart } from "echarts/charts";
 import {
-  TitleComponent,
   TooltipComponent,
   LegendComponent,
   ToolboxComponent,
@@ -19,7 +18,6 @@ import {
 echarts.use([
   BarChart,
   LineChart,
-  TitleComponent,
   TooltipComponent,
   LegendComponent,
   ToolboxComponent,
@@ -107,6 +105,9 @@ export default defineComponent({
                 return `₦${value}`;
               },
             },
+            emphasis: {
+              focus: "series",
+            },
             itemStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                 { offset: 1, color: "rgb(173, 255, 47)" },
@@ -125,6 +126,9 @@ export default defineComponent({
                 return `₦${value}`;
               },
             },
+            emphasis: {
+              focus: "series",
+            },
             itemStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                 { offset: 0, color: "rgb(255, 192, 203)" },
@@ -138,6 +142,9 @@ export default defineComponent({
             name: "P&L",
             type: "line",
             symbol: "none",
+            emphasis: {
+              focus: "series",
+            },
             tooltip: {
               valueFormatter: function (value: string) {
                 return `₦${value}`;

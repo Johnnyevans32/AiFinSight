@@ -132,6 +132,7 @@ export const schemaPathMap: any = {
   [ACCOUNT_ASSETS]: `${ACCOUNTS}/${ACCOUNT_ASSETS}`,
   [ACCOUNTS]: ACCOUNTS,
   [BUDGETS]: BUDGETS,
+  [CONVERSATIONS]: CONVERSATIONS,
 };
 
 export const protocolDefinition: ProtocolDefinition = {
@@ -139,15 +140,19 @@ export const protocolDefinition: ProtocolDefinition = {
   published: true,
   types: {
     ...Object.fromEntries(
-      [ACCOUNT_TRANSACTIONS, ACCOUNT_ASSETS, ACCOUNTS, BUDGETS].map(
-        (schema) => [
-          schema,
-          {
-            schema: `https://didcomm.org/finance-insight/schemas/${schema}.json`,
-            dataFormats: ["application/json"],
-          },
-        ]
-      )
+      [
+        ACCOUNT_TRANSACTIONS,
+        ACCOUNT_ASSETS,
+        ACCOUNTS,
+        BUDGETS,
+        CONVERSATIONS,
+      ].map((schema) => [
+        schema,
+        {
+          schema: `https://didcomm.org/finance-insight/schemas/${schema}.json`,
+          dataFormats: ["application/json"],
+        },
+      ])
     ),
   },
   structure: {

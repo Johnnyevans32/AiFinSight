@@ -3,7 +3,11 @@
     <CommonPageBar mainPage="Analysis" />
   </div>
 
-  <income-expenses-bar-chart :data="chartData" />
+  <chart-income-expense :data="chartData.incomeExpense" />
+  <chart-category-spending
+    :data="chartData.categoryExpense"
+    :periods="chartData.periods"
+  />
 </template>
 
 <script lang="ts">
@@ -11,7 +15,7 @@ import { defineComponent } from "vue";
 import moment from "moment";
 
 import { useAppStore } from "~/store";
-import { TransactionType } from "~/types/mono";
+import { TransactionCategory, TransactionType } from "~/types/mono";
 import { useAppUserConfigStore } from "~/store/config";
 
 export default defineComponent({
@@ -20,7 +24,7 @@ export default defineComponent({
       title: "Analysis",
       ogTitle: "Analysis",
     });
-    const { transactions } = storeToRefs(useAppStore());
+    const { transactions, budgets } = storeToRefs(useAppStore());
     const { currency } = storeToRefs(useAppUserConfigStore());
 
     const chartData = computed(() => {
@@ -48,10 +52,32 @@ export default defineComponent({
       // Initialize income and expense totals for each period
       const incomeMap = new Map<string, number>();
       const expenseMap = new Map<string, number>();
+      const categoryExpenseMap = new Map<
+        TransactionCategory,
+        { [month: string]: number }
+      >(
+        budgets.value.reduce((acc, budget) => {
+          acc.set(
+            budget.category,
+            Object.fromEntries(
+              Array.from({ length: 12 }, (_, i) => [
+                moment()
+                  .subtract(11, "months")
+                  .startOf("month")
+                  .add(i, "months")
+                  .format("MMM YY"),
+                0,
+              ])
+            )
+          );
+          return acc;
+        }, new Map())
+      );
 
+      console.log({ categoryExpenseMap });
       // Group transactions by month and calculate income and expenses
       for (const transaction of filteredTransactions) {
-        const key = moment(transaction.date).format("MM-YYYY");
+        const key = moment(transaction.date).format("MMM YY");
 
         if (!incomeMap.has(key)) {
           incomeMap.set(key, 0);
@@ -62,25 +88,56 @@ export default defineComponent({
           incomeMap.set(key, incomeMap.get(key)! + transaction.amount);
         } else if (transaction.type === TransactionType.DEBIT) {
           expenseMap.set(key, expenseMap.get(key)! + transaction.amount);
+
+          // Update categoryExpenseMap based on budgets
+          const budget = budgets.value.find(
+            (b) => b.category === transaction.category
+          );
+          const { category } = budget || {};
+          if (category) {
+            const categoryData = categoryExpenseMap.get(category);
+            if (categoryData) {
+              categoryData[key] = (categoryData[key] || 0) + transaction.amount;
+            }
+          }
         }
       }
 
-      // Calculate differences for each period
+      const categoryExpenses: Record<string, number[]> = {};
       for (const period of last12Months) {
-        const key = period.format("MM-YYYY");
+        const key = period.format("MMM YY");
         const income = incomeMap.get(key) || 0;
         const expense = expenseMap.get(key) || 0;
 
         incomes.push(income);
-        expenses.push(-expense); // Expenses are represented as negative values
+        expenses.push(-expense);
         differences.push(income - expense);
+
+        for (const [category] of categoryExpenseMap) {
+          if (!categoryExpenses[category]) {
+            categoryExpenses[category] = [];
+          }
+        }
+
+        for (const [category, monthData] of categoryExpenseMap) {
+          const expense = monthData[key] || 0;
+          const categoryData = categoryExpenses[category];
+          if (categoryData) {
+            categoryData.push(expense);
+          }
+        }
       }
 
+      console.log("finished", { categoryExpenses, periods });
       return {
+        incomeExpense: {
+          periods,
+          incomes,
+          expenses,
+          differences,
+        },
+        categoryExpense: categoryExpenses,
         periods,
-        incomes,
-        expenses,
-        differences,
       };
     });
 

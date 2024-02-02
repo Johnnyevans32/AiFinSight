@@ -7,8 +7,6 @@
         <div class="grid grid-cols-1 gap-4 p-5 text-center">
           <slot />
         </div>
-
-        <FooterBar />
       </div>
     </div>
   </div>

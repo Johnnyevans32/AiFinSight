@@ -19,6 +19,7 @@ export const useAppStore = defineStore("appStore", () => {
     [BUDGETS]: false,
   });
 
+  const myDid = ref<string>("");
   const accounts = ref<AccountDTO[]>([]);
   const assets = ref<AccountAssetDTO[]>([]);
   const transactions = ref<AccountStatementDTO[]>([]);
@@ -37,6 +38,9 @@ export const useAppStore = defineStore("appStore", () => {
     _loadingScreenText: string = "Migrating financial data, it might take a while.... hang tight 👨🏽‍🔧"
   ) {
     loadingScreenText.value = _loadingScreenText;
+  }
+  function setMyDid(_did: string) {
+    myDid.value = _did;
   }
 
   function setTransactions(_transactions: AccountStatementDTO[]) {
@@ -66,6 +70,7 @@ export const useAppStore = defineStore("appStore", () => {
     loadingScreenText,
     recordIsInPullingState,
     conversations,
+    myDid,
     updateLoadingScreenStatus,
     setTransactions,
     setAssets,
@@ -74,5 +79,6 @@ export const useAppStore = defineStore("appStore", () => {
     updateLoadingScreenText,
     updateRecordPullingStatus,
     setConversations,
+    setMyDid,
   };
 });

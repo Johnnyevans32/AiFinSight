@@ -33,31 +33,32 @@
     <p>Nothing to see here</p>
     <p>Connect your accounts to get started with your financial insights.</p>
   </div>
-  <div
-    v-else
-    v-for="account in accounts"
-    :key="account.recordId"
-    :style="
-      account.bankLogoMutedColor && {
-        background: `linear-gradient(to right, ${account.bankLogoMutedColor}, ${account.bankLogoVibrantColor})`,
-        color: account.bankLogoTextColor,
-      }
-    "
-    :class="!account.bankLogoMutedColor && 'bg-lightbase'"
-    class="cursor-pointer p-5 flex items-center h-16 justify-between rounded-xl"
-    @click="viewSingleAccount(account)"
-  >
-    <div class="flex space-x-3 items-center">
-      <CommonImage :image="account.bankLogo" :alt="account.bankName" />
-
-      <div class="flex flex-col text-left">
-        <span class="capitalize font-bold">{{ account.bankName }}</span>
-        <span class="">{{ account.accountNumber }}</span>
-      </div>
-    </div>
-    <span class="capitalize text-sm"
-      >{{ account.currencySign }} {{ formatMoney(account.balance) }}</span
+  <div v-else class="flex flex-col gap-2">
+    <div
+      v-for="account in accounts"
+      :key="account.recordId"
+      :style="
+        account.bankLogoMutedColor && {
+          background: `linear-gradient(to right, ${account.bankLogoMutedColor}, ${account.bankLogoVibrantColor})`,
+          color: account.bankLogoTextColor,
+        }
+      "
+      :class="!account.bankLogoMutedColor && 'bg-lightbase'"
+      class="cursor-pointer p-5 flex items-center h-16 justify-between rounded-xl"
+      @click="viewSingleAccount(account)"
     >
+      <div class="flex space-x-3 items-center">
+        <CommonImage :image="account.bankLogo" :alt="account.bankName" />
+
+        <div class="flex flex-col text-left">
+          <span class="capitalize font-bold">{{ account.bankName }}</span>
+          <span class="">{{ account.accountNumber }}</span>
+        </div>
+      </div>
+      <span class="capitalize text-sm"
+        >{{ account.currencySign }} {{ formatMoney(account.balance) }}</span
+      >
+    </div>
   </div>
 
   <CommonModal

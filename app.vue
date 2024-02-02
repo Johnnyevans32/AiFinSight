@@ -42,7 +42,7 @@
           <button
             type="button"
             @click="props.close"
-            class="ml-auto -mx-1.5 -my-1.5 text-white w-6 h-6 p-2 rounded-xl focus:ring-2 focus:ring-gray-400 flex items-center justify-center"
+            class="ml-auto -mx-1.5 -my-1.5 text-white w-6 h-6 p-2 rounded-xl flex items-center justify-center"
           >
             <font-awesome-icon icon="fa-solid fa-xmark" />
           </button>
@@ -71,6 +71,7 @@ import type {
 export default defineComponent({
   async setup() {
     const config = useRuntimeConfig();
+    const { $did } = useNuxtApp();
     useHead({
       titleTemplate: (titleChunk) => {
         return titleChunk && titleChunk !== config.public.appName
@@ -86,9 +87,11 @@ export default defineComponent({
       setAssets,
       setTransactions,
       updateRecordPullingStatus,
+      setMyDid,
     } = useAppStore();
     onBeforeMount(async () => {
       try {
+        setMyDid($did);
         const monoJS = "https://connect.withmono.com/connect.js";
         const script = document.createElement("script");
         script.src = monoJS;

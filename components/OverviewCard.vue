@@ -8,7 +8,7 @@
     </div>
 
     <div class="flex flex-col justify-between items-end">
-      <trend-chart
+      <chart-income-expense-trend
         :data="data"
         :periods="periods"
         class="md:block hidden"

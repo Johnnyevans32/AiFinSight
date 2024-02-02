@@ -1,44 +1,65 @@
 <template>
-  <div class="text-left">
-    <div class="flex flex-col gap-2">
-      <div class="grid grid-cols-2 md:grid-cols-2 gap-2">
-        <div
-          v-for="(promptItem, index) in suggestedPrompts"
-          :key="index"
-          class="prompt flex justify-between items-center h-16 py-2 px-5 rounded-xl bg-bgbase border-[1px] border-base cursor-pointer hover:bg-lightbase"
-          @mouseover="hoveredIndex = index"
-          @mouseout="hoveredIndex = null"
-          @click="
-            () => {
-              prompt = `${promptItem.title} ${promptItem.others}`;
-              answerQuestion();
-            }
-          "
-        >
-          <div class="text-left text-sm">
-            <p class="font-extrabold">
-              {{ promptItem.title }}
-            </p>
-            <p>{{ promptItem.others }}</p>
-          </div>
-          <font-awesome-icon
-            v-show="hoveredIndex === index"
-            icon="arrow-up"
-            class="bg-bgbase rounded-lg h-5 w-5 p-1"
-          />
-        </div>
+  <div class="md:h-[80vh] h-[70vh] flex flex-col gap-2 place-content-between">
+    <ChatConversation
+      v-show="conversations.length"
+      class="overflow-x-hidden overflow-y-auto"
+    />
+
+    <div
+      class="grid grid-cols-2 gap-2 mt-36"
+      v-show="!conversations || conversations.length === 0"
+    >
+      <div class="col-span-2 flex flex-col gap-2 mb-36">
+        <font-awesome-icon icon="robot" class="text-5xl" />
+        <h1>
+          I'm your personal financial assistant, how many I help you today?
+        </h1>
       </div>
+
+      <div
+        v-for="(promptItem, index) in suggestedPrompts"
+        :key="index"
+        class="flex justify-between items-center py-2 px-5 rounded-xl bg-bgbase border-[1px] border-base cursor-pointer hover:bg-lightbase"
+        @mouseover="hoveredIndex = index"
+        @mouseout="hoveredIndex = null"
+        @click="
+          () => {
+            prompt = `${promptItem.title} ${promptItem.others}`;
+            answerQuestion();
+          }
+        "
+      >
+        <div class="text-left text-sm">
+          <p class="font-extrabold">
+            {{ promptItem.title }}
+          </p>
+          <p>{{ promptItem.others }}</p>
+        </div>
+        <font-awesome-icon
+          v-show="hoveredIndex === index"
+          icon="arrow-up"
+          class="bg-bgbase rounded-lg h-5 w-5 p-1"
+        />
+      </div>
+    </div>
+
+    <div class="flex">
       <CommonFormInput
         v-model="prompt"
-        :validation-message="promptErrorMsg"
         @keyup.enter="answerQuestion"
+        class="flex-1"
+        custom-css="border-r-0 rounded-r-none "
         placeholder="Ask me anything about your finance"
       />
+      <button
+        class="flex items-center bg-lightbase rounded-lg p-2 border-[1px] border-l-0 border-base rounded-l-none"
+      >
+        <font-awesome-icon
+          :icon="aiResponseLoading ? 'pause' : 'arrow-up'"
+          class="bg-bgbase rounded-lg h-5 w-5 p-1"
+        />
+      </button>
     </div>
-    <div id="block" class="text-left text-base"></div>
-    <span v-show="aiResponseLoading" class="text-left text-base"
-      >crunching numbers for your answer... hang tight!</span
-    >
   </div>
 </template>
 
@@ -46,7 +67,6 @@
 import { defineComponent } from "vue";
 import { notify } from "@kyvg/vue3-notification";
 import moment from "moment";
-import Typed from "typed.js";
 
 import { useAppStore } from "~/store";
 import { BudgetDTO, ConversationDTO } from "~/types/accounts";
@@ -75,22 +95,10 @@ export default defineComponent({
     ]);
 
     const { $api } = useNuxtApp();
+
     const prompt = ref("");
-    watch(prompt, (newVal, prevVal) => {
-      !newVal
-        ? (promptErrorMsg.value = "your prompt is required")
-        : (promptErrorMsg.value = "");
-    });
-    const promptErrorMsg = ref<string>("");
 
     const aiResponseLoading = ref(false);
-
-    let typed: Typed;
-    onBeforeUnmount(() => {
-      if (typed) {
-        typed.destroy();
-      }
-    });
 
     const userFinanceContext = computed(() => {
       if (!transactions.value.length) {
@@ -231,7 +239,6 @@ export default defineComponent({
 
       return context;
     });
-
     const answerQuestion = async () => {
       try {
         if (aiResponseLoading.value) {
@@ -254,13 +261,15 @@ export default defineComponent({
           return;
         }
 
-        const response = await $api.accountService.queryContextualGpt(
-          userFinanceContext.value,
-          prompt.value
-        );
+        // const response = await $api.accountService.queryContextualGpt(
+        //   userFinanceContext.value,
+        //   prompt.value
+        // );
+
+        const response = "Hi okkk";
         aiResponseLoading.value = false;
         addToConversations(response);
-        typeCharacter(response);
+        prompt.value = "";
       } catch (error) {
         notify({
           type: "error",
@@ -271,41 +280,23 @@ export default defineComponent({
       }
     };
 
-    const addToConversations = async (response: string) => {
+    const addToConversations = (response: string) => {
       const data = {
         ai: response,
         user: prompt.value,
         date: moment().toString(),
       };
-      const createdData = await createRecord<ConversationDTO>(
-        data,
-        CONVERSATIONS
-      );
-
-      if (createdData) {
-        setConversations([...conversations.value, createdData]);
-      }
-    };
-
-    const typeCharacter = (string: string, loop = false) => {
-      const textArea = document.getElementById("block");
-      if (textArea) {
-        textArea.textContent = "";
-        typed = new Typed(textArea, {
-          strings: [string],
-          showCursor: false,
-          loop,
-        });
-      }
+      setConversations([...conversations.value, data]);
+      createRecord<ConversationDTO>(data, CONVERSATIONS);
     };
 
     return {
       prompt,
-      promptErrorMsg,
       answerQuestion,
       aiResponseLoading,
       suggestedPrompts,
       hoveredIndex,
+      conversations,
     };
   },
 });

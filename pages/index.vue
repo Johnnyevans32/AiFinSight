@@ -34,12 +34,18 @@
   </div>
   <div class="flex items-center justify-between">
     <h1 class="text-xl font-bold">Transactions</h1>
-    <CommonFormInput
-      v-model="searchQueryModel"
-      inputType="text"
-      :placeholder="String.fromCodePoint(0x1f50d) + ' search transactions'"
-      @keyup.enter="searchItem"
-    />
+    <div class="flex gap-2 items-center">
+      <CommonFormInput
+        v-model="searchQueryModel"
+        inputType="text"
+        :placeholder="String.fromCodePoint(0x1f50d) + ' search transactions'"
+        @keyup.enter="searchItem"
+      />
+      <font-awesome-icon
+        icon="sync"
+        class="bg-lightbase rounded-lg px-5 py-2 hover:bg-base cursor-pointer"
+      />
+    </div>
   </div>
 
   <div v-if="recordIsInPullingState[ACCOUNT_TRANSACTIONS]">
@@ -483,7 +489,8 @@ export default defineComponent({
       recordIsInPullingState,
       ACCOUNT_TRANSACTIONS,
       overviewMonthOptions,
-      overviewMonth,currency
+      overviewMonth,
+      currency,
     };
   },
 });
