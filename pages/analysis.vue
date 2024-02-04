@@ -74,8 +74,6 @@ export default defineComponent({
         }, new Map())
       );
 
-      console.log({ categoryExpenseMap });
-      // Group transactions by month and calculate income and expenses
       for (const transaction of filteredTransactions) {
         const key = moment(transaction.date).format("MMM YY");
 
@@ -89,7 +87,6 @@ export default defineComponent({
         } else if (transaction.type === TransactionType.DEBIT) {
           expenseMap.set(key, expenseMap.get(key)! + transaction.amount);
 
-          // Update categoryExpenseMap based on budgets
           const budget = budgets.value.find(
             (b) => b.category === transaction.category
           );
@@ -128,7 +125,6 @@ export default defineComponent({
         }
       }
 
-      console.log("finished", { categoryExpenses, periods });
       return {
         incomeExpense: {
           periods,

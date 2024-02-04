@@ -20,7 +20,9 @@
       v-for="setting in settingsItems"
       :key="setting.action"
       :to="setting.href"
+      @click="setting.settingAction"
       :target="setting.external ? '_blank' : ''"
+      :class="setting.customCss"
       class="cursor-pointer flex items-center justify-between px-5 py-2 rounded-xl text-base bg-lightbase border-[1px] border-base"
     >
       <div class="flex space-x-2 items-center">
@@ -39,6 +41,14 @@
       <font-awesome-icon icon="arrow-right" />
     </NuxtLink>
   </div>
+  <CommonConfirmationModal
+    :open="confirmDeletionModal"
+    title="Confirm data deletion from dwn"
+    desc="Are you sure you want to delete all your data associated with this protocol from your dwn? This action will delete all your financial data and chat conversations associated with this platform from your dwn."
+    :loading="deleteAllRecordsBtnLoading"
+    @change-modal-status="(value) => (confirmDeletionModal = value)"
+    @confirm-modal-action="deleteAllRecords"
+  />
 </template>
 
 <script lang="ts">
@@ -54,10 +64,14 @@ export default defineComponent({
       title: "Settings",
       ogTitle: "Settings",
     });
+    const { deleteRecordsFromProtocol } = useAppVueUtils();
     const { myDid } = storeToRefs(useAppStore());
     const { dwnEndpoint, appThemeColor, currency } = storeToRefs(
       useAppUserConfigStore()
     );
+
+    const deleteAllRecordsBtnLoading = ref(false);
+    const confirmDeletionModal = ref(false);
 
     const settingsItems = ref([
       {
@@ -81,6 +95,7 @@ export default defineComponent({
         logoType: "icon",
         href: "/settings/currency",
       },
+
       {
         logo: "fa-solid fa-bug",
         action: "report an issue",
@@ -89,7 +104,31 @@ export default defineComponent({
         external: true,
         href: generateMailToLink(),
       },
+      {
+        logo: "radiation",
+        action: "delete data",
+        value: "delete all data associated with this protocol from dwn",
+        logoType: "icon",
+        customCss: "bg-red-400",
+        settingAction: () => (confirmDeletionModal.value = true),
+      },
     ]);
+
+    const deleteAllRecords = async () => {
+      try {
+        deleteAllRecordsBtnLoading.value = true;
+
+        await deleteRecordsFromProtocol(true);
+
+        notify({
+          type: "success",
+          title: "data deleted from dwn",
+        });
+      } finally {
+        deleteAllRecordsBtnLoading.value = false;
+        confirmDeletionModal.value = false;
+      }
+    };
 
     const copyDid = async () => {
       try {
@@ -107,6 +146,9 @@ export default defineComponent({
       settingsItems,
       myDid,
       copyDid,
+      deleteAllRecords,
+      confirmDeletionModal,
+      deleteAllRecordsBtnLoading,
     };
   },
 });

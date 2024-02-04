@@ -48,11 +48,9 @@ export default defineComponent({
       }
 
       const axisLabel = {
-        textStyle: {
-          fontFamily: "Farfetch Basis Regular",
-          fontSize: 10,
-          fontWeight: "normal",
-        },
+        fontFamily: "Farfetch Basis Regular",
+        fontSize: 10,
+        fontWeight: "normal",
       };
 
       const options = {

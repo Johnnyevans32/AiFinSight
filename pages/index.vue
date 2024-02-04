@@ -48,7 +48,7 @@
     </div>
   </div>
 
-  <div v-if="recordIsInPullingState[ACCOUNT_TRANSACTIONS]">
+  <div v-show="recordIsInPullingState[ACCOUNT_TRANSACTIONS]">
     <div v-for="i in 2" :key="i">
       <div class="h-2 w-20 bg-base rounded mb-2"></div>
       <div
@@ -72,7 +72,7 @@
     </div>
   </div>
 
-  <div v-else-if="!Object.keys(formatedTransactions).length">
+  <div v-show="!Object.keys(formatedTransactions).length">
     <font-awesome-icon class="text-7xl mb-5" icon="magnifying-glass-dollar" />
     <p>No transactions yet</p>
     <p>
@@ -81,7 +81,7 @@
     </p>
   </div>
 
-  <div v-else>
+  <div v-show="Object.keys(formatedTransactions).length">
     <div
       v-for="(transactions, date) in formatedTransactions"
       :key="date"
@@ -97,8 +97,8 @@
         <div class="flex space-x-2 items-center">
           <div class="text-sm transform translate-y-0">
             <CommonImage
-              :image="accountsGroupedById[txn.accountId].bankLogo"
-              :alt="accountsGroupedById[txn.accountId].bankName"
+              :image="accountsGroupedById[txn.accountId]?.bankLogo"
+              :alt="accountsGroupedById[txn.accountId]?.bankName"
             />
             <font-awesome-icon
               v-if="txn?.type === TransactionType.DEBIT"
@@ -170,8 +170,8 @@
           <span>Source bank account:</span>
           <span class="font-bold flex items-center gap-2">
             <CommonImage
-              :image="accountsGroupedById[modalTransaction.accountId].bankLogo"
-              :alt="accountsGroupedById[modalTransaction.accountId].bankName"
+              :image="accountsGroupedById[modalTransaction.accountId]?.bankLogo"
+              :alt="accountsGroupedById[modalTransaction.accountId]?.bankName"
             />
             {{ accountsGroupedById[modalTransaction.accountId]?.accountNumber }}
           </span>

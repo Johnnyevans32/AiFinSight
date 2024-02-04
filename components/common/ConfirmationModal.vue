@@ -24,6 +24,7 @@
 </template>
 
 <script lang="ts">
+import { notify } from "@kyvg/vue3-notification";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -44,8 +45,16 @@ export default defineComponent({
   },
   emits: ["changeModalStatus", "confirmModalAction"],
   setup(props, ctx) {
-    const changeModalStatus = (value: boolean) =>
+    const changeModalStatus = (value: boolean) => {
+      if (props.loading) {
+        notify({
+          type: "info",
+          title: "you cant close modal while an action is in progress",
+        });
+        return;
+      }
       ctx.emit("changeModalStatus", value);
+    };
 
     const handleBtnClickAction = () => ctx.emit("confirmModalAction");
 

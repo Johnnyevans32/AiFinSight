@@ -9,7 +9,7 @@
     v-else
     class="bg-base h-10 w-10 text-lightbase rounded-xl flex items-center justify-center text-xl"
   >
-    {{ alt.split("")[0] }}
+    {{ alt?.split("")[0] || "?" }}
   </div>
 </template>
 <script lang="ts">
@@ -22,7 +22,6 @@ export default defineComponent({
     },
     alt: {
       type: String,
-      required: true,
     },
   },
   setup(props, ctx) {

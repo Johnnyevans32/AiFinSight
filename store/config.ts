@@ -4,13 +4,10 @@ export enum AppThemeEnum {
   LIGHT = "light",
   DARK = "dark",
   COFFEE = "coffee",
-  CHERRY = "cherry",
   WHITE = "white",
-  OCEAN = "ocean",
   FOREST = "forest",
   MIDNIGHT = "midnight",
   OCEAN_BREEZE = "ocean-breeze",
-  ROYAL_PURPLE = "royal-purple",
   LAVENDER_DREAM = "lavender-dream",
 }
 

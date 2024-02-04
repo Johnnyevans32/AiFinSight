@@ -19,7 +19,7 @@
             leave-to="opacity-0"
           >
             <DialogOverlay
-              class="fixed inset-0 bg-lightbase bg-opacity-75 transition-opacity"
+              class="fixed inset-0 bg-lightbase bg-opacity-30 transition-opacity"
             />
           </TransitionChild>
 

@@ -359,13 +359,11 @@ export default defineComponent({
         if (modalBudget.value && modalBudget.value.recordId) {
           deleteRecord(modalBudget.value.recordId, BUDGETS);
 
-          console.log("udgets.gege.", budgets.value);
           const updatedBudgets = budgets.value.filter(
             (budget) => budget.recordId !== modalBudget.value?.recordId
           );
 
           setBudgets(updatedBudgets);
-          console.log("udgets.value.", budgets.value);
 
           notify({
             type: "success",

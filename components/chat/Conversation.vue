@@ -48,7 +48,7 @@
 import Typed from "typed.js";
 
 import { CONVERSATIONS } from "~/services/schemas";
-import { ConversationDTO } from "~/types/accounts";
+import type { ConversationDTO } from "~/types/accounts";
 import { useAppStore } from "~/store";
 
 export default defineComponent({

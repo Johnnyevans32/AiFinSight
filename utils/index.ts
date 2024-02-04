@@ -1,5 +1,6 @@
 import moment from "moment";
-import { ProtocolDefinition } from "@tbd54566975/dwn-sdk-js";
+import type { ProtocolDefinition } from "@tbd54566975/dwn-sdk-js";
+import { Temporal } from "@js-temporal/polyfill";
 
 import {
   ACCOUNTS,
@@ -228,4 +229,8 @@ export const groupBy = <T extends Record<string | number, any>>(
     }
     return acc;
   }, {} as Record<string | number, T>);
+};
+
+export const formatToWeb5Date = (date: string) => {
+  return Temporal.Instant.from(date).toString({ smallestUnit: "microseconds" });
 };

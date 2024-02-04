@@ -149,10 +149,13 @@ export default defineComponent({
       ogTitle: "Accounts",
     });
     const { $api } = useNuxtApp();
-    const { createRecord, $launchMono, findRecords, deleteRecord } =
-      useAppVueUtils();
-    const { accounts, transactions, assets, recordIsInPullingState } =
-      storeToRefs(useAppStore());
+    const {
+      createRecord,
+      $launchMono,
+      findRecords,
+      deleteRecordsFromProtocol,
+    } = useAppVueUtils();
+    const { accounts, recordIsInPullingState } = storeToRefs(useAppStore());
     const { updateLoadingScreenText } = useAppStore();
     const viewSingleAccountModal = ref(false);
     const unlinkBtnLoading = ref(false);
@@ -187,7 +190,12 @@ export default defineComponent({
 
       const createRecordPromises: Promise<any>[] = [
         ...accountStatement.map((item) =>
-          createRecord(item, ACCOUNT_TRANSACTIONS, accountRecord?.recordId)
+          createRecord(
+            item,
+            ACCOUNT_TRANSACTIONS,
+            accountRecord?.recordId,
+            item.date
+          )
         ),
         ...accountAssets.map((item) =>
           createRecord(item, ACCOUNT_ASSETS, accountRecord?.recordId)
@@ -271,41 +279,9 @@ export default defineComponent({
         const { value: modalAccountValue } = modalAccount;
 
         if (modalAccountValue && modalAccountValue.recordId) {
-          const { accountId, recordId } = modalAccountValue;
-          const { value: transactionsValue } = transactions;
-          const { value: assetsValue } = assets;
+          const { accountId } = modalAccountValue;
 
-          await $api.accountService.disconnect(accountId);
-
-          const deleteRecordPromises = [
-            deleteRecord(recordId, ACCOUNTS),
-            ...transactionsValue
-              .filter((txn) => txn.accountId === accountId)
-              .map((txn) =>
-                deleteRecord(txn.recordId || "", ACCOUNT_TRANSACTIONS)
-              ),
-            ...assetsValue
-              .filter((asset) => asset.accountId === accountId)
-              .map((asset) =>
-                deleteRecord(asset.recordId || "", ACCOUNT_ASSETS)
-              ),
-          ];
-
-          await Promise.all(deleteRecordPromises);
-
-          const updatedAccounts = accounts.value.filter(
-            (acc) => acc.accountId !== accountId
-          );
-          const updatedTransactions = transactionsValue.filter(
-            (txn) => txn.accountId !== accountId
-          );
-          const updatedAssets = assetsValue.filter(
-            (asset) => asset.accountId !== accountId
-          );
-
-          setAccounts(updatedAccounts);
-          setTransactions(updatedTransactions);
-          setAssets(updatedAssets);
+          await deleteRecordsFromProtocol(false, [accountId]);
 
           notify({
             type: "success",

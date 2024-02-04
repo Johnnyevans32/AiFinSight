@@ -1,6 +1,6 @@
 <template>
   <Loading />
-  <div class="h-screen">
+  <div class="min-h-screen">
     <Navbar />
     <div class="grid grid-cols-4 gap-y-4">
       <div class="col-span-4 md:col-start-2 md:col-span-2">

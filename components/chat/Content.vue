@@ -69,7 +69,7 @@ import { notify } from "@kyvg/vue3-notification";
 import moment from "moment";
 
 import { useAppStore } from "~/store";
-import { BudgetDTO, ConversationDTO } from "~/types/accounts";
+import type { BudgetDTO, ConversationDTO } from "~/types/accounts";
 import { TransactionType, TransactionCategory } from "~/types/mono";
 import { CONVERSATIONS } from "~/services/schemas";
 

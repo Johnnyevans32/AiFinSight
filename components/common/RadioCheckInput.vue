@@ -1,41 +1,29 @@
 <template>
-  <div>
-    <RadioGroup v-model="selectedOption" class="text-left space-y-1">
-      <RadioGroupLabel>Select {{ name }}:</RadioGroupLabel>
-      <div class="space-y-2">
-        <RadioGroupOption
-          as="template"
-          v-for="option in options"
-          :key="option"
-          :value="option"
-          v-slot="{ active, checked }"
+  <RadioGroup v-model="selectedOption" class="text-left space-y-1">
+    <RadioGroupLabel>Select {{ name }}:</RadioGroupLabel>
+    <div class="space-y-2">
+      <RadioGroupOption
+        as="template"
+        v-for="option in options"
+        :key="option"
+        :value="option"
+        v-slot="{ checked }"
+      >
+        <div
+          class="cursor-pointer rounded-xl flex items-center justify-between px-5 py-1 w-full border-[1px] border-base bg-lightbase"
         >
-          <div
-            :class="[
-              active
-                ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-sky-300'
-                : '',
-              checked ? ' text-white ' : 'bg-base ',
-            ]"
-            class="cursor-pointer rounded-xl flex items-center justify-between px-5 py-1 w-full border-[1px] border-base bg-lightbase focus:outline-none"
-          >
-            <RadioGroupLabel as="p" class="text-base">
-              {{ option }}
-            </RadioGroupLabel>
+          <RadioGroupLabel as="p" class="text-base">
+            {{ option.replaceAll("-", " ") }}
+          </RadioGroupLabel>
 
-            <div class="text-base text-2xl">
-              <font-awesome-icon v-if="checked" icon="circle-check" />
-              <font-awesome-icon
-                v-else
-                icon="circle-minus"
-                class="text-white"
-              />
-            </div>
+          <div class="text-2xl">
+            <font-awesome-icon v-if="checked" icon="circle-check" />
+            <font-awesome-icon v-else icon="fa-regular fa-circle" />
           </div>
-        </RadioGroupOption>
-      </div>
-    </RadioGroup>
-  </div>
+        </div>
+      </RadioGroupOption>
+    </div>
+  </RadioGroup>
 </template>
 
 <script lang="ts">

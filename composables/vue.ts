@@ -3,12 +3,28 @@ import { DateSort } from "@tbd54566975/dwn-sdk-js";
 import { Record } from "@web5/api/dist/types/record";
 import { Protocol } from "@web5/api/dist/types/protocol";
 import { useAppStore } from "~/store";
+import {
+  ACCOUNTS,
+  ACCOUNT_TRANSACTIONS,
+  ACCOUNT_ASSETS,
+  BUDGETS,
+  CONVERSATIONS,
+} from "~/services/schemas";
 
 export function useAppVueUtils() {
   const config = useRuntimeConfig();
   const { $web5 } = useNuxtApp();
+  const { $api } = useNuxtApp();
 
-  const { myDid } = storeToRefs(useAppStore());
+  const { myDid, transactions, assets, accounts, budgets, conversations } =
+    storeToRefs(useAppStore());
+  const {
+    setAccounts,
+    setTransactions,
+    setAssets,
+    setConversations,
+    setBudgets,
+  } = useAppStore();
 
   const useCustomFetch = async <T>(url: string, options?: any): Promise<T> => {
     const res = await $fetch<T>(url, {
@@ -31,6 +47,57 @@ export function useAppVueUtils() {
     connect.open();
   };
 
+  const deleteRecordsFromProtocol = async (
+    deleteAll = false,
+    accountIds: string[] = accounts.value.map((acc) => acc.accountId)
+  ) => {
+    accountIds.map((accountId) => $api.accountService.disconnect(accountId));
+
+    const deleteRecordPromises = [
+      ...accounts.value
+        .filter(
+          (account) => accountIds.includes(account.accountId) || deleteAll
+        )
+        .map((account) => deleteRecord(account.recordId || "", ACCOUNTS)),
+      ...transactions.value
+        .filter((txn) => accountIds.includes(txn.accountId) || deleteAll)
+        .map((txn) => deleteRecord(txn.recordId || "", ACCOUNT_TRANSACTIONS)),
+      ...assets.value
+        .filter((asset) => accountIds.includes(asset.accountId) || deleteAll)
+        .map((asset) => deleteRecord(asset.recordId || "", ACCOUNT_ASSETS)),
+      ...(deleteAll
+        ? budgets.value.map((budget) =>
+            deleteRecord(budget.recordId || "", BUDGETS)
+          )
+        : []),
+      ...(deleteAll
+        ? conversations.value.map((conversation) =>
+            deleteRecord(conversation.recordId || "", CONVERSATIONS)
+          )
+        : []),
+    ];
+
+    await Promise.all(deleteRecordPromises);
+    const updatedAccounts = accounts.value.filter(
+      (acc) => !accountIds.includes(acc.accountId) && !deleteAll
+    );
+    const updatedTransactions = transactions.value.filter(
+      (txn) => !accountIds.includes(txn.accountId) && !deleteAll
+    );
+    const updatedAssets = assets.value.filter(
+      (asset) => !accountIds.includes(asset.accountId) && !deleteAll
+    );
+
+    setAccounts(updatedAccounts);
+    setTransactions(updatedTransactions);
+    setAssets(updatedAssets);
+
+    if (deleteAll) {
+      setAccounts([]);
+      setConversations([]);
+    }
+  };
+
   const validateDwnEnpoint = async (dwnUrl: string) => {
     try {
       const healthCheck = await fetch(`${dwnUrl}/health`);
@@ -42,27 +109,6 @@ export function useAppVueUtils() {
   };
 
   const configureProtocol = async () => {
-    const { protocols, status } = await $web5.dwn.protocols.query({
-      message: {
-        filter: {
-          protocol: protocolDefinition.protocol,
-        },
-      },
-    });
-    console.log({ status, protocols });
-
-    if (status.code !== 200) {
-      notify({
-        type: "error",
-        title: "error querying protocols",
-      });
-      return;
-    }
-
-    // if (protocols.length > 0) {
-    //   return;
-    // }
-
     const { status: configureStatus, protocol } =
       await $web5.dwn.protocols.configure({
         message: {
@@ -85,7 +131,8 @@ export function useAppVueUtils() {
   const createRecord = async <T>(
     data: T,
     schema: string,
-    parentId?: string
+    parentId?: string,
+    dateCreated?: string
   ) => {
     try {
       const { record, status } = await $web5.dwn.records.write({
@@ -96,6 +143,12 @@ export function useAppVueUtils() {
           schema: protocolDefinition.types[schema].schema,
           dataFormat: protocolDefinition.types[schema].dataFormats?.[0],
           ...(parentId ? { parentId, contextId: parentId } : {}),
+          ...(dateCreated
+            ? {
+                dateCreated: formatToWeb5Date(dateCreated),
+                messageTimestamp: formatToWeb5Date(dateCreated),
+              }
+            : {}),
         },
       });
       if (status.code !== 202) {
@@ -136,21 +189,59 @@ export function useAppVueUtils() {
 
     return loadRecords as T;
   };
+
+  const findPaginatedRecords = async <T>(
+    schema: string,
+    recordId?: string,
+    itemsPerPage = 10
+  ) => {
+    const { records } = await $web5.dwn.records.query({
+      from: myDid.value,
+      message: {
+        filter: {
+          protocol: protocolDefinition.protocol,
+          schema: protocolDefinition.types[schema].schema,
+        },
+        pagination: {
+          limit: itemsPerPage,
+        },
+        dateSort: DateSort.CreatedAscending,
+        ...(recordId ? { recordId } : {}),
+      },
+    });
+    const loadRecords = await Promise.all(
+      (records || []).map(
+        async (record: { data: { json: () => any }; id: any }) => {
+          const data = await record.data.json();
+          return { recordId: record.id, ...data };
+        }
+      )
+    );
+
+    return loadRecords as T;
+  };
   const updateRecord = async (recordId: string, data: any, schema: string) => {
-    const { record } = await $web5.dwn.records.read({
+    const { record, status } = await $web5.dwn.records.read({
       message: {
         filter: { recordId },
       },
     });
+    if (!record) {
+      return;
+    }
     await record.update({ data });
+
     syncToUserDwn(record);
   };
   const deleteRecord = async (recordId: string, schema: string) => {
-    await $web5.dwn.records.delete({
+    const { status } = await $web5.dwn.records.delete({
+      from: myDid.value,
       message: {
         recordId,
       },
     });
+
+    return { status, recordId };
   };
 
   const syncToUserDwn = async (
@@ -160,10 +251,10 @@ export function useAppVueUtils() {
     const { status: sendStatus } = await record.send(targetDid);
 
     if (sendStatus.code !== 202) {
-      console.log("Unable to send to target did:" + sendStatus);
+      console.log("Unable to send to target did:", { sendStatus });
       return;
     } else {
-      console.log("record sent to user remote dwn");
+      console.log("record sent to user remote dwn", { sendStatus });
     }
   };
 
@@ -176,5 +267,6 @@ export function useAppVueUtils() {
     createRecord,
     configureProtocol,
     validateDwnEnpoint,
+    deleteRecordsFromProtocol,
   };
 }
