@@ -3,11 +3,12 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+
     <notifications position="top center" width="500px" animation-type="css">
       <template #body="props">
         <div
           :class="[
-            'flex p-5 mx-[5px] mb-[5px] font-semibold bg-black border-l-4 text-white',
+            'flex items-center p-5 mx-[5px] mb-[5px] font-semibold bg-black border-l-4 text-white',
             {
               'border-green-500': props.item.type === 'success',
               'border-blue-500': props.item.type === 'info',
@@ -92,6 +93,7 @@ export default defineComponent({
     onBeforeMount(async () => {
       try {
         setMyDid($did);
+
         const monoJS = "https://connect.withmono.com/connect.js";
         const script = document.createElement("script");
         script.src = monoJS;
@@ -133,6 +135,16 @@ html {
 }
 .specialfont {
   font-family: "Panchang", sans-serif;
+}
+
+@font-face {
+  font-family: "PowerGroteskTrial-Bold";
+  src: local("PowerGroteskTrial"),
+    url("./assets/PowerGroteskTrial-Bold.ttf") format("truetype");
+}
+
+.logo {
+  font-family: "PowerGroteskTrial-Bold", sans-serif;
 }
 
 *,

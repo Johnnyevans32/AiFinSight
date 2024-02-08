@@ -7,19 +7,44 @@
         <div class="grid grid-cols-1 gap-4 p-5 text-center">
           <slot />
         </div>
-
-        <FooterBar />
       </div>
     </div>
   </div>
+  <v-idle
+    v-if="user.isGuardScreenEnabled"
+    @idle="onidle"
+    @remind="onremind"
+    :loop="true"
+    :reminders="[10, 15]"
+    :wait="5"
+    :duration="300"
+  />
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-
+import { notify } from "@kyvg/vue3-notification";
+import { useAppStore } from "~/store";
 export default defineComponent({
   setup() {
-    return {};
+    const route = useRoute();
+    const { user } = storeToRefs(useAppStore());
+    const { setAppLocked } = useAppStore();
+    const onidle = async () => {
+      setAppLocked(true);
+      await navigateTo(`/guard?redirect=${route.fullPath}`);
+      notify({
+        type: "info",
+        title: "You have been logged out",
+      });
+    };
+
+    const onremind = (time: number) => {
+      notify({
+        type: "info",
+        title: `We care about your security! To ensure the safety of your account, you will be automatically logged out if there is no activity detected for ${time} seconds. Please stay active to avoid being locked out.`,
+      });
+    };
+    return { onremind, onidle, user };
   },
 });
 </script>

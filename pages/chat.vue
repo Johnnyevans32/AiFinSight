@@ -12,9 +12,6 @@ export default defineComponent({
       title: "Chat",
       ogTitle: "Chat",
     });
-    definePageMeta({
-      layout: "chat",
-    });
 
     return {};
   },

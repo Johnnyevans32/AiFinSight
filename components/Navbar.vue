@@ -4,13 +4,8 @@
   >
     <nav class="grid grid-cols-3 justify-items-center">
       <div class="justify-self-start flex space-x-2 w-40 items-center">
-        <img
-          v-if="myDid"
-          :src="`https://robohash.org/${myDid}`"
-          alt="avatar"
-          class="w-7 h-7 rounded-xl"
-        />
-        <span class="text-xs">{{ formattedDid }}</span>
+        <img :src="`./logo.jpg`" alt="logo" class="w-7 h-7 rounded-xl" />
+        <span class="logo">{{ config.public.appName }}</span>
       </div>
 
       <div class="flex justify-center">
@@ -51,14 +46,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { useAppStore } from "~/store";
 
 export default defineComponent({
   setup() {
     const route = useRoute();
+    const config = useRuntimeConfig();
 
-    const { myDid } = storeToRefs(useAppStore());
-    const active = ref(true);
     const items = ref([
       {
         name: "Dashboard",
@@ -91,9 +84,6 @@ export default defineComponent({
         href: "/settings",
       },
     ]);
-    const accountMenuDropdownOn = ref(false);
-
-    const formattedDid = computed<string>(() => truncateString(myDid.value));
 
     const activeNavbar = computed(() => {
       const { path } = route;
@@ -108,12 +98,9 @@ export default defineComponent({
     });
 
     return {
-      active,
       items,
-      accountMenuDropdownOn,
       activeNavbar,
-      myDid,
-      formattedDid,
+      config,
     };
   },
 });

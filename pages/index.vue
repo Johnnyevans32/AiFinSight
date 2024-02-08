@@ -41,10 +41,10 @@
         :placeholder="String.fromCodePoint(0x1f50d) + ' search transactions'"
         @keyup.enter="searchItem"
       />
-      <font-awesome-icon
+      <!-- <font-awesome-icon
         icon="sync"
         class="bg-lightbase rounded-lg px-5 py-2 hover:bg-base cursor-pointer"
-      />
+      /> -->
     </div>
   </div>
 
@@ -72,7 +72,12 @@
     </div>
   </div>
 
-  <div v-show="!Object.keys(formatedTransactions).length">
+  <div
+    v-show="
+      !Object.keys(formatedTransactions).length &&
+      !recordIsInPullingState[ACCOUNT_TRANSACTIONS]
+    "
+  >
     <font-awesome-icon class="text-7xl mb-5" icon="magnifying-glass-dollar" />
     <p>No transactions yet</p>
     <p>
@@ -81,7 +86,12 @@
     </p>
   </div>
 
-  <div v-show="Object.keys(formatedTransactions).length">
+  <div
+    v-show="
+      Object.keys(formatedTransactions).length &&
+      !recordIsInPullingState[ACCOUNT_TRANSACTIONS]
+    "
+  >
     <div
       v-for="(transactions, date) in formatedTransactions"
       :key="date"

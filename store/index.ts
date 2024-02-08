@@ -4,6 +4,7 @@ import type {
   AccountStatementDTO,
   BudgetDTO,
   ConversationDTO,
+  UserDTO,
 } from "~/types/accounts";
 import { ACCOUNT_TRANSACTIONS, ACCOUNTS, BUDGETS } from "~/services/schemas";
 
@@ -13,6 +14,9 @@ export const useAppStore = defineStore("appStore", () => {
     "Migrating financial data, it might take a while.... hang tight 👨🏽‍🔧"
   );
 
+  const appLocked = ref(false);
+  const inactivityPeriodLimit = ref();
+
   const recordIsInPullingState = ref<{ [schema: string]: boolean }>({
     [ACCOUNT_TRANSACTIONS]: false,
     [ACCOUNTS]: false,
@@ -20,6 +24,7 @@ export const useAppStore = defineStore("appStore", () => {
   });
 
   const myDid = ref<string>("");
+  const user = ref<UserDTO>({});
   const accounts = ref<AccountDTO[]>([]);
   const assets = ref<AccountAssetDTO[]>([]);
   const transactions = ref<AccountStatementDTO[]>([]);
@@ -61,6 +66,15 @@ export const useAppStore = defineStore("appStore", () => {
   function setConversations(_conversations: ConversationDTO[]) {
     conversations.value = _conversations;
   }
+
+  function setUser(_user: UserDTO) {
+    user.value = _user;
+  }
+
+  function setAppLocked(_state: boolean) {
+    appLocked.value = _state;
+  }
+
   return {
     accounts,
     assets,
@@ -71,6 +85,9 @@ export const useAppStore = defineStore("appStore", () => {
     recordIsInPullingState,
     conversations,
     myDid,
+    appLocked,
+    inactivityPeriodLimit,
+    setAppLocked,
     updateLoadingScreenStatus,
     setTransactions,
     setAssets,
@@ -80,5 +97,7 @@ export const useAppStore = defineStore("appStore", () => {
     updateRecordPullingStatus,
     setConversations,
     setMyDid,
+    user,
+    setUser,
   };
 });

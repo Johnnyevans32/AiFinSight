@@ -22,12 +22,13 @@
         ></path>
       </svg>
 
-      <p class="text-gray-600 mt-5">{{ loadingScreenText }}</p>
+      <p class="text-base mt-5">{{ loadingScreenText }}</p>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { useAppUserConfigStore } from "~/store/config";
 import { defineComponent } from "vue";
 import { useAppStore } from "~/store";
 

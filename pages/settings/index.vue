@@ -17,7 +17,7 @@
   </span>
   <div class="flex flex-col gap-2">
     <NuxtLink
-      v-for="setting in settingsItems"
+      v-for="setting in settingsItems.filter((i) => !i.disabled)"
       :key="setting.action"
       :to="setting.href"
       @click="setting.settingAction"
@@ -65,7 +65,8 @@ export default defineComponent({
       ogTitle: "Settings",
     });
     const { deleteRecordsFromProtocol } = useAppVueUtils();
-    const { myDid } = storeToRefs(useAppStore());
+    const { myDid, user } = storeToRefs(useAppStore());
+    const { setAppLocked } = useAppStore();
     const { dwnEndpoint, appThemeColor, currency } = storeToRefs(
       useAppUserConfigStore()
     );
@@ -82,6 +83,13 @@ export default defineComponent({
         href: "/settings/dwn",
       },
       {
+        logo: "shield",
+        action: "guard",
+        value: "manage settings to guard your data",
+        logoType: "icon",
+        href: "/settings/guard",
+      },
+      {
         logo: "fa-solid fa-palette",
         action: "theme",
         value: appThemeColor.value,
@@ -95,7 +103,21 @@ export default defineComponent({
         logoType: "icon",
         href: "/settings/currency",
       },
-
+      {
+        logo: "lock",
+        action: "lock app",
+        value: "lock app from external intruders",
+        logoType: "icon",
+        disabled: !user.value.isGuardScreenEnabled,
+        settingAction: async () => {
+          setAppLocked(true);
+          await navigateTo("/guard");
+          notify({
+            type: "info",
+            title: "app locked",
+          });
+        },
+      },
       {
         logo: "fa-solid fa-bug",
         action: "report an issue",
@@ -131,15 +153,11 @@ export default defineComponent({
     };
 
     const copyDid = async () => {
-      try {
-        await navigator.clipboard.writeText(myDid.value);
-        notify({
-          type: "success",
-          title: `copied`,
-        });
-      } catch (e) {
-        console.error(e);
-      }
+      await navigator.clipboard.writeText(myDid.value);
+      notify({
+        type: "success",
+        title: `copied`,
+      });
     };
 
     return {

@@ -234,3 +234,11 @@ export const groupBy = <T extends Record<string | number, any>>(
 export const formatToWeb5Date = (date: string) => {
   return Temporal.Instant.from(date).toString({ smallestUnit: "microseconds" });
 };
+
+export const comparePassword = (password: string, userPassword: string) => {
+  return password === userPassword;
+};
+
+export const generateRandomDigits = (length = 6) => {
+  return Array.from({ length }, () => Math.floor(Math.random() * 10)).join("");
+};

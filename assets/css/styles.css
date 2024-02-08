@@ -122,4 +122,14 @@
     --border-base: 128, 0, 128;
     --border-lightbase: 147, 112, 219;
   }
+  .lemon {
+    --bg-bgbase: 255, 255, 255;
+    --bg-base: 141, 194, 0;
+    --bg-lightbase: 201, 254, 0;
+    --bg-hoverlightbase: 201, 254, 0;
+    --text-base: 31, 41, 55;
+    --text-lightbase: 181, 234, 30;
+    --border-base: 31, 41, 55;
+    --border-lightbase: 201, 254, 0;
+  }
 }

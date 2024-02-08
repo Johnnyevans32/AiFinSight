@@ -4,6 +4,14 @@ import {
   type TransactionType,
 } from "./mono";
 
+export type UserDTO = {
+  email?: string;
+  password?: string;
+  isGuardScreenEnabled?: boolean;
+  resetPasswordCode?: string;
+  resetPasswordCodeExpiresAt?: string;
+};
+
 export type AccountDTO = {
   recordId?: string;
   accountId: string;
