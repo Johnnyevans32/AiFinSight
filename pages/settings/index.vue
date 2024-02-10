@@ -97,7 +97,7 @@ export default defineComponent({
         href: "/settings/theme",
       },
       {
-        logo: "dollar-sign",
+        logo: "naira-sign",
         action: "currency",
         value: currency.value,
         logoType: "icon",
