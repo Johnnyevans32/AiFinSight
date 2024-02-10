@@ -42,6 +42,6 @@
     "vue-awesome-paginate": "^1.1.46"
   },
   "engines": {
-    "node": "20.9"
+    "node": "20"
   }
 }
