@@ -11,6 +11,7 @@
     </div>
   </div>
   <v-idle
+    v-show="false"
     v-if="user.isGuardScreenEnabled"
     @idle="onidle"
     @remind="onremind"
@@ -34,14 +35,14 @@ export default defineComponent({
       await navigateTo(`/guard?redirect=${route.fullPath}`);
       notify({
         type: "info",
-        title: "You have been logged out",
+        title: "You have been locked out",
       });
     };
 
     const onremind = (time: number) => {
       notify({
         type: "info",
-        title: `We care about your security! To ensure the safety of your account, you will be automatically logged out if there is no activity detected for ${time} seconds. Please stay active to avoid being locked out.`,
+        title: `We care about your security! To ensure the safety of your account, you will be automatically locked out if there is no activity detected for ${time} seconds. Please stay active to avoid being locked out.`,
       });
     };
     return { onremind, onidle, user };

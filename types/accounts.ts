@@ -5,6 +5,7 @@ import {
 } from "./mono";
 
 export type UserDTO = {
+  recordId?: string;
   email?: string;
   password?: string;
   isGuardScreenEnabled?: boolean;

@@ -149,12 +149,9 @@ export default defineComponent({
       ogTitle: "Accounts",
     });
     const { $api } = useNuxtApp();
-    const {
-      createRecord,
-      $launchMono,
-      findRecords,
-      deleteRecordsFromProtocol,
-    } = useAppVueUtils();
+    const { $launchMono, deleteRecordsFromProtocol } = useAppVueUtils();
+
+    const { createRecord, findRecords } = useWeb5VueUtils();
     const { accounts, recordIsInPullingState } = storeToRefs(useAppStore());
     const { updateLoadingScreenText } = useAppStore();
     const viewSingleAccountModal = ref(false);
@@ -245,7 +242,6 @@ export default defineComponent({
             updateLoadingScreenStatus(true);
             await linkAccount(response.code);
           } catch (err) {
-            console.error(err);
             notify({
               type: "error",
               title: "error occurred",

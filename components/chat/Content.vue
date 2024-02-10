@@ -10,9 +10,9 @@
       v-show="!conversations || conversations.length === 0"
     >
       <div class="col-span-2 flex flex-col gap-2 mb-36">
-        <font-awesome-icon icon="robot" class="text-5xl" />
+        <font-awesome-icon icon="fa-brands fa-android" class="text-5xl" />
         <h1>
-          I'm your personal financial assistant, how many I help you today?
+          I'm your personal financial assistant, how may I help you today?
         </h1>
       </div>
 
@@ -83,7 +83,7 @@ export default defineComponent({
   async setup() {
     const { budgets, transactions, accounts, assets, conversations } =
       storeToRefs(useAppStore());
-    const { createRecord } = useAppVueUtils();
+    const { createRecord } = useWeb5VueUtils();
     const { setConversations } = useAppStore();
 
     const hoveredIndex = ref<null | number>(null);

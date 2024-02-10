@@ -14,7 +14,7 @@ export const useAppStore = defineStore("appStore", () => {
     "Migrating financial data, it might take a while.... hang tight 👨🏽‍🔧"
   );
 
-  const appLocked = ref(false);
+  const appLocked = ref(true);
   const inactivityPeriodLimit = ref();
 
   const recordIsInPullingState = ref<{ [schema: string]: boolean }>({

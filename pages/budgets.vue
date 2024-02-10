@@ -202,7 +202,7 @@ export default defineComponent({
       ogTitle: "Budgets",
     });
     const { findRecords, createRecord, updateRecord, deleteRecord } =
-      useAppVueUtils();
+      useWeb5VueUtils();
 
     const limitModel = ref<number>(1000);
     const categoryModel = ref<TransactionCategory>(TransactionCategory.FOOD);
@@ -321,7 +321,7 @@ export default defineComponent({
           });
           return;
         }
-        setBudgets([...budgets.value, createdData]);
+        setBudgets([createdData, ...budgets.value]);
       } finally {
         createBudgetBtnLoading.value = false;
         createBudgetModal.value = false;

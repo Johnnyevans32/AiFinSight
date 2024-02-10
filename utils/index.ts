@@ -1,6 +1,7 @@
 import moment from "moment";
 import type { ProtocolDefinition } from "@tbd54566975/dwn-sdk-js";
 import { Temporal } from "@js-temporal/polyfill";
+import bcrypt from "bcryptjs";
 
 import {
   ACCOUNTS,
@@ -8,6 +9,7 @@ import {
   ACCOUNT_TRANSACTIONS,
   BUDGETS,
   CONVERSATIONS,
+  USER,
 } from "~/services/schemas";
 import { TransactionCategory } from "~/types/mono";
 
@@ -107,7 +109,9 @@ export const paginate = <T>(
     return sortDirection === "ascending" ? compareResult : -compareResult;
   };
 
-  const sortedData = data.slice().sort(sortMethod);
+  const sortedData = data.slice();
+
+  // const sortedData = data.slice().sort(sortMethod);
 
   const startIndex = pageNumber * itemsPerPage - itemsPerPage;
   const endIndex = pageNumber * itemsPerPage;
@@ -134,6 +138,7 @@ export const schemaPathMap: any = {
   [ACCOUNTS]: ACCOUNTS,
   [BUDGETS]: BUDGETS,
   [CONVERSATIONS]: CONVERSATIONS,
+  [USER]: USER,
 };
 
 export const protocolDefinition: ProtocolDefinition = {
@@ -147,6 +152,7 @@ export const protocolDefinition: ProtocolDefinition = {
         ACCOUNTS,
         BUDGETS,
         CONVERSATIONS,
+        USER,
       ].map((schema) => [
         schema,
         {
@@ -189,32 +195,24 @@ export const protocolDefinition: ProtocolDefinition = {
         ])
       ),
     },
-    [BUDGETS]: {
-      $actions: [
+    ...Object.fromEntries(
+      [BUDGETS, CONVERSATIONS, USER].map((schema) => [
+        schema,
         {
-          who: "author",
-          of: BUDGETS,
-          can: "read",
+          $actions: [
+            {
+              who: "anyone",
+              can: "write",
+            },
+            {
+              who: "author",
+              of: schema,
+              can: "read",
+            },
+          ],
         },
-        {
-          who: "anyone",
-          can: "write",
-        },
-      ],
-    },
-    [CONVERSATIONS]: {
-      $actions: [
-        {
-          who: "author",
-          of: CONVERSATIONS,
-          can: "read",
-        },
-        {
-          who: "anyone",
-          can: "write",
-        },
-      ],
-    },
+      ])
+    ),
   },
 };
 
@@ -241,4 +239,19 @@ export const comparePassword = (password: string, userPassword: string) => {
 
 export const generateRandomDigits = (length = 6) => {
   return Array.from({ length }, () => Math.floor(Math.random() * 10)).join("");
+};
+
+export const hashPassword = async (password: string) => {
+  const SALT_ROUNDS = 10;
+  const salt = await bcrypt.genSalt(SALT_ROUNDS);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  return hashedPassword;
+};
+
+export const verifyPassword = async (
+  password: string,
+  hashedPassword: string
+) => {
+  const isMatch = await bcrypt.compare(password, hashedPassword);
+  return isMatch;
 };

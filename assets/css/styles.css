@@ -34,7 +34,7 @@
   }
   .dark {
     --bg-bgbase: 0, 0, 0;
-    --bg-base: 0, 0, 0;
+    --bg-base: 50, 50, 50;
     --bg-lightbase: 38, 38, 38;
     --bg-hoverlightbase: 31, 31, 31;
     --text-base: 255, 255, 255;

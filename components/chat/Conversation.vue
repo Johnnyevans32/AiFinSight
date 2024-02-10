@@ -5,7 +5,7 @@
       :key="date"
       class="flex flex-col gap-2"
     >
-      <span class="px-2 py-1 rounded-xl bg-lightbase justify-self-center">{{
+      <span class="px-2 py-1 rounded-xl bg-lightbase self-center">{{
         date
       }}</span>
       <div
@@ -21,7 +21,7 @@
             class="w-10 h-10 rounded-xl bg-lightbase"
           />
           <div class="flex flex-col items-start">
-            <p class="font-bold">user</p>
+            <p class="font-bold">You:</p>
             <p>{{ conversation.user }}</p>
           </div>
         </div>
@@ -29,11 +29,11 @@
           <div
             class="w-10 h-10 rounded-xl bg-lightbase flex items-center justify-center"
           >
-            <font-awesome-icon icon="robot" />
+            <font-awesome-icon icon="fa-brands fa-android" class="text-2xl" />
           </div>
 
           <div class="flex flex-col items-start">
-            <p class="font-bold">Finsight AI</p>
+            <p class="font-bold">Finsight AI:</p>
             <p>{{ conversation.ai }}</p>
             <!-- <p v-if="i !== conversations.length - 1">{{ conversation.ai }}</p>
             <p v-else :id="'typed-ai-' + i"></p> -->
@@ -57,7 +57,7 @@ export default defineComponent({
 
     const { setConversations } = useAppStore();
 
-    const { findRecords } = useAppVueUtils();
+    const { findRecords } = useWeb5VueUtils();
 
     let typed: Typed;
     onBeforeUnmount(() => {

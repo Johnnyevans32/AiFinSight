@@ -2,13 +2,14 @@
   <Switch
     v-model="enabled"
     :class="selected ? 'bg-base' : 'bg-lightbase'"
-    class="flex p-1 w-14 h-7 items-center rounded-xl"
+    class="flex p-1 w-12 h-7 items-center rounded-xl border-[1px] border-base"
   >
     <span class="sr-only">Enable notifications</span>
-    <span
-      :class="selected ? 'translate-x-4' : 'translate-x-0'"
-      class="h-5 w-5 transform rounded-xl bg-bgbase transition"
-    ></span>
+    <font-awesome-icon
+      icon="circle"
+      :class="selected ? 'translate-x-full' : 'translate-x-0'"
+      class="h-5 w-5 transform text-base transition"
+    />
   </Switch>
 </template>
 

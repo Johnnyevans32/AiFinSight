@@ -83,7 +83,7 @@ export default defineComponent({
         href: "/settings/dwn",
       },
       {
-        logo: "shield",
+        logo: "shield-halved",
         action: "guard",
         value: "manage settings to guard your data",
         logoType: "icon",
@@ -104,7 +104,7 @@ export default defineComponent({
         href: "/settings/currency",
       },
       {
-        logo: "lock",
+        logo: "user-lock",
         action: "lock app",
         value: "lock app from external intruders",
         logoType: "icon",

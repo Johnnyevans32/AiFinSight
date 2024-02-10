@@ -6,11 +6,20 @@
     class="w-28 h-28 rounded-xl justify-self-center"
   />
   <h1 class="logo text-4xl">Forgot your password?</h1>
+  <p>Enter the verification code sent to your recovery email</p>
+  <CommonOtpInput v-model="resetPasswordCode" :fields="6" />
+  <p class="cursor-pointer">
+    Didn't receive any code in your mailbox?
+    <span class="text-blue-600" @click="sendResetPasswordCode"
+      >Resend code</span
+    >
+  </p>
   <CommonFormInput
     inputType="password"
     v-model="password"
     title="type your new password"
     placeholder="password"
+    @keyup.enter="resetPassword"
   />
   <CommonButton
     text="Reset"
@@ -25,6 +34,7 @@
 <script lang="ts">
 import { notify } from "@kyvg/vue3-notification";
 import moment from "moment";
+import { USER } from "~/services/schemas";
 
 import { useAppStore } from "~/store";
 
@@ -38,11 +48,16 @@ export default defineComponent({
     definePageMeta({
       layout: "guard",
     });
-    const config = useRuntimeConfig();
+    const { findOrUpdateRecord } = useWeb5VueUtils();
+
     const { myDid, user } = storeToRefs(useAppStore());
     const { setUser } = useAppStore();
     const password = ref("");
-    const resetPasswordCode = ref("");
+    const resetPasswordCode = ref(null);
+
+    onMounted(() => {
+      sendResetPasswordCode();
+    });
 
     const resetPassword = async () => {
       if (
@@ -65,10 +80,15 @@ export default defineComponent({
         });
         return;
       }
-      setUser({
-        ...user.value,
-        password: password.value,
-      });
+      const hashedPassword = await hashPassword(password.value);
+      const userRecord = await findOrUpdateRecord(
+        {
+          ...user.value,
+          password: hashedPassword,
+        },
+        USER
+      );
+      setUser(userRecord);
 
       notify({
         type: "success",
@@ -78,11 +98,21 @@ export default defineComponent({
       navigateTo("/guard");
     };
 
-    const sendResetPasswordCode = () => {
-      setUser({
-        ...user.value,
-        resetPasswordCode: generateRandomDigits(),
-        resetPasswordCodeExpiresAt: moment().add("hours", 1).toISOString(),
+    const sendResetPasswordCode = async () => {
+      const resetPasswordCode = generateRandomDigits();
+      const userRecord = await findOrUpdateRecord(
+        {
+          ...user.value,
+          resetPasswordCode,
+          resetPasswordCodeExpiresAt: moment().add("hours", 1).toISOString(),
+        },
+        USER
+      );
+      setUser(userRecord);
+
+      notify({
+        type: "success",
+        title: "verification code sent to your recovery email",
       });
     };
 
@@ -90,6 +120,8 @@ export default defineComponent({
       myDid,
       password,
       resetPassword,
+      resetPasswordCode,
+      sendResetPasswordCode,
     };
   },
 });

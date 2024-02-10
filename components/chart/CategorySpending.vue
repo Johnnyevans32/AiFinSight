@@ -64,7 +64,7 @@ export default defineComponent({
           },
         },
         legend: {
-          data: Object.keys(props.data),
+          data: Object.keys(props.data).map((i) => i.replaceAll("_", " ")),
         },
         xAxis: {
           type: "category",
@@ -83,7 +83,7 @@ export default defineComponent({
           },
         },
         series: Object.keys(props.data).map((category) => ({
-          name: category,
+          name: category.replaceAll("_", " "),
           type: "line",
           data: props.data[category],
           emphasis: {

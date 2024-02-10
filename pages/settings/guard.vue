@@ -2,18 +2,20 @@
   <div class="border-b-[1px] border-base text-left py-5">
     <CommonPageBar mainPage="Settings" currentPage="Guard" />
   </div>
-  <div class="flex justify-between items-center">
+  <div class="flex justify-between items-start">
     <div class="text-left">
       <p class="font-bold">Enable Guard Screen</p>
-      <p>
+      <p class="text-sm">
         Enable guard screen to protect your account from unauthorized access.
         You will need to enter your password after a period of inactivity.
       </p>
     </div>
-    <CommonSwitch
-      @change-option="handleEnableLockScreenSwitchChange"
-      :selected="user.isGuardScreenEnabled"
-    />
+    <div class="w-40 flex justify-end">
+      <CommonSwitch
+        @change-option="handleEnableLockScreenSwitchChange"
+        :selected="user.isGuardScreenEnabled"
+      />
+    </div>
   </div>
 
   <CommonModal
@@ -57,6 +59,7 @@
 
 <script lang="ts">
 import { notify } from "@kyvg/vue3-notification";
+import { USER } from "~/services/schemas";
 
 import { useAppStore } from "~/store";
 
@@ -68,7 +71,8 @@ export default defineComponent({
     });
 
     const { user } = storeToRefs(useAppStore());
-    const { setUser } = useAppStore();
+    const { setUser, setAppLocked } = useAppStore();
+    const { findOrUpdateRecord } = useWeb5VueUtils();
 
     const email = ref(user.value.email);
     const password = ref("");
@@ -76,23 +80,33 @@ export default defineComponent({
     const setUpGuardModal = ref(false);
     const enableGuardBtnLoading = ref(false);
 
-    const handleEnableLockScreenSwitchChange = (newVal: boolean) => {
+    const handleEnableLockScreenSwitchChange = async (newVal: boolean) => {
       if (newVal) {
         setUpGuardModal.value = true;
       } else {
-        setUser({
-          ...user.value,
-          isGuardScreenEnabled: false,
-        });
+        const userRecord = await findOrUpdateRecord(
+          {
+            ...user.value,
+            isGuardScreenEnabled: false,
+          },
+          USER
+        );
+        setUser(userRecord);
       }
     };
-    const updateUserRecord = () => {
+    const updateUserRecord = async () => {
       try {
-        setUser({
-          email: email.value,
-          isGuardScreenEnabled: true,
-          password: password.value,
-        });
+        const hashedPassword = await hashPassword(password.value);
+        const userRecord = await findOrUpdateRecord(
+          {
+            email: email.value,
+            isGuardScreenEnabled: true,
+            password: hashedPassword,
+          },
+          USER
+        );
+        setUser(userRecord);
+        setAppLocked(false);
         notify({
           type: "success",
           title: "guard screen setup updated",

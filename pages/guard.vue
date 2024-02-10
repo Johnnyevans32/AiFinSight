@@ -5,12 +5,14 @@
     alt="avatar"
     class="w-28 h-28 rounded-xl justify-self-center"
   />
-  <h1 class="logo text-4xl">Welcome back! {{ truncateString(myDid) }}</h1>
+  <h1 class="logo text-4xl">Welcome Back!</h1>
+  <h1 class="logo text-4xl">{{ truncateString(myDid) }}</h1>
   <CommonFormInput
     inputType="password"
     v-model="password"
     title="enter your password"
     placeholder="password"
+    @keyup.enter="unlock"
   />
   <CommonButton
     text="Unlock"
@@ -22,7 +24,10 @@
   >
   <p class="text-sm">
     Need help?
-    <a class="text-blue-600" :href="generateMailToLink()" target="_blank"
+    <a
+      class="text-blue-600 cursor-pointer"
+      :href="generateMailToLink()"
+      target="_blank"
       >Contact {{ config.public.appName }} support</a
     >
   </p>
@@ -54,7 +59,7 @@ export default defineComponent({
         return handleUnlockSuccess();
       }
 
-      const passwordMatched = comparePassword(
+      const passwordMatched = await verifyPassword(
         password.value,
         user.value.password
       );

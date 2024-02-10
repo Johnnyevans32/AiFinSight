@@ -1,5 +1,7 @@
 import Vibrant from "node-vibrant";
 
+export const SALT_ROUNDS = 10;
+
 const getTextColor = (hexColor: string): string => {
   // Convert hex color to RGB
   const rgb = hexToRgb(hexColor);

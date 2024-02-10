@@ -30,7 +30,7 @@ export default defineComponent({
       title: "Settings",
       ogTitle: "Settings",
     });
-    const { validateDwnEnpoint } = useAppVueUtils();
+    const { validateDwnEnpoint } = useWeb5VueUtils();
     const { setDwnEndpoint } = useAppUserConfigStore();
     const { dwnEndpoint } = storeToRefs(useAppUserConfigStore());
     const customDwnEndpoint = ref(dwnEndpoint.value);

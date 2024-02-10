@@ -33,13 +33,14 @@
     />
   </div>
   <div class="flex items-center justify-between">
-    <h1 class="text-xl font-bold">Transactions</h1>
-    <div class="flex gap-2 items-center">
+    <h1 class="md:block hidden text-xl font-bold">Transactions</h1>
+    <div class="flex gap-2 items-center md:w-fit w-full">
       <CommonFormInput
         v-model="searchQueryModel"
         inputType="text"
         :placeholder="String.fromCodePoint(0x1f50d) + ' search transactions'"
         @keyup.enter="searchItem"
+        class="w-full"
       />
       <!-- <font-awesome-icon
         icon="sync"
@@ -256,7 +257,7 @@ export default defineComponent({
     );
     const { currency } = storeToRefs(useAppUserConfigStore());
     const { setTransactions } = useAppStore();
-    const { updateRecord } = useAppVueUtils();
+    const { updateRecord } = useWeb5VueUtils();
     const currentPage = ref(1);
 
     const overviewMonthOptions = Array.from({ length: 12 }, (_, index) =>

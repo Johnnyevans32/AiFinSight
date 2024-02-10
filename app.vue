@@ -54,20 +54,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-
 import {
   ACCOUNT_TRANSACTIONS,
   ACCOUNTS,
   ACCOUNT_ASSETS,
-} from "./services/schemas";
+  USER,
+} from "~/services/schemas";
 import { useAppStore } from "~/store";
 import { useAppUserConfigStore } from "~/store/config";
 import type {
   AccountStatementDTO,
   AccountDTO,
   AccountAssetDTO,
-} from "./types/accounts";
+} from "~/types/accounts";
 
 export default defineComponent({
   async setup() {
@@ -82,13 +81,15 @@ export default defineComponent({
     });
 
     const { appThemeColor } = storeToRefs(useAppUserConfigStore());
-    const { findRecords, configureProtocol } = useAppVueUtils();
+    const { findRecords, configureProtocol, findOrUpdateRecord } =
+      useWeb5VueUtils();
     const {
       setAccounts,
       setAssets,
       setTransactions,
       updateRecordPullingStatus,
       setMyDid,
+      setUser,
     } = useAppStore();
     onBeforeMount(async () => {
       try {
@@ -106,14 +107,17 @@ export default defineComponent({
         updateRecordPullingStatus(ACCOUNTS, true);
         await configureProtocol();
 
-        const [dbAccounts, dbTransactions, dbAssets] = await Promise.all([
-          findRecords<AccountDTO[]>(ACCOUNTS),
-          findRecords<AccountStatementDTO[]>(ACCOUNT_TRANSACTIONS),
-          findRecords<AccountAssetDTO[]>(ACCOUNT_ASSETS),
-        ]);
+        const [dbAccounts, dbTransactions, dbAssets, dbUser] =
+          await Promise.all([
+            findRecords<AccountDTO[]>(ACCOUNTS),
+            findRecords<AccountStatementDTO[]>(ACCOUNT_TRANSACTIONS),
+            findRecords<AccountAssetDTO[]>(ACCOUNT_ASSETS),
+            findOrUpdateRecord({}, USER, false),
+          ]);
         setAccounts(dbAccounts);
         setTransactions(dbTransactions);
         setAssets(dbAssets);
+        setUser(dbUser);
       } catch (err) {
         console.log("before mount error", { err });
       } finally {
