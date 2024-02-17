@@ -49,6 +49,7 @@
 
 <script lang="ts">
 import Typed from "typed.js";
+import { DateSort } from "@tbd54566975/dwn-sdk-js";
 
 import { CONVERSATIONS } from "~/services/schemas";
 import type { ConversationDTO } from "~/types/accounts";
@@ -72,7 +73,11 @@ export default defineComponent({
     onBeforeMount(async () => {
       try {
         const [dbConversations] = await Promise.all([
-          findRecords<ConversationDTO[]>(CONVERSATIONS),
+          findRecords<ConversationDTO[]>(
+            CONVERSATIONS,
+            undefined,
+            DateSort.CreatedAscending
+          ),
         ]);
         setConversations(dbConversations);
         // initializeTypedForLastAiConversation();

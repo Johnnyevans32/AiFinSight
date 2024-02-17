@@ -51,9 +51,6 @@ export default defineNuxtConfig({
       appContactEmail: process.env.APP_CONTACT_EMAIL,
       apiUrl: process.env.API_URL,
     },
-    monoApiUrl: "",
-    monoSecretKey: "",
-    openaiApiKey: "",
   },
   vite: {
     plugins: [nodePolyfills()],

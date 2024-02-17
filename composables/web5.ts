@@ -79,34 +79,10 @@ export function useWeb5VueUtils() {
 
     return { ...data, recordId: record?.id };
   };
-  const findRecords = async <T>(schema: string, recordId?: string) => {
-    const { records } = await $web5.dwn.records.query({
-      from: myDid.value,
-      message: {
-        filter: {
-          protocol: protocolDefinition.protocol,
-          schema: protocolDefinition.types[schema].schema,
-        },
-        dateSort: DateSort.CreatedDescending,
-        ...(recordId ? { recordId } : {}),
-      },
-    });
-    const loadRecords = await Promise.all(
-      (records || []).map(
-        async (record: { data: { json: () => any }; id: any }) => {
-          const data = await record.data.json();
-          return { recordId: record.id, ...data };
-        }
-      )
-    );
-
-    return loadRecords as T;
-  };
-
-  const findPaginatedRecords = async <T>(
+  const findRecords = async <T>(
     schema: string,
     recordId?: string,
-    itemsPerPage = 10
+    dateSort = DateSort.CreatedDescending
   ) => {
     const { records } = await $web5.dwn.records.query({
       from: myDid.value,
@@ -115,10 +91,7 @@ export function useWeb5VueUtils() {
           protocol: protocolDefinition.protocol,
           schema: protocolDefinition.types[schema].schema,
         },
-        pagination: {
-          limit: itemsPerPage,
-        },
-        dateSort: DateSort.CreatedAscending,
+        dateSort,
         ...(recordId ? { recordId } : {}),
       },
     });
@@ -133,6 +106,7 @@ export function useWeb5VueUtils() {
 
     return loadRecords as T;
   };
+
   const updateRecord = async (recordId: string, data: any, schema: string) => {
     const { record, status } = await $web5.dwn.records.read({
       message: {
