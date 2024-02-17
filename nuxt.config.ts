@@ -49,6 +49,7 @@ export default defineNuxtConfig({
       appName: process.env.APP_NAME,
       appDesc: process.env.APP_DESC,
       appContactEmail: process.env.APP_CONTACT_EMAIL,
+      apiUrl: process.env.API_URL,
     },
     monoApiUrl: "",
     monoSecretKey: "",

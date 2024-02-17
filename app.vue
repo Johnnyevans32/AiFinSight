@@ -71,7 +71,7 @@ import type {
 export default defineComponent({
   async setup() {
     const config = useRuntimeConfig();
-    const { $did } = useNuxtApp();
+    const { $did, $api } = useNuxtApp();
     useHead({
       titleTemplate: (titleChunk) => {
         return titleChunk && titleChunk !== config.public.appName
@@ -81,7 +81,7 @@ export default defineComponent({
     });
 
     const { appThemeColor } = storeToRefs(useAppUserConfigStore());
-    const { findRecords, configureProtocol, findOrUpdateRecord } =
+    const { findRecords, configureProtocol, createSignedAuthToken } =
       useWeb5VueUtils();
     const {
       setAccounts,
@@ -89,12 +89,13 @@ export default defineComponent({
       setTransactions,
       updateRecordPullingStatus,
       setMyDid,
-      setUser,
     } = useAppStore();
     onBeforeMount(async () => {
       try {
         setMyDid($did);
 
+        await $api.userService.ping();
+        await createSignedAuthToken();
         const monoJS = "https://connect.withmono.com/connect.js";
         const script = document.createElement("script");
         script.src = monoJS;
@@ -107,17 +108,14 @@ export default defineComponent({
         updateRecordPullingStatus(ACCOUNTS, true);
         await configureProtocol();
 
-        const [dbAccounts, dbTransactions, dbAssets, dbUser] =
-          await Promise.all([
-            findRecords<AccountDTO[]>(ACCOUNTS),
-            findRecords<AccountStatementDTO[]>(ACCOUNT_TRANSACTIONS),
-            findRecords<AccountAssetDTO[]>(ACCOUNT_ASSETS),
-            findOrUpdateRecord({}, USER, false),
-          ]);
+        const [dbAccounts, dbTransactions, dbAssets] = await Promise.all([
+          findRecords<AccountDTO[]>(ACCOUNTS),
+          findRecords<AccountStatementDTO[]>(ACCOUNT_TRANSACTIONS),
+          findRecords<AccountAssetDTO[]>(ACCOUNT_ASSETS),
+        ]);
         setAccounts(dbAccounts);
         setTransactions(dbTransactions);
         setAssets(dbAssets);
-        setUser(dbUser);
       } catch (err) {
         console.log("before mount error", { err });
       } finally {

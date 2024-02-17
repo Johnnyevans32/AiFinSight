@@ -3,12 +3,16 @@ import { useAppUserConfigStore } from "~/store/config";
 
 export default defineNuxtPlugin(async () => {
   const { dwnEndpoint } = storeToRefs(useAppUserConfigStore());
+  const { getUserPortableDidAndAgent } = useWeb5VueUtils();
   let web5: Web5;
   let did: string;
 
   try {
     console.log("connecting to web5", dwnEndpoint.value);
+    const { managedDid, userAgent } = await getUserPortableDidAndAgent();
     ({ web5, did } = await Web5.connect({
+      agent: userAgent,
+      connectedDid: managedDid.did,
       techPreview: { dwnEndpoints: [dwnEndpoint.value] },
       sync: "60s",
     }));

@@ -13,7 +13,10 @@
         :key="i"
         class="flex flex-col gap-2"
       >
-        <div class="flex items-center gap-2">
+        <div
+          v-if="conversation.author === 'user'"
+          class="flex items-center gap-2"
+        >
           <img
             v-if="myDid"
             :src="`https://robohash.org/${myDid}`"
@@ -22,10 +25,10 @@
           />
           <div class="flex flex-col items-start">
             <p class="font-bold">You:</p>
-            <p>{{ conversation.user }}</p>
+            <p>{{ conversation.message }}</p>
           </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div v-else class="flex items-center gap-2">
           <div
             class="w-10 h-10 rounded-xl bg-lightbase flex items-center justify-center"
           >
@@ -34,7 +37,7 @@
 
           <div class="flex flex-col items-start">
             <p class="font-bold">Finsight AI:</p>
-            <p>{{ conversation.ai }}</p>
+            <p>{{ conversation.message }}</p>
             <!-- <p v-if="i !== conversations.length - 1">{{ conversation.ai }}</p>
             <p v-else :id="'typed-ai-' + i"></p> -->
           </div>
@@ -85,7 +88,10 @@ export default defineComponent({
       const lastIndex = conversations.value.length - 1;
       const lastAiConversation = conversations.value[lastIndex];
       if (lastAiConversation) {
-        return typeCharacter(lastAiConversation.ai, `typed-ai-${lastIndex}`);
+        return typeCharacter(
+          lastAiConversation.message,
+          `typed-ai-${lastIndex}`
+        );
       }
     };
 

@@ -2,50 +2,55 @@ import {
   type AccountAssetDTO,
   type AccountStatementDTO,
   type AccountDTO,
+  ResponseObject,
 } from "~/types/accounts";
 
 class AccountService {
   async connect(authCode: string) {
     const { useCustomFetch } = useAppVueUtils();
-    const res = await useCustomFetch<string>("/api/accounts/connect", {
-      method: "post",
-      body: { code: authCode },
-    });
-    return res;
-  }
-
-  async disconnect(accountId: string) {
-    const { useCustomFetch } = useAppVueUtils();
-    await useCustomFetch<void>(`/api/accounts/${accountId}/disconnect`, {
-      method: "post",
-    });
-  }
-
-  async getAccountStatement(accountId: string) {
-    const { useCustomFetch } = useAppVueUtils();
-    const data = await useCustomFetch<AccountStatementDTO[]>(
-      `/api/accounts/${accountId}/statement`,
+    const { data } = await useCustomFetch<ResponseObject<string>>(
+      "/api/user-accounts/connect",
       {
-        method: "get",
+        method: "post",
+        body: { code: authCode },
       }
     );
     return data;
   }
-  async getAccountTransactions(accountId: string) {
+
+  async disconnect(accountId: string) {
     const { useCustomFetch } = useAppVueUtils();
-    const data = await useCustomFetch<AccountStatementDTO[]>(
-      `/api/accounts/${accountId}/transactions`,
+    await useCustomFetch<ResponseObject<void>>(
+      `/api/user-accounts/${accountId}/disconnect`,
       {
-        method: "get",
+        method: "put",
       }
     );
+  }
+
+  async getAccountStatement(accountId: string) {
+    const { useCustomFetch } = useAppVueUtils();
+    const { data } = await useCustomFetch<
+      ResponseObject<AccountStatementDTO[]>
+    >(`/api/user-accounts/${accountId}/statement`, {
+      method: "get",
+    });
+    return data;
+  }
+  async getAccountTransactions(accountId: string) {
+    const { useCustomFetch } = useAppVueUtils();
+    const { data } = await useCustomFetch<
+      ResponseObject<AccountStatementDTO[]>
+    >(`/api/user-accounts/${accountId}/transactions`, {
+      method: "get",
+    });
     return data;
   }
 
   async getAccountAssets(accountId: string) {
     const { useCustomFetch } = useAppVueUtils();
-    const data = await useCustomFetch<AccountAssetDTO[]>(
-      `/api/accounts/${accountId}/assets`,
+    const { data } = await useCustomFetch<ResponseObject<AccountAssetDTO[]>>(
+      `/api/user-accounts/${accountId}/assets`,
       {
         method: "get",
       }
@@ -57,22 +62,13 @@ class AccountService {
   async getAccountDetail(accountId: string) {
     const { useCustomFetch } = useAppVueUtils();
 
-    const data = await useCustomFetch<AccountDTO>(
-      `/api/accounts/${accountId}/detail`,
+    const { data } = await useCustomFetch<ResponseObject<AccountDTO>>(
+      `/api/user-accounts/${accountId}/detail`,
       {
         method: "get",
       }
     );
     return data;
-  }
-
-  async queryContextualGpt(context: string, prompt: string) {
-    const { useCustomFetch } = useAppVueUtils();
-    const response = await useCustomFetch<string>(`/api/contextual_gpt`, {
-      method: "post",
-      body: { context, prompt },
-    });
-    return response;
   }
 }
 

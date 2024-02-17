@@ -246,8 +246,10 @@ import {
   type AccountStatementDTO,
   ChartPeriodEnum,
   currencySignMap,
+  TransactionType,
+  Currency,
+  TransactionCategory,
 } from "~/types/accounts";
-import { TransactionType, Currency, TransactionCategory } from "~/types/mono";
 import { useAppUserConfigStore } from "~/store/config";
 
 export default defineComponent({

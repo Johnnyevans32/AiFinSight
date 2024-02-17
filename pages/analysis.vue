@@ -15,7 +15,7 @@ import { defineComponent } from "vue";
 import moment from "moment";
 
 import { useAppStore } from "~/store";
-import { TransactionCategory, TransactionType } from "~/types/mono";
+import { TransactionCategory, TransactionType } from "~/types/accounts";
 import { useAppUserConfigStore } from "~/store/config";
 
 export default defineComponent({

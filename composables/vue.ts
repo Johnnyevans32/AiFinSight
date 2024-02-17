@@ -14,7 +14,7 @@ export function useAppVueUtils() {
 
   const { $api } = useNuxtApp();
 
-  const { transactions, assets, accounts, budgets, conversations } =
+  const { transactions, assets, accounts, budgets, conversations, vcJwt } =
     storeToRefs(useAppStore());
   const {
     setAccounts,
@@ -29,7 +29,13 @@ export function useAppVueUtils() {
       ...options,
       async onResponseError({ response }) {},
 
-      async onRequest({ request, options }) {},
+      async onRequest({ request, options }) {
+        options.baseURL = config.public.apiUrl;
+        options.headers = {
+          ...options.headers,
+          Authorization: `Bearer ${vcJwt.value}`,
+        };
+      },
       async onRequestError({ request, options, error }) {},
     });
 

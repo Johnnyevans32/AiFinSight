@@ -69,8 +69,12 @@ import { notify } from "@kyvg/vue3-notification";
 import moment from "moment";
 
 import { useAppStore } from "~/store";
-import type { BudgetDTO, ConversationDTO } from "~/types/accounts";
-import { TransactionType, TransactionCategory } from "~/types/mono";
+import {
+  BudgetDTO,
+  ConversationDTO,
+  TransactionType,
+  TransactionCategory,
+} from "~/types/accounts";
 import { CONVERSATIONS } from "~/services/schemas";
 
 interface MonthlyTransaction {
@@ -260,30 +264,31 @@ export default defineComponent({
           });
           return;
         }
+        addToConversations(prompt.value, "user");
 
-        // const response = await $api.accountService.queryContextualGpt(
-        //   userFinanceContext.value,
-        //   prompt.value
-        // );
+        const response = await $api.aiService.chat(
+          userFinanceContext.value,
+          prompt.value
+        );
 
-        const response = "Hi okkk";
         aiResponseLoading.value = false;
-        addToConversations(response);
+        addToConversations(response, "ai");
         prompt.value = "";
       } catch (error) {
+        console.log({ error });
         notify({
           type: "error",
-          title: "try again, an error occured",
+          title: (error as any)?.data?.message || "try again, an error occured",
         });
       } finally {
         aiResponseLoading.value = false;
       }
     };
 
-    const addToConversations = (response: string) => {
+    const addToConversations = (message: string, author: "ai" | "user") => {
       const data = {
-        ai: response,
-        user: prompt.value,
+        message,
+        author,
         date: moment().toString(),
       };
       setConversations([...conversations.value, data]);

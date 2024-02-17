@@ -191,8 +191,13 @@ import { notify } from "@kyvg/vue3-notification";
 
 import { BUDGETS } from "~/services/schemas";
 import { useAppStore } from "~/store";
-import { type BudgetDTO, currencySignMap } from "~/types/accounts";
-import { TransactionCategory, TransactionType, Currency } from "~/types/mono";
+import {
+  type BudgetDTO,
+  currencySignMap,
+  TransactionCategory,
+  TransactionType,
+  Currency,
+} from "~/types/accounts";
 import { useAppUserConfigStore } from "~/store/config";
 
 export default defineComponent({

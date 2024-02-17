@@ -1,4 +1,4 @@
-import { Currency } from "~/types/mono";
+import { Currency } from "~/types/accounts";
 
 export enum AppThemeEnum {
   LIGHT = "light",

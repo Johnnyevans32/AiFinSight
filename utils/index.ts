@@ -11,8 +11,9 @@ import {
   CONVERSATIONS,
   USER,
 } from "~/services/schemas";
-import { TransactionCategory } from "~/types/mono";
+import { TransactionCategory } from "~/types/accounts";
 
+export const AGENT_MANAGER_NAME = "key12434";
 export const formatMoney = (value: number) =>
   value.toLocaleString(undefined, {
     minimumFractionDigits: 2,

@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { Currency } from "~/types/mono";
+import { Currency } from "~/types/accounts";
 import { defineComponent } from "vue";
 
 import { useAppUserConfigStore } from "~/store/config";
