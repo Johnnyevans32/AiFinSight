@@ -1,9 +1,6 @@
 <template>
-  <div class="md:h-[80vh] h-[70vh] flex flex-col gap-2 place-content-between">
-    <ChatConversation
-      v-show="conversations.length"
-      class="overflow-x-hidden overflow-y-auto"
-    />
+  <div class="md:h-[80vh] h-[75vh] flex flex-col gap-2 place-content-between">
+    <ChatConversation v-show="conversations.length" />
 
     <div
       class="grid grid-cols-2 gap-2 mt-36"
@@ -76,6 +73,7 @@ import {
   TransactionCategory,
 } from "~/types/accounts";
 import { CONVERSATIONS } from "~/services/schemas";
+import { useAppUserConfigStore } from "~/store/config";
 
 interface MonthlyTransaction {
   income: number;
@@ -87,6 +85,7 @@ export default defineComponent({
   async setup() {
     const { budgets, transactions, accounts, assets, conversations } =
       storeToRefs(useAppStore());
+    const { currency } = storeToRefs(useAppUserConfigStore());
     const { createRecord } = useWeb5VueUtils();
     const { setConversations } = useAppStore();
 
@@ -135,7 +134,7 @@ export default defineComponent({
 
       const monthlyFigures = Object.entries(monthlyTransactions)
         .map(([monthYear, data]) => {
-          return `Month and Year: ${monthYear} | Credits: ${data.income} | Debits: ${data.expenses}`;
+          return `Month and Year: ${monthYear} | Income: ${data.income} | Expenses: ${data.expenses} | Currency: ${currency.value}`;
         })
         .join("\n");
 
@@ -243,19 +242,20 @@ export default defineComponent({
 
       return context;
     });
+
     const answerQuestion = async () => {
       try {
         if (aiResponseLoading.value) {
           return;
         }
         aiResponseLoading.value = true;
-        if (!userFinanceContext.value) {
-          notify({
-            type: "error",
-            title: "context not available",
-          });
-          return;
-        }
+        // if (!userFinanceContext.value) {
+        //   notify({
+        //     type: "error",
+        //     title: "context not available",
+        //   });
+        //   return;
+        // }
 
         if (!prompt.value) {
           notify({
@@ -273,6 +273,7 @@ export default defineComponent({
 
         aiResponseLoading.value = false;
         addToConversations(response, "ai");
+
         prompt.value = "";
       } catch (error) {
         console.log({ error });

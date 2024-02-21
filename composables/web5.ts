@@ -50,7 +50,8 @@ export function useWeb5VueUtils() {
     data: T,
     schema: string,
     parentId?: string,
-    dateCreated?: string
+    dateCreated?: string,
+    recordId?: string
   ) => {
     const { record, status } = await $web5.dwn.records.write({
       data,
@@ -60,6 +61,7 @@ export function useWeb5VueUtils() {
         schema: protocolDefinition.types[schema].schema,
         dataFormat: protocolDefinition.types[schema].dataFormats?.[0],
         ...(parentId ? { parentId, contextId: parentId } : {}),
+        ...(recordId ? { recordId } : {}),
         ...(dateCreated
           ? {
               dateCreated: formatToWeb5Date(dateCreated),
