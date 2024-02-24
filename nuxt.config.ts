@@ -14,6 +14,10 @@ export default defineNuxtConfig({
           content: "your decentralised financial companion",
         },
         { name: "format-detection", content: "telephone=no" },
+        {
+          name: "theme-color",
+          content: "#000000",
+        },
       ],
       link: [
         {
@@ -23,6 +27,7 @@ export default defineNuxtConfig({
       ],
     },
   },
+
   telemetry: false,
   css: [
     "~/assets/css/styles.css",

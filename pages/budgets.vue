@@ -73,23 +73,29 @@
       v-for="budget in Object.values(formattedBudgets.budgetsGroupedByCategory)"
       :key="budget.recordId"
       @click="viewSingleBudget(budget)"
-      class="cursor-pointer px-5 py-2 flex space-x-3 items-center rounded-xl text-base bg-lightbase border-[1px] border-base"
+      class="cursor-pointer px-5 py-3 flex space-x-3 items-center rounded-xl text-base bg-lightbase border-[1px] border-base"
     >
       <font-awesome-icon
         :icon="generateIconMap(budget.category)"
-        class="h-10 w-10 rounded-xl text-2xl"
+        class="h-5 w-5 rounded-xl p-2 cursor-pointer bg-bgbase"
       />
 
       <div class="flex flex-col w-full gap-1 text-left">
-        <span class="capitalize font-bold">{{
-          budget.category.replaceAll("_", " ")
-        }}</span>
+        <div class="flex justify-between">
+          <span class="capitalize font-bold">{{
+            budget.category.replaceAll("_", " ")
+          }}</span>
+          <span class="text-sm"
+            >{{ budget.currencySign }} {{ formatMoney(budget.limit) }}
+          </span>
+        </div>
+
         <CommonProgressBar
           :percentage="
             ((budget.amountSpentOnCategoryBudget || 0) / budget.limit) * 100
           "
         />
-        <div class="flex justify-between">
+        <!-- <div class="flex justify-between">
           <span class="text-sm"
             >{{ budget.currencySign }}
             {{ formatMoney(budget.limit) }} limit</span
@@ -107,8 +113,8 @@
               )
             }}
             left</span
-          >
-        </div>
+          > -->
+        <!-- </div> -->
       </div>
     </div>
   </div>

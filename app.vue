@@ -91,6 +91,13 @@ export default defineComponent({
     } = useAppStore();
     onBeforeMount(async () => {
       try {
+        const themeColorDOM = document.querySelector(
+          'meta[name="theme-color"]'
+        );
+
+        if (themeColorDOM)
+          themeColorDOM.setAttribute("content", `rgb(var(--bg-bgbase))`);
+
         setMyDid($did);
 
         await $api.userService.ping();

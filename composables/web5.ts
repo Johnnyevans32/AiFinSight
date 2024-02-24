@@ -182,12 +182,13 @@ export function useWeb5VueUtils() {
   const createSignedAuthToken = async () => {
     const { managedDid } = await getUserPortableDidAndAgent();
 
-    const keyDid = await DidKeyMethod.create();
+    const bob = await DidKeyMethod.create();
 
+    const alice = await DidKeyMethod.create();
     const authAuthorizationVc = await VerifiableCredential.create({
       type: "AuthAuthorization",
-      issuer: managedDid.did,
-      subject: managedDid.did,
+      issuer: bob.did,
+      subject: bob.did,
       data: { data: "ok" },
       expirationDate: moment()
         .add(1, "minutes")
@@ -196,47 +197,39 @@ export function useWeb5VueUtils() {
     });
 
     const signedVcJwt = await authAuthorizationVc.sign({
-      did: keyDid,
+      did: alice,
     });
 
     // setVcJwt(signedVcJwt);
 
-    console.log({ signedVcJwt, keyDid });
+    console.log({ signedVcJwt, bob, alice });
 
     const verified = await VerifiableCredential.verify({ vcJwt: signedVcJwt });
-    console.log({ verified });
+    const parsed = VerifiableCredential.parseJwt({
+      vcJwt: signedVcJwt,
+    });
+    console.log({ verified, parsed });
   };
 
   const getUserPortableDidAndAgent = async () => {
     try {
-      // A custom Web5Agent implementation was not specified, so use default managed user agent.
       const userAgent = await Web5UserAgent.create();
 
-      // Start the agent.
       await userAgent.start({ passphrase: "insecure-static-phrase" });
-      // Query the Agent's DWN tenant for identity records.
       const identities = (await userAgent.identityManager.list()).filter(
         (i) => i.name === AGENT_MANAGER_NAME
       );
       const storedIdentities = identities.length;
       let managedDid: ManagedDid | PortableDid;
-      // If an existing identity is not found found, create a new one.
       if (storedIdentities === 0) {
         const didOptions = await DidIonMethod.generateDwnOptions({
           serviceEndpointNodes: [dwnEndpoint.value],
         });
-        // Create new DID and generate key set.
-        // managedDid = await userAgent.didManager.create({
-        //   method: "ion",
-        //   kms: "local",
-        //   ...didOptions,
-        // });
 
         managedDid = await DidIonMethod.create({
           services: didOptions.services,
         });
 
-        console.log({ managedDid });
         const identity = {
           did: managedDid.did,
           name: AGENT_MANAGER_NAME,
@@ -246,7 +239,7 @@ export function useWeb5VueUtils() {
           context: userAgent.agentDid,
         });
         await userAgent.didManager.import({
-          alias: "",
+          alias: "LOL",
           did: managedDid,
           context: userAgent.agentDid,
           kms: "local",
@@ -260,20 +253,18 @@ export function useWeb5VueUtils() {
         if (!result) throw new Error("No did found");
 
         managedDid = result;
-        console.log({ imporefedmanagedDid: managedDid });
         await Promise.all(
           (managedDid.keySet.verificationMethodKeys || []).map(async (key) => {
+            if (!key.keyManagerId) return;
             const keyData = (await userAgent.keyManager.getKey({
-              keyRef: key.keyManagerId || "",
+              keyRef: key.keyManagerId,
             })) as ManagedKeyPair;
-            console.log({ keyData });
             key.privateKeyJwk = (await Jose.cryptoKeyToJwk({
               key: {
                 ...(keyData.privateKey as any),
                 material: keyData.publicKey.material,
               },
             })) as any;
-            console.log("key.privateKeyJwk", key.privateKeyJwk);
           })
         );
       }

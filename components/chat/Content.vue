@@ -50,6 +50,7 @@
       />
       <button
         class="flex items-center bg-lightbase rounded-lg p-2 border-[1px] border-l-0 border-base rounded-l-none"
+        @click="answerQuestion"
       >
         <font-awesome-icon
           :icon="aiResponseLoading ? 'pause' : 'arrow-up'"
@@ -266,15 +267,19 @@ export default defineComponent({
         }
         addToConversations(prompt.value, "user");
 
-        const response = await $api.aiService.chat(
-          userFinanceContext.value,
-          prompt.value
-        );
+        setTimeout(async () => {
+          console.log("Executing the next line of code after one second");
 
-        aiResponseLoading.value = false;
-        addToConversations(response, "ai");
+          const response = await $api.aiService.chat(
+            userFinanceContext.value,
+            prompt.value
+          );
 
-        prompt.value = "";
+          aiResponseLoading.value = false;
+          addToConversations(response, "ai");
+
+          prompt.value = "";
+        }, 5000);
       } catch (error) {
         console.log({ error });
         notify({

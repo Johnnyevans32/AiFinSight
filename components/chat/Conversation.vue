@@ -1,8 +1,8 @@
 <template>
   <div
-    class="flex flex-col gap-4 overflow-y-scroll"
+    class="flex flex-col gap-4 overflow-y-scroll overscroll-y-none"
     id="conversation-container"
-    @scroll="(event) => checkScroll()"
+    @scroll="checkScroll"
   >
     <div
       v-for="(conversations, date) in formatedConvos"
@@ -12,37 +12,39 @@
       <span class="px-2 py-1 rounded-xl bg-lightbase self-center">{{
         date
       }}</span>
-      <div
-        v-for="(conversation, i) in conversations"
-        :key="i"
-        class="flex flex-col gap-2"
-      >
-        <div class="flex items-start gap-2">
-          <img
-            v-if="myDid && conversation.author === 'user'"
-            :src="`https://robohash.org/${myDid}`"
-            alt="avatar"
-            class="w-10 h-10 rounded-xl bg-lightbase"
-          />
-          <div
-            v-else-if="conversation.author === 'ai'"
-            class="w-10 h-10 rounded-xl bg-lightbase flex items-center justify-center"
-          >
-            <font-awesome-icon icon="fa-brands fa-android" class="text-2xl" />
-          </div>
-          <div class="flex flex-col items-start">
-            <p>
-              <b class="font-bold">
-                {{ conversation.author === "user" ? "You " : "Finsight AI " }}
-              </b>
-              <span class="text-sm">
-                {{ formatDate(conversation.date, "h:mm A") }}</span
-              >
-            </p>
-            <p class="text-left">{{ conversation.message }}</p>
+      <TransitionGroup name="list" tag="ul" class="flex flex-col gap-2">
+        <div
+          v-for="(conversation, i) in conversations"
+          :key="i"
+          class="flex flex-col gap-2"
+        >
+          <div class="flex items-start gap-2">
+            <img
+              v-if="myDid && conversation.author === 'user'"
+              :src="`https://robohash.org/${myDid}`"
+              alt="avatar"
+              class="w-10 h-10 rounded-xl bg-lightbase"
+            />
+            <div
+              v-else-if="conversation.author === 'ai'"
+              class="w-10 h-10 rounded-xl bg-lightbase flex items-center justify-center"
+            >
+              <font-awesome-icon icon="fa-brands fa-android" class="text-2xl" />
+            </div>
+            <div class="flex flex-col items-start">
+              <p>
+                <b class="font-bold">
+                  {{ conversation.author === "user" ? "You " : "Finsight AI " }}
+                </b>
+                <span class="text-sm">
+                  {{ formatDate(conversation.date, "h:mm A") }}</span
+                >
+              </p>
+              <p class="text-left">{{ conversation.message }}</p>
+            </div>
           </div>
         </div>
-      </div>
+      </TransitionGroup>
       <font-awesome-icon
         v-show="canScrollDown"
         icon="arrow-down"
@@ -148,3 +150,22 @@ export default defineComponent({
   },
 });
 </script>
+<style scoped>
+.list-move, /* apply transition to moving elements */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* ensure leaving items are taken out of layout flow so that moving
+   animations can be calculated correctly. */
+.list-leave-active {
+  position: absolute;
+}
+</style>
