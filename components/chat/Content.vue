@@ -45,11 +45,11 @@
         v-model="prompt"
         @keyup.enter="answerQuestion"
         class="flex-1"
-        custom-css="border-r-0 rounded-r-none "
+        custom-css="border-r-0 rounded-r-none"
         placeholder="Ask me anything about your finance"
       />
       <button
-        class="flex items-center bg-lightbase rounded-lg p-2 border-[1px] border-l-0 border-base rounded-l-none"
+        class="flex items-center bg-lightbase rounded-lg px-5 py-2 border-[1px] border-l-0 border-base rounded-l-none"
         @click="answerQuestion"
       >
         <font-awesome-icon
@@ -92,10 +92,13 @@ export default defineComponent({
 
     const hoveredIndex = ref<null | number>(null);
     const suggestedPrompts = ref([
-      { title: "whats my", others: "income for last month" },
-      { title: "whats my", others: "income for last month" },
-      { title: "whats my", others: "income for last month" },
-      { title: "whats my", others: "income for last month" },
+      { title: "What's my", others: "income for last month?" },
+      { title: "How much did I spend on", others: "groceries last week?" },
+      { title: "Show me my", others: "monthly expenses breakdown?" },
+      {
+        title: "Set a budget of",
+        others: "500 naira for dining out this month.",
+      },
     ]);
 
     const { $api } = useNuxtApp();
@@ -267,19 +270,13 @@ export default defineComponent({
         }
         addToConversations(prompt.value, "user");
 
-        setTimeout(async () => {
-          console.log("Executing the next line of code after one second");
+        const response = await $api.aiService.chat(
+          userFinanceContext.value,
+          prompt.value
+        );
 
-          const response = await $api.aiService.chat(
-            userFinanceContext.value,
-            prompt.value
-          );
-
-          aiResponseLoading.value = false;
-          addToConversations(response, "ai");
-
-          prompt.value = "";
-        }, 5000);
+        addToConversations(response, "ai");
+        prompt.value = "";
       } catch (error) {
         console.log({ error });
         notify({

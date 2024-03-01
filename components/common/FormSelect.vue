@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-end items-center">
+  <div :class="customCss" class="flex justify-end items-center">
     <select
       v-model="selectedOption"
       class="rounded-xl border-[1px] border-base bg-lightbase text-base pl-5 pr-8 py-2 w-full cursor-pointer appearance-none"
@@ -23,6 +23,9 @@ export default defineComponent({
       default: [],
     },
     selected: {
+      type: String,
+    },
+    customCss: {
       type: String,
     },
   },

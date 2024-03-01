@@ -13,6 +13,14 @@ class UserService {
       console.log("error from ping", { err });
     }
   }
+
+  async sendResetPasswordCodeEmail(email: string, code: string) {
+    const { useCustomFetch } = useAppVueUtils();
+    await useCustomFetch(`/api/users/reset-password-code`, {
+      method: "post",
+      body: { email, code },
+    });
+  }
 }
 
 export default UserService;

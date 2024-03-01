@@ -7,7 +7,6 @@
       inputType="text"
       v-model="customDwnEndpoint"
       title="set your dwn endpoint"
-      custom-css="specialfont"
     />
     <CommonButton
       text="Apply"

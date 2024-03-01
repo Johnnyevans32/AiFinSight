@@ -6,7 +6,7 @@
     v-if="myDid"
     :src="`https://robohash.org/${myDid}`"
     alt="avatar"
-    class="w-28 h-28 rounded-xl justify-self-center"
+    class="w-28 h-28 rounded-xl justify-self-center border-[1px] border-base bg-lightbase"
   />
   <span
     v-if="myDid"
@@ -35,7 +35,7 @@
         </div>
         <div class="flex flex-col text-left">
           <span class="font-bold">{{ setting.action }}</span>
-          <span class="text-sm specialfont">{{ setting.value }}</span>
+          <span class="text-sm">{{ setting.value }}</span>
         </div>
       </div>
       <font-awesome-icon icon="arrow-right" />
@@ -64,7 +64,7 @@ export default defineComponent({
       title: "Settings",
       ogTitle: "Settings",
     });
-    const { deleteRecordsFromProtocol } = useAppVueUtils();
+    const { deleteRecordsFromProtocol } = useWeb5VueUtils();
     const { myDid, user } = storeToRefs(useAppStore());
     const { setAppLocked } = useAppStore();
     const { dwnEndpoint, appThemeColor, currency } = storeToRefs(

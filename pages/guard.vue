@@ -5,8 +5,8 @@
     alt="avatar"
     class="w-28 h-28 rounded-xl justify-self-center"
   />
-  <h1 class="logo text-4xl">Welcome Back!</h1>
-  <h1 class="logo text-4xl">{{ truncateString(myDid) }}</h1>
+  <h1 class="text-4xl">Welcome Back!</h1>
+  <h1 class="text-4xl">{{ truncateString(myDid) }}</h1>
   <CommonFormInput
     inputType="password"
     v-model="password"
@@ -20,15 +20,15 @@
     custom-css="!bg-blue-400 w-full text-black"
   />
   <NuxtLink class="text-blue-600 text-sm" to="/reset-password"
-    >Forgot password?</NuxtLink
+    >forgot password?</NuxtLink
   >
   <p class="text-sm">
-    Need help?
+    need help?
     <a
       class="text-blue-600 cursor-pointer"
       :href="generateMailToLink()"
       target="_blank"
-      >Contact {{ config.public.appName }} support</a
+      >contact {{ config.public.appName }} support</a
     >
   </p>
 </template>

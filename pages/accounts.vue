@@ -11,6 +11,23 @@
       customCss="justify-self-end"
     />
   </div>
+  <div
+    class="flex justify-between p-5 font-bold rounded-xl border-[1px] bg-lightbase border-base text-left md:text-3xl text-2xl"
+  >
+    <p>Total Balance</p>
+    <p>
+      {{ currencySignMap[currency] }}
+      {{
+        formatMoney(
+          accounts
+            .filter((acc) => acc.currency === currency)
+            .reduce((acc, curr) => {
+              return acc + (curr.balance || 0);
+            }, 0)
+        )
+      }}
+    </p>
+  </div>
   <div v-if="recordIsInPullingState[ACCOUNTS]">
     <div
       v-for="i in 2"
@@ -128,18 +145,19 @@
 </template>
 <script lang="ts">
 import { notify } from "@kyvg/vue3-notification";
-import { defineComponent } from "vue";
 
+import { useAppUserConfigStore } from "~/store/config";
 import {
   ACCOUNTS,
   ACCOUNT_TRANSACTIONS,
   ACCOUNT_ASSETS,
 } from "~/services/schemas";
 import { useAppStore } from "~/store";
-import type {
-  AccountAssetDTO,
-  AccountDTO,
-  AccountStatementDTO,
+import {
+  type AccountAssetDTO,
+  type AccountDTO,
+  type AccountStatementDTO,
+  currencySignMap,
 } from "~/types/accounts";
 
 export default defineComponent({
@@ -149,10 +167,12 @@ export default defineComponent({
       ogTitle: "Accounts",
     });
     const { $api } = useNuxtApp();
-    const { $launchMono, deleteRecordsFromProtocol } = useAppVueUtils();
+    const { $launchMono } = useAppVueUtils();
+    const { deleteRecordsFromProtocol } = useWeb5VueUtils();
 
     const { createRecord, findRecords } = useWeb5VueUtils();
     const { accounts, recordIsInPullingState } = storeToRefs(useAppStore());
+    const { currency } = storeToRefs(useAppUserConfigStore());
     const { updateLoadingScreenText } = useAppStore();
     const viewSingleAccountModal = ref(false);
     const unlinkBtnLoading = ref(false);
@@ -191,8 +211,7 @@ export default defineComponent({
             item,
             ACCOUNT_TRANSACTIONS,
             accountRecord?.recordId,
-            item.date,
-            item.statementId
+            item.date
           )
         ),
         ...accountAssets.map((item) =>
@@ -302,6 +321,8 @@ export default defineComponent({
       confirmUnlinkModal,
       ACCOUNTS,
       recordIsInPullingState,
+      currency,
+      currencySignMap,
     };
   },
 });

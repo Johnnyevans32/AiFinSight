@@ -80,8 +80,7 @@ export default defineComponent({
     });
 
     const { appThemeColor } = storeToRefs(useAppUserConfigStore());
-    const { findRecords, configureProtocol, createSignedAuthToken } =
-      useWeb5VueUtils();
+    const { findRecords, configureProtocol } = useWeb5VueUtils();
     const {
       setAccounts,
       setAssets,
@@ -89,19 +88,28 @@ export default defineComponent({
       updateRecordPullingStatus,
       setMyDid,
     } = useAppStore();
+
+    watch(appThemeColor, () => {
+      setBrowserThemeColor();
+    });
+
+    const browserThemeMap: any = {
+      base: "244, 244, 244",
+      cherry: "255, 255, 255",
+      coffee: "255, 255, 255",
+      dark: "0, 0, 0",
+      white: "255, 255, 255",
+      ocean: "255, 255, 255",
+      forest: "255, 255, 255",
+      midnight: "0, 0, 0",
+      sunflower: "255, 255, 255",
+      "ocean-breeze": "255, 255, 255",
+      "royal-purple": "255, 255, 255",
+      "lavender-dream": "255, 255, 255",
+      lemon: "255, 255, 255",
+    };
     onBeforeMount(async () => {
       try {
-        const themeColorDOM = document.querySelector(
-          'meta[name="theme-color"]'
-        );
-
-        if (themeColorDOM)
-          themeColorDOM.setAttribute("content", `rgb(var(--bg-bgbase))`);
-
-        setMyDid($did);
-
-        await $api.userService.ping();
-        await createSignedAuthToken();
         const monoJS = "https://connect.withmono.com/connect.js";
         const script = document.createElement("script");
         script.src = monoJS;
@@ -109,6 +117,10 @@ export default defineComponent({
         if (!document.querySelector(`[src="${monoJS}"]`)) {
           document.body.appendChild(script);
         }
+        setMyDid($did);
+
+        setBrowserThemeColor();
+        $api.userService.ping();
 
         updateRecordPullingStatus(ACCOUNT_TRANSACTIONS, true);
         updateRecordPullingStatus(ACCOUNTS, true);
@@ -130,6 +142,17 @@ export default defineComponent({
       }
     });
 
+    const setBrowserThemeColor = () => {
+      const themeColorDOM = document.querySelector('meta[name="theme-color"]');
+
+      if (themeColorDOM) {
+        themeColorDOM.setAttribute(
+          "content",
+          `rgb(${browserThemeMap[appThemeColor.value]})`
+        );
+      }
+    };
+
     return {
       appThemeColor,
     };
@@ -139,10 +162,8 @@ export default defineComponent({
 
 <style>
 html {
-  font-family: "Farfetch Basis Regular";
-}
-.specialfont {
-  font-family: "Panchang", sans-serif;
+  /* font-family: "Farfetch Basis Regular"; */
+  font-family: "PowerGroteskTrial-Regular";
 }
 
 @font-face {
@@ -150,9 +171,15 @@ html {
   src: local("PowerGroteskTrial"),
     url("./assets/PowerGroteskTrial-Bold.ttf") format("truetype");
 }
-
-.logo {
-  font-family: "PowerGroteskTrial-Bold", sans-serif;
+@font-face {
+  font-family: "PowerGroteskTrial-Light";
+  src: local("PowerGroteskTrial"),
+    url("./assets/PowerGroteskTrial-Light.ttf") format("truetype");
+}
+@font-face {
+  font-family: "PowerGroteskTrial-Regular";
+  src: local("PowerGroteskTrial"),
+    url("./assets/PowerGroteskTrial-Regular.ttf") format("truetype");
 }
 
 *,

@@ -7,8 +7,9 @@
       <h2 class="md:text-xl text-sm">{{ currency }}{{ value }}</h2>
     </div>
 
-    <div class="flex flex-col justify-between items-end">
+    <div class="flex flex-col justify-between">
       <chart-income-expense-trend
+        v-if="!recordIsInPullingState[ACCOUNT_TRANSACTIONS]"
         :data="data"
         :periods="periods"
         class="md:block hidden"
@@ -33,7 +34,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { useAppStore } from "~/store";
+import { ACCOUNT_TRANSACTIONS } from "~/services/schemas";
+
 export default defineComponent({
   props: {
     icon: String,
@@ -57,6 +60,7 @@ export default defineComponent({
     },
   },
   async setup(props) {
+    const { recordIsInPullingState } = storeToRefs(useAppStore());
     const differenceIcon = computed(() => {
       return props.difference < 0 ? "arrow-trend-down" : "arrow-trend-up";
     });
@@ -75,7 +79,14 @@ export default defineComponent({
         : "text-green-600";
     });
 
-    return { differenceIcon, differenceClass, trendIconClass, labelIconClass };
+    return {
+      differenceIcon,
+      differenceClass,
+      trendIconClass,
+      labelIconClass,
+      recordIsInPullingState,
+      ACCOUNT_TRANSACTIONS,
+    };
   },
 });
 </script>

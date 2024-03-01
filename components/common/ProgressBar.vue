@@ -1,8 +1,8 @@
 <template>
-  <div class="w-full bg-gray-200 rounded-xl h-2.5">
+  <div :class="customCss" class="w-full bg-gray-200 rounded-xl h-2">
     <div
       :class="progressBarColor"
-      class="h-2.5 rounded-xl"
+      class="h-full rounded-xl"
       :style="'width:' + Math.min(percentage, 100) + '%'"
     ></div>
   </div>
@@ -16,6 +16,9 @@ export default defineComponent({
     percentage: {
       type: Number,
       required: true,
+    },
+    customCss: {
+      type: String,
     },
   },
   setup(props, ctx) {

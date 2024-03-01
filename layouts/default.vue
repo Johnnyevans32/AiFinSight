@@ -18,18 +18,22 @@
     :loop="true"
     :reminders="[10, 15]"
     :wait="5"
-    :duration="300"
+    :duration="durationOfScreenLockUntilLockInMins * 60"
   />
 </template>
 
 <script lang="ts">
 import { notify } from "@kyvg/vue3-notification";
+import { useAppUserConfigStore } from "~/store/config";
 import { useAppStore } from "~/store";
 export default defineComponent({
   setup() {
     const route = useRoute();
     const { user } = storeToRefs(useAppStore());
     const { setAppLocked } = useAppStore();
+    const { durationOfScreenLockUntilLockInMins } = storeToRefs(
+      useAppUserConfigStore()
+    );
     const onidle = async () => {
       setAppLocked(true);
       await navigateTo(`/guard?redirect=${route.fullPath}`);
@@ -45,7 +49,7 @@ export default defineComponent({
         title: `We care about your security! To ensure the safety of your account, you will be automatically locked out if there is no activity detected for ${time} seconds. Please stay active to avoid being locked out.`,
       });
     };
-    return { onremind, onidle, user };
+    return { onremind, onidle, user, durationOfScreenLockUntilLockInMins };
   },
 });
 </script>

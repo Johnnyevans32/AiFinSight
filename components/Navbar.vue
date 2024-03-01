@@ -5,7 +5,7 @@
     <nav class="grid grid-cols-3 justify-items-center">
       <div class="justify-self-start flex space-x-2 w-40 items-center">
         <img :src="`./logo.jpg`" alt="logo" class="w-7 h-7 rounded-xl" />
-        <span class="logo">{{ config.public.appName }}</span>
+        <span>{{ config.public.appName }}</span>
       </div>
 
       <div class="flex justify-center">
@@ -35,10 +35,10 @@
         :key="item.name"
         role="tab"
         v-bind:class="{ active: activeNavbar === item.name }"
-        class="cursor-pointer w-full flex flex-col py-4 px-2 text-center hover:text-base transition duration-300"
+        class="cursor-pointer w-full flex flex-col py-3 px-2 text-center hover:text-base transition duration-300"
       >
         <font-awesome-icon :icon="item.icon" />
-        <!-- <span class="text-xs">{{ item.name }}</span> -->
+        <span class="text-xs">{{ item.name }}</span>
       </NuxtLink>
     </nav>
   </div>
@@ -54,8 +54,8 @@ export default defineComponent({
 
     const items = ref([
       {
-        name: "Dashboard",
-        icon: "fa-solid fa-chart-pie",
+        name: "Home",
+        icon: "fa-solid fa-home",
         href: "/",
       },
       {
@@ -87,13 +87,13 @@ export default defineComponent({
 
     const activeNavbar = computed(() => {
       const { path } = route;
-      if (!path) return "Dashboard";
+      if (!path) return "Home";
 
       const pathSlice = (path as string).split("/");
 
       return (
         items.value.find((item) => item.href === `/${pathSlice[1]}`)?.name ||
-        "Dashboard"
+        "Home"
       );
     });
 

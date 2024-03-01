@@ -3,7 +3,15 @@
     <CommonPageBar mainPage="Budgets" />
   </div>
   <div class="flex items-center justify-between">
-    <h1 class="text-xl font-bold">Budgets</h1>
+    <CommonFormSelect
+      :selected="budgetMonth"
+      :options="monthOptions"
+      @change-option="
+        (newVal) => {
+          budgetMonth = newVal;
+        }
+      "
+    />
     <CommonButton
       text="Create Budget"
       @btn-action="createBudgetModal = true"
@@ -15,16 +23,15 @@
   >
     <div class="flex justify-between">
       <div class="flex flex-col text-left">
-        <span>Total Amount Spent</span>
+        <span>Total Spent</span>
         <span class="text-sm capitalize text-red-600"
           >{{ currencySignMap[currency] }}
           {{ formatMoney(formattedBudgets.overall.spent) }}</span
         >
       </div>
 
-      <p>{{ budgetPeriod }}</p>
       <div class="flex flex-col text-right">
-        <span>Total Budget Limit</span>
+        <span>Total Limit</span>
         <span class="text-sm capitalize"
           >{{ currencySignMap[currency] }}
           {{ formatMoney(formattedBudgets.overall.limit) }}
@@ -35,6 +42,7 @@
       :percentage="
         (formattedBudgets.overall.spent / formattedBudgets.overall.limit) * 100
       "
+      custom-css="h-4"
     />
   </div>
 
@@ -75,19 +83,16 @@
       @click="viewSingleBudget(budget)"
       class="cursor-pointer px-5 py-3 flex space-x-3 items-center rounded-xl text-base bg-lightbase border-[1px] border-base"
     >
-      <font-awesome-icon
-        :icon="generateIconMap(budget.category)"
-        class="h-5 w-5 rounded-xl p-2 cursor-pointer bg-bgbase"
-      />
+      <CommonImage type="icon" :image="generateIconMap(budget.category)" />
 
       <div class="flex flex-col w-full gap-1 text-left">
         <div class="flex justify-between">
-          <span class="capitalize font-bold">{{
+          <span class="capitalize font-bold text-xs">{{
             budget.category.replaceAll("_", " ")
           }}</span>
-          <span class="text-sm"
+          <!-- <span class="text-sm"
             >{{ budget.currencySign }} {{ formatMoney(budget.limit) }}
-          </span>
+          </span> -->
         </div>
 
         <CommonProgressBar
@@ -95,13 +100,12 @@
             ((budget.amountSpentOnCategoryBudget || 0) / budget.limit) * 100
           "
         />
-        <!-- <div class="flex justify-between">
-          <span class="text-sm"
+        <div class="flex justify-between text-xs">
+          <span
             >{{ budget.currencySign }}
             {{ formatMoney(budget.limit) }} limit</span
           >
           <span
-            class="text-sm"
             :class="
               budget.limit - (budget.amountSpentOnCategoryBudget || 0) < 0 &&
               'text-red-600'
@@ -113,29 +117,28 @@
               )
             }}
             left</span
-          > -->
-        <!-- </div> -->
+          >
+        </div>
       </div>
     </div>
   </div>
 
   <CommonModal
     :open="createBudgetModal"
-    title="Create budget"
+    title="Create a Budget"
     @change-modal-status="changeModalStatus"
   >
     <template v-slot:content>
       <div class="flex flex-col gap-4">
-        <CommonFormInput
-          v-model="limitModel"
-          inputType="number"
-          placeholder="0"
-          title="limit"
-        />
         <CommonFormSelect
           :selected="categoryModel"
           :options="Object.values(TransactionCategory)"
           @change-option="handleBudgetCategoryChange"
+        />
+        <CommonAmountInput
+          v-model="limitModel"
+          placeholder="Enter amount"
+          title="what's the most you want to spend in this spending category"
         />
       </div>
     </template>
@@ -155,22 +158,21 @@
   </CommonModal>
   <CommonModal
     :open="updateBudgetModal"
-    title="Update budget"
+    title="Update a Budget"
     @change-modal-status="changeModalStatus"
   >
     <template v-slot:content>
       <div class="flex flex-col gap-4">
-        <CommonFormInput
-          v-if="modalBudget?.limit"
-          v-model="modalBudget.limit"
-          inputType="number"
-          placeholder="0"
-          title="limit"
-        />
         <CommonFormSelect
           :selected="modalBudget?.category"
           :options="Object.values(TransactionCategory)"
           @change-option="handleBudgetCategoryUpdateChange"
+        />
+        <CommonAmountInput
+          v-if="modalBudget?.limit"
+          v-model="modalBudget.limit"
+          placeholder="Enter amount"
+          title="what's the most you want to spend in this spending category"
         />
       </div>
     </template>
@@ -223,18 +225,23 @@ export default defineComponent({
     const updateBudgetBtnLoading = ref(false);
     const modalBudget = ref<BudgetDTO | null>(null);
 
+    const monthOptions = Array.from({ length: 12 }, (_, index) =>
+      moment().clone().subtract(index, "months").startOf("month")
+    ).map((date) => date.format("MMMM YYYY"));
+    const budgetMonth = ref(monthOptions[0]);
+
     const createBudgetModal = ref(false);
     const { budgets, transactions, recordIsInPullingState } = storeToRefs(
       useAppStore()
     );
     const { currency } = storeToRefs(useAppUserConfigStore());
     const { setBudgets, updateRecordPullingStatus } = useAppStore();
-    const startOfMonth = ref(moment().startOf("month"));
-
-    const endOfMonth = ref(moment().endOf("month"));
-    const budgetPeriod = computed(() => {
-      return startOfMonth.value.format("MMMM YYYY");
-    });
+    const startOfMonth = computed(() =>
+      moment(budgetMonth.value, "MMMM YYYY").startOf("month")
+    );
+    const endOfMonth = computed(() =>
+      moment(budgetMonth.value, "MMMM YYYY").endOf("month")
+    );
 
     const formattedBudgets = computed(() => {
       const transactionsForPeriod = transactions.value.filter(
@@ -400,7 +407,7 @@ export default defineComponent({
     return {
       TransactionType,
       budgets,
-      budgetPeriod,
+      budgetMonth,
       formattedBudgets,
       currencySignMap,
       Currency,
@@ -422,6 +429,7 @@ export default defineComponent({
       recordIsInPullingState,
       BUDGETS,
       currency,
+      monthOptions,
     };
   },
 });

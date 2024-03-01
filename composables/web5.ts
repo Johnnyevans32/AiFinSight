@@ -3,21 +3,29 @@ import { DateSort } from "@tbd54566975/dwn-sdk-js";
 import { Record } from "@web5/api/dist/types/record";
 import { Protocol } from "@web5/api/dist/types/protocol";
 import { VerifiableCredential } from "@web5/credentials";
-import { DidKeyMethod, DidIonMethod } from "@web5/dids";
-import { Web5UserAgent } from "@web5/user-agent";
-import { ManagedDid, ManagedKeyPair } from "@web5/agent/dist/types";
-import { PortableDid } from "@web5/dids/dist/types";
-import { Jose } from "@web5/crypto";
 import moment from "moment";
 
 import { useAppStore } from "~/store";
-import { useAppUserConfigStore } from "~/store/config";
+import {
+  ACCOUNTS,
+  ACCOUNT_TRANSACTIONS,
+  ACCOUNT_ASSETS,
+  BUDGETS,
+  CONVERSATIONS,
+} from "~/services/schemas";
 
 export function useWeb5VueUtils() {
-  const { $web5 } = useNuxtApp();
-  const { dwnEndpoint } = storeToRefs(useAppUserConfigStore());
-  const { myDid } = storeToRefs(useAppStore());
-  const { setVcJwt } = useAppStore();
+  const { $web5, $api } = useNuxtApp();
+  const { myDid, transactions, assets, accounts, budgets, conversations } =
+    storeToRefs(useAppStore());
+
+  const {
+    setAccounts,
+    setTransactions,
+    setAssets,
+    setConversations,
+    setBudgets,
+  } = useAppStore();
 
   const validateDwnEnpoint = async (dwnUrl: string) => {
     try {
@@ -70,6 +78,12 @@ export function useWeb5VueUtils() {
           : {}),
       },
     });
+
+    console.log({
+      record,
+      status,
+    });
+
     if (status.code !== 202) {
       throw Error(status.detail);
     }
@@ -180,100 +194,69 @@ export function useWeb5VueUtils() {
   };
 
   const createSignedAuthToken = async () => {
-    const { managedDid } = await getUserPortableDidAndAgent();
-
-    const bob = await DidKeyMethod.create();
-
-    const alice = await DidKeyMethod.create();
     const authAuthorizationVc = await VerifiableCredential.create({
       type: "AuthAuthorization",
-      issuer: bob.did,
-      subject: bob.did,
+      issuer: myDid.value,
+      subject: myDid.value,
       data: { data: "ok" },
       expirationDate: moment()
         .add(1, "minutes")
         .toISOString()
         .replace(/\.\d+Z$/, "Z"),
     });
-
-    const signedVcJwt = await authAuthorizationVc.sign({
-      did: alice,
-    });
-
-    // setVcJwt(signedVcJwt);
-
-    console.log({ signedVcJwt, bob, alice });
-
-    const verified = await VerifiableCredential.verify({ vcJwt: signedVcJwt });
-    const parsed = VerifiableCredential.parseJwt({
-      vcJwt: signedVcJwt,
-    });
-    console.log({ verified, parsed });
   };
 
-  const getUserPortableDidAndAgent = async () => {
-    try {
-      const userAgent = await Web5UserAgent.create();
+  const deleteRecordsFromProtocol = async (
+    deleteAll = false,
+    accountIds: string[] = accounts.value.map((acc) => acc.accountId)
+  ) => {
+    accountIds.map((accountId) => $api.accountService.disconnect(accountId));
 
-      await userAgent.start({ passphrase: "insecure-static-phrase" });
-      const identities = (await userAgent.identityManager.list()).filter(
-        (i) => i.name === AGENT_MANAGER_NAME
-      );
-      const storedIdentities = identities.length;
-      let managedDid: ManagedDid | PortableDid;
-      if (storedIdentities === 0) {
-        const didOptions = await DidIonMethod.generateDwnOptions({
-          serviceEndpointNodes: [dwnEndpoint.value],
-        });
+    const deleteRecordPromises = [
+      ...accounts.value
+        .filter(
+          (account) => accountIds.includes(account.accountId) || deleteAll
+        )
+        .map((account) => deleteRecord(account.recordId || "", ACCOUNTS)),
+      ...transactions.value
+        .filter((txn) => accountIds.includes(txn.accountId) || deleteAll)
+        .map((txn) => deleteRecord(txn.recordId || "", ACCOUNT_TRANSACTIONS)),
+      ...assets.value
+        .filter((asset) => accountIds.includes(asset.accountId) || deleteAll)
+        .map((asset) => deleteRecord(asset.recordId || "", ACCOUNT_ASSETS)),
+      ...(deleteAll
+        ? budgets.value.map((budget) =>
+            deleteRecord(budget.recordId || "", BUDGETS)
+          )
+        : []),
+      ...(deleteAll
+        ? conversations.value.map((conversation) =>
+            deleteRecord(conversation.recordId || "", CONVERSATIONS)
+          )
+        : []),
+    ];
 
-        managedDid = await DidIonMethod.create({
-          services: didOptions.services,
-        });
+    await Promise.all(deleteRecordPromises);
+    const updatedAccounts = accounts.value.filter(
+      (acc) => !accountIds.includes(acc.accountId) && !deleteAll
+    );
+    const updatedTransactions = transactions.value.filter(
+      (txn) => !accountIds.includes(txn.accountId) && !deleteAll
+    );
+    const updatedAssets = assets.value.filter(
+      (asset) => !accountIds.includes(asset.accountId) && !deleteAll
+    );
 
-        const identity = {
-          did: managedDid.did,
-          name: AGENT_MANAGER_NAME,
-        };
-        await userAgent.identityManager.import({
-          identity,
-          context: userAgent.agentDid,
-        });
-        await userAgent.didManager.import({
-          alias: "LOL",
-          did: managedDid,
-          context: userAgent.agentDid,
-          kms: "local",
-        });
-      } else {
-        const [identity] = identities;
+    setAccounts(updatedAccounts);
+    setTransactions(updatedTransactions);
+    setAssets(updatedAssets);
 
-        const result = await userAgent.didManager.get({
-          didRef: identity.did,
-        });
-        if (!result) throw new Error("No did found");
-
-        managedDid = result;
-        await Promise.all(
-          (managedDid.keySet.verificationMethodKeys || []).map(async (key) => {
-            if (!key.keyManagerId) return;
-            const keyData = (await userAgent.keyManager.getKey({
-              keyRef: key.keyManagerId,
-            })) as ManagedKeyPair;
-            key.privateKeyJwk = (await Jose.cryptoKeyToJwk({
-              key: {
-                ...(keyData.privateKey as any),
-                material: keyData.publicKey.material,
-              },
-            })) as any;
-          })
-        );
-      }
-      return { managedDid, userAgent };
-    } catch (err) {
-      console.error(err);
-      throw err;
+    if (deleteAll) {
+      setBudgets([]);
+      setConversations([]);
     }
   };
+
   return {
     findRecords,
     updateRecord,
@@ -283,6 +266,6 @@ export function useWeb5VueUtils() {
     validateDwnEnpoint,
     findOrUpdateRecord,
     createSignedAuthToken,
-    getUserPortableDidAndAgent,
+    deleteRecordsFromProtocol,
   };
 }

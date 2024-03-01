@@ -2,12 +2,12 @@ import { Currency } from "~/types/accounts";
 
 export enum AppThemeEnum {
   LIGHT = "light",
-  DARK = "dark",
-  COFFEE = "coffee",
   WHITE = "white",
-  FOREST = "forest",
+  DARK = "dark",
   MIDNIGHT = "midnight",
-  OCEAN_BREEZE = "ocean-breeze",
+  COFFEE = "coffee",
+  // FOREST = "forest",
+  // OCEAN = "ocean",
   LAVENDER_DREAM = "lavender-dream",
   LEMON = "lemon",
 }
@@ -15,9 +15,10 @@ export enum AppThemeEnum {
 export const useAppUserConfigStore = defineStore(
   "appUserConfigStore",
   () => {
-    const appThemeColor = ref<string>("light");
+    const appThemeColor = ref<string>("white");
     const dwnEndpoint = ref("https://dwn.tbddev.org/dwn1");
     const currency = ref(Currency.NGN);
+    const durationOfScreenLockUntilLockInMins = ref(5);
 
     function setDwnEndpoint(_dwnEndpoint: string) {
       dwnEndpoint.value = _dwnEndpoint;
@@ -29,13 +30,19 @@ export const useAppUserConfigStore = defineStore(
     function setCurrency(_currency: Currency) {
       currency.value = _currency;
     }
+
+    function setDurationOfScreenLockUntilLockInMins(_time: number) {
+      durationOfScreenLockUntilLockInMins.value = _time;
+    }
     return {
       dwnEndpoint,
       appThemeColor,
       currency,
+      durationOfScreenLockUntilLockInMins,
       setDwnEndpoint,
       toggleAppTheme,
       setCurrency,
+      setDurationOfScreenLockUntilLockInMins,
     };
   },
   {

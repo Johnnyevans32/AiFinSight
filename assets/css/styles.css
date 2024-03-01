@@ -3,7 +3,7 @@
 @tailwind utilities;
 @layer base {
   :root {
-    --bg-bgbase: 255, 255, 255;
+    --bg-bgbase: 244, 244, 244;
     --bg-base: 169, 173, 179;
     --bg-lightbase: 219, 223, 229;
     --bg-hoverlightbase: 209, 213, 219;

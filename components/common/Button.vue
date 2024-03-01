@@ -4,7 +4,7 @@
     @click="handleBtnClickAction"
     :disabled="disabled || loading"
     :class="`${disabled && 'cursor-not-allowed'} ${customCss}`"
-    class="rounded-xl justify-between flex items-center py-2 px-4 h-[4vh] border-[1px] border-base bg-lightbase"
+    class="rounded-xl justify-between flex items-center py-2 px-4 border-[1px] border-base bg-lightbase"
   >
     <img
       v-show="image"

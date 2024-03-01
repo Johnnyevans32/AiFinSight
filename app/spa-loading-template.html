@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.cdnfonts.com/css/mordeka" rel="stylesheet" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        color: rgb(141, 194, 0);
+        background: rgb(0, 0, 0);
+        font-family: "Mordeka", sans-serif;
+        font-size: 2vh;
+      }
+
+      h1 {
+        font-size: 3vh;
+      }
+
+      .h-full {
+        height: 100vh;
+      }
+
+      .w-full {
+        width: 100vw;
+      }
+
+      .flex {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .items-center {
+        align-items: center;
+      }
+
+      .justify-center {
+        justify-content: center;
+      }
+
+      .rounded-xl {
+        border-radius: 0.5rem;
+      }
+
+      /* Curtain-down transition */
+      .fade-out {
+        transition: transform 1s ease, opacity 1s ease;
+        transform: translateY(100%);
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading" class="h-full w-full flex items-center justify-center">
+      <img
+        src="https://i.ibb.co/3krjwsK/1000198972.jpg"
+        width="80px"
+        height="auto"
+        class="rounded-xl"
+      />
+      <h1>Finsight AI</h1>
+      <p>your decentralied financial companion</p>
+    </div>
+
+    <script>
+      // Simulate leaving the loading page after 3 seconds
+      setTimeout(() => {
+        document.getElementById("loading").classList.add("fade-out");
+      }, 4000);
+    </script>
+  </body>
+</html>

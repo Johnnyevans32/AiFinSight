@@ -37,9 +37,10 @@
     <div class="flex gap-2 items-center md:w-fit w-full">
       <CommonFormInput
         v-model="searchQueryModel"
-        inputType="text"
-        :placeholder="String.fromCodePoint(0x1f50d) + ' search transactions'"
+        inputType="search"
+        placeholder="search transactions"
         @keyup.enter="searchItem"
+        customCss="pr-3 pl-9"
         class="w-full"
       />
       <!-- <font-awesome-icon
@@ -136,11 +137,13 @@
           <span
             class="font-bold"
             :class="
-              txn?.type === TransactionType.CREDIT ? 'text-green-600' : ''
+              txn?.type === TransactionType.CREDIT
+                ? 'text-green-600'
+                : 'text-red-600'
             "
             >{{ txn.currencySign }} {{ formatMoney(txn.amount) }}
           </span>
-          <span class="font-thin text-sm"
+          <span class="text-sm"
             >{{ txn.currencySign }} {{ formatMoney(txn.balance) }}</span
           >
         </div>
@@ -254,9 +257,12 @@ import { useAppUserConfigStore } from "~/store/config";
 
 export default defineComponent({
   async setup() {
-    const { transactions, accounts, recordIsInPullingState } = storeToRefs(
-      useAppStore()
-    );
+    const {
+      transactions,
+      transactionsInPageView,
+      accounts,
+      recordIsInPullingState,
+    } = storeToRefs(useAppStore());
     const { currency } = storeToRefs(useAppUserConfigStore());
     const { setTransactions } = useAppStore();
     const { updateRecord } = useWeb5VueUtils();
@@ -273,18 +279,7 @@ export default defineComponent({
     const updateTransactionBtnLoading = ref(false);
     const modalTransaction = ref<AccountStatementDTO | null>(null);
 
-    const transactionsInPageView = ref<AccountStatementDTO[]>(
-      transactions.value
-    );
-
-    const paginatedTransactions = computed(() => {
-      return paginate<AccountStatementDTO>(
-        transactionsInPageView.value,
-        currentPage.value,
-        10,
-        "date"
-      );
-    });
+    const txnLen = computed(() => transactions.value.length);
 
     const searchItem = () => {
       const trimmedSearchQuery = searchQueryModel.value.trim();
@@ -306,7 +301,17 @@ export default defineComponent({
 
     const formatedTransactions = computed<
       Record<string, AccountStatementDTO[]>
-    >(() => groupByDate(paginatedTransactions.value, "date"));
+    >(() =>
+      groupByDate(
+        paginate<AccountStatementDTO>(
+          transactionsInPageView.value,
+          currentPage.value,
+          10,
+          "date"
+        ),
+        "date"
+      )
+    );
 
     const overviewData = computed(() => {
       const startOfOverviewMonth = moment(
@@ -504,6 +509,7 @@ export default defineComponent({
       overviewMonthOptions,
       overviewMonth,
       currency,
+      txnLen,
     };
   },
 });
