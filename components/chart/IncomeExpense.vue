@@ -62,6 +62,29 @@ export default defineComponent({
               color: "#999",
             },
           },
+          padding: 0,
+          formatter: function (params: any) {
+            let tooltip =
+              "<div class='tooltip bg-lightbase text-base border-[1px] border-base text-tiny p-2 m-0'>";
+            const period = params[0].name;
+            tooltip += `
+              <div class='flex justify-between gap-2'>
+                <p>Period:</p>
+                <p>${period}</p>
+              </div>`;
+            params.forEach((param: any) => {
+              const seriesName = param.seriesName;
+              const value = param.value;
+              const formattedValue = `₦ ${formatMoney(Number(value))}`;
+              tooltip += `
+              <div class='flex justify-between gap-2'>
+                <p>${seriesName}:</p>
+                <p>${formattedValue}</p>
+              </div>`;
+            });
+            tooltip += "</div>";
+            return tooltip;
+          },
         },
         toolbox: {
           feature: {
@@ -98,11 +121,6 @@ export default defineComponent({
             name: "Income",
             type: "bar",
             stack: "total",
-            tooltip: {
-              valueFormatter: function (value: string) {
-                return `₦ ${formatMoney(Number(value))}`;
-              },
-            },
             emphasis: {
               focus: "series",
             },
@@ -119,11 +137,6 @@ export default defineComponent({
             name: "Expense",
             stack: "total",
             type: "bar",
-            tooltip: {
-              valueFormatter: function (value: string) {
-                return `₦ ${formatMoney(Number(value))}`;
-              },
-            },
             emphasis: {
               focus: "series",
             },
@@ -143,11 +156,6 @@ export default defineComponent({
             emphasis: {
               focus: "series",
             },
-            tooltip: {
-              valueFormatter: function (value: string) {
-                return `₦ ${formatMoney(Number(value))}`;
-              },
-            },
             itemStyle: {
               color: "#facc15",
             },
@@ -164,3 +172,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.tooltip {
+  font-family: "PowerGroteskTrial-Regular";
+}
+</style>
