@@ -245,14 +245,16 @@ export default defineComponent({
         completedPromises++;
         loadingProgress = Math.floor((completedPromises / totalPromises) * 100);
         updateLoadingScreenText(
-          `Migrating financial data from your bank, ${loadingProgress}% done...`
+          `Transferring your financial data from your bank to dwn. Progress: ${loadingProgress}%. Please hold on, we're almost there!`
         );
       };
 
       await Promise.allSettled(
         promises.map((promise) => promise.then(updateProgress))
       );
-      updateLoadingScreenText();
+      updateLoadingScreenText(
+        "Finalizing migration cleanup... We're almost done!"
+      );
     };
 
     const launchMono = async () => {

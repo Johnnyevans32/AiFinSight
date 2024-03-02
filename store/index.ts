@@ -11,7 +11,7 @@ import { ACCOUNT_TRANSACTIONS, ACCOUNTS, BUDGETS } from "~/services/schemas";
 export const useAppStore = defineStore("appStore", () => {
   const loadingScreenEnabled = ref<boolean>(false);
   const loadingScreenText = ref(
-    "Migrating financial data, it might take a minute or more.... hang tight 👨🏽‍🔧"
+    "We're fetching your financial data from your bank. This process may take a minute or more, so you might want to grab a coffee and relax. Hang tight! 👨🏽‍🔧"
   );
 
   const appLocked = ref(true);

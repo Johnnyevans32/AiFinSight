@@ -11,9 +11,9 @@ import {
   TooltipComponent,
   LegendComponent,
   ToolboxComponent,
-  DataZoomComponent,
   GridComponent,
 } from "echarts/components";
+import { UniversalTransition } from "echarts/features";
 
 echarts.use([
   BarChart,
@@ -21,9 +21,9 @@ echarts.use([
   TooltipComponent,
   LegendComponent,
   ToolboxComponent,
-  DataZoomComponent,
   CanvasRenderer,
   GridComponent,
+  UniversalTransition,
 ]);
 export default defineComponent({
   props: {
@@ -100,7 +100,7 @@ export default defineComponent({
             stack: "total",
             tooltip: {
               valueFormatter: function (value: string) {
-                return `₦${value}`;
+                return `₦ ${formatMoney(Number(value))}`;
               },
             },
             emphasis: {
@@ -121,7 +121,7 @@ export default defineComponent({
             type: "bar",
             tooltip: {
               valueFormatter: function (value: string) {
-                return `₦${value}`;
+                return `₦ ${formatMoney(Number(value))}`;
               },
             },
             emphasis: {
@@ -145,7 +145,7 @@ export default defineComponent({
             },
             tooltip: {
               valueFormatter: function (value: string) {
-                return `₦${value}`;
+                return `₦ ${formatMoney(Number(value))}`;
               },
             },
             itemStyle: {

@@ -11,18 +11,18 @@ import {
   TooltipComponent,
   LegendComponent,
   ToolboxComponent,
-  DataZoomComponent,
   GridComponent,
 } from "echarts/components";
+import { UniversalTransition } from "echarts/features";
 
 echarts.use([
   LineChart,
   TooltipComponent,
   LegendComponent,
   ToolboxComponent,
-  DataZoomComponent,
   CanvasRenderer,
   GridComponent,
+  UniversalTransition,
 ]);
 export default defineComponent({
   props: {
@@ -93,7 +93,7 @@ export default defineComponent({
           smooth: false,
           tooltip: {
             valueFormatter: function (value: string) {
-              return `₦${value}`;
+              return `₦ ${formatMoney(Number(value))}`;
             },
           },
         })),
