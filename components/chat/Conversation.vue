@@ -16,32 +16,30 @@
         <div
           v-for="(conversation, i) in conversations"
           :key="i"
-          class="flex flex-col gap-2"
+          class="flex items-start gap-2"
         >
-          <div class="flex items-start gap-2">
-            <img
-              v-if="myDid && conversation.author === 'user'"
-              :src="`https://robohash.org/${myDid}`"
-              alt="avatar"
-              class="w-10 h-10 rounded-xl bg-lightbase"
-            />
-            <div
-              v-else-if="conversation.author === 'ai'"
-              class="w-10 h-10 rounded-xl bg-lightbase flex items-center justify-center"
-            >
-              <font-awesome-icon icon="fa-brands fa-android" class="text-2xl" />
-            </div>
-            <div class="flex flex-col items-start">
-              <p>
-                <b class="font-bold">
-                  {{ conversation.author === "user" ? "You " : "Finsight AI " }}
-                </b>
-                <span class="text-sm">
-                  {{ formatDate(conversation.date, "h:mm A") }}</span
-                >
-              </p>
-              <p class="text-left">{{ conversation.message }}</p>
-            </div>
+          <img
+            v-if="myDid && conversation.author === 'user'"
+            :src="`https://robohash.org/${myDid}`"
+            alt="avatar"
+            class="w-10 h-10 rounded-xl bg-lightbase"
+          />
+          <div
+            v-else-if="conversation.author === 'ai'"
+            class="w-10 h-10 p-2 rounded-xl bg-lightbase flex items-center justify-center"
+          >
+            <font-awesome-icon icon="fa-brands fa-android" class="text-2xl" />
+          </div>
+          <div class="flex flex-col items-start">
+            <p>
+              <b class="font-bold">
+                {{ conversation.author === "user" ? "You " : "Finsight AI " }}
+              </b>
+              <span class="text-sm">
+                {{ formatDate(conversation.date, "h:mm A") }}</span
+              >
+            </p>
+            <p class="text-left">{{ conversation.message }}</p>
           </div>
         </div>
       </TransitionGroup>

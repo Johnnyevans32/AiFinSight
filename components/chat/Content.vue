@@ -268,11 +268,13 @@ export default defineComponent({
           });
           return;
         }
-        addToConversations(prompt.value, "user");
+        const userPrompt = prompt.value;
+        prompt.value = "";
+        addToConversations(userPrompt, "user");
 
         const response = await $api.aiService.chat(
           userFinanceContext.value,
-          prompt.value
+          userPrompt
         );
 
         addToConversations(response, "ai");

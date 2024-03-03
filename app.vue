@@ -71,30 +71,10 @@ export default defineComponent({
   async setup() {
     const config = useRuntimeConfig();
     const { $did, $api } = useNuxtApp();
-    useHead({
-      titleTemplate: (titleChunk) => {
-        return titleChunk && titleChunk !== config.public.appName
-          ? `${config.public.appName}: ${titleChunk}`
-          : config.public.appName;
-      },
-    });
 
     const { appThemeColor } = storeToRefs(useAppUserConfigStore());
-    const { findRecords, configureProtocol } = useWeb5VueUtils();
-    const {
-      setAccounts,
-      setAssets,
-      setTransactions,
-      updateRecordPullingStatus,
-      setMyDid,
-    } = useAppStore();
-
-    watch(appThemeColor, () => {
-      setBrowserThemeColor();
-    });
-
     const browserThemeMap: any = {
-      base: "244, 244, 244",
+      light: "244, 244, 244",
       cherry: "255, 255, 255",
       coffee: "255, 255, 255",
       dark: "0, 0, 0",
@@ -108,6 +88,34 @@ export default defineComponent({
       "lavender-dream": "255, 255, 255",
       lemon: "255, 255, 255",
     };
+
+    useHead({
+      titleTemplate: (titleChunk) => {
+        return titleChunk && titleChunk !== config.public.appName
+          ? `${config.public.appName}: ${titleChunk}`
+          : config.public.appName;
+      },
+      meta: [
+        {
+          name: "theme-color",
+          content: `rgb(${browserThemeMap[appThemeColor.value]})`,
+        },
+      ],
+    });
+
+    const { findRecords, configureProtocol } = useWeb5VueUtils();
+    const {
+      setAccounts,
+      setAssets,
+      setTransactions,
+      updateRecordPullingStatus,
+      setMyDid,
+    } = useAppStore();
+
+    watch(appThemeColor, () => {
+      setBrowserThemeColor();
+    });
+
     onBeforeMount(async () => {
       try {
         const monoJS = "https://connect.withmono.com/connect.js";
@@ -143,14 +151,18 @@ export default defineComponent({
     });
 
     const setBrowserThemeColor = () => {
-      const themeColorDOM = document.querySelector('meta[name="theme-color"]');
+      let themeColorDOM = document.querySelector('meta[name="theme-color"]');
 
-      if (themeColorDOM) {
-        themeColorDOM.setAttribute(
-          "content",
-          `rgb(${browserThemeMap[appThemeColor.value]})`
-        );
+      if (!themeColorDOM) {
+        themeColorDOM = document.createElement("meta");
+        themeColorDOM.setAttribute("name", "theme-color");
+        document.head.appendChild(themeColorDOM);
       }
+
+      themeColorDOM.setAttribute(
+        "content",
+        `rgb(${browserThemeMap[appThemeColor.value]})`
+      );
     };
 
     return {
